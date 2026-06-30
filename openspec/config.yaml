@@ -1,0 +1,60 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: Static frontend — HTML5, CSS3, vanilla JavaScript (ES6+)
+  Architecture: Single-page application, no framework, no bundler
+  Testing: No test runner detected — strict TDD is not applicable
+  Style: Plain CSS with responsive design, progressive enhancement
+  Features: Web Speech API (voice recognition + TTS), interactive exercises,
+    structured B1-level learning path, pronunciation feedback
+
+strict_tdd: false
+strict_tdd_reason: >
+  No test runner, test framework, or testing configuration detected.
+  This is a static HTML/CSS/JS frontend project with no build step.
+  Strict TDD (RED-GREEN-REFACTOR) is not applicable without a test runner.
+  Manual/visual testing will be used instead.
+
+testing:
+  runner:
+    available: false
+    command: ""
+    framework: ""
+  layers:
+    unit: { available: false, tool: "—" }
+    integration: { available: false, tool: "—" }
+    e2e: { available: false, tool: "—" }
+  coverage:
+    available: false
+    command: ""
+  quality:
+    linter: { available: false, command: "—" }
+    type_checker: { available: false, command: "—" }
+    formatter: { available: false, command: "—" }
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Describe Web Speech API integration approach
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Include voice recognition edge cases (accents, noise, silence)
+  design:
+    - Include component tree for the UI
+    - Document data flow for exercise state management
+    - Document Web Speech API integration points
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: ""
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
