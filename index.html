@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aplicación interactiva para aprender italiano nivel B1">
+  <title>Italiano B1</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/exercises.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Saltar al contenido</a>
+  <header>
+    <div class="header-inner">
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Menú de navegación">☰</button>
+      <button class="logo-btn" id="home-btn" aria-label="Ir al inicio">🇮🇹 Italiano B1</button>
+      <div class="header-controls">
+        <span id="learner-name" class="learner-name" aria-live="polite"></span>
+        <span id="streak-counter" class="streak-counter" aria-label="Racha actual">🔥 <span id="streak-count">0</span></span>
+        <button id="dark-toggle" class="icon-btn" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">🌙</button>
+        <button id="switcher-btn" class="icon-btn" aria-label="Cambiar de aprendiz" title="Cambiar de aprendiz">👤</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Sidebar -->
+    <aside id="sidebar" aria-label="Lista de módulos">
+      <!-- Sidebar rendered by App.renderSidebar() -->
+    </aside>
+
+    <!-- Home: Module Grid -->
+    <section id="section-home" class="active" aria-label="Selección de módulo">
+      <h1>Selecciona un módulo</h1>
+      <div id="progress-summary" class="progress-summary" role="region" aria-label="Resumen de progreso">
+        <div class="progress-summary-header">
+          <span class="progress-summary-icon">📊</span>
+          <h2>Tu Progreso</h2>
+        </div>
+        <div class="progress-stats" id="progress-stats">
+          <!-- Rendered dynamically -->
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-track">
+            <div id="overall-progress-bar" class="progress-bar-fill" style="width:0%"></div>
+          </div>
+          <span id="overall-pct-text" class="progress-pct-text">0%</span>
+        </div>
+      </div>
+      <div id="module-grid" class="module-grid"></div>
+      <div class="exam-start-card">
+        <h3>🎯 Simulación Examen CILS/CELI B1</h3>
+        <p>Pon a prueba tus conocimientos con un examen completo nivel B1.</p>
+        <button id="start-exam-btn" class="primary-btn">Iniciar examen</button>
+        <button id="start-practice-btn" class="secondary-btn">Modo práctica</button>
+      </div>
+      <div id="competition-card" class="competition-card">
+        <div class="competition-header">
+          <span class="competition-icon">🏆</span>
+          <h3>Competencia</h3>
+        </div>
+        <div id="competition-stats" class="competition-stats">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Module Detail -->
+    <section id="section-module" aria-label="Detalle del módulo">
+      <nav class="section-nav" aria-label="Navegación">
+        <button class="nav-home-btn" data-section="home" aria-label="Ir al inicio">🏠 Inicio</button>
+        <span class="nav-separator">›</span>
+        <span id="nav-module-name" class="nav-current">Módulo</span>
+      </nav>
+      <div id="module-lesson" class="module-lesson">
+        <div class="lesson-header-card">
+          <h2 id="module-title"></h2>
+          <p id="module-description" class="module-desc"></p>
+        </div>
+
+        <div class="lesson-section" id="lesson-grammar">
+          <h3>📚 Gramática</h3>
+          <ul id="grammar-list" class="grammar-list"></ul>
+        </div>
+
+        <div class="lesson-section" id="lesson-explanation">
+          <h3>💡 Explicación</h3>
+          <div id="lesson-explicacion" class="lesson-explicacion"></div>
+        </div>
+
+        <div class="lesson-section" id="lesson-examples">
+          <h3>📝 Ejemplos</h3>
+          <div id="lesson-ejemplos" class="lesson-ejemplos"></div>
+        </div>
+
+        <div class="lesson-section" id="lesson-tables">
+          <h3>📊 Tablas</h3>
+          <div id="tablas-container" class="tablas-container"></div>
+        </div>
+
+        <button id="start-exercises-btn" class="primary-btn start-exercises-btn" style="display:none">
+          ▶ Empezar ejercicios
+        </button>
+
+        <div id="lesson-stepper" class="lesson-stepper"></div>
+      </div>
+
+      <div id="module-exercises" class="module-exercises" style="display:none">
+        <button id="back-to-lesson-btn" class="secondary-btn" style="margin-bottom:16px">
+          ← Volver a la lección
+        </button>
+        <h3>📝 Ejercicios del módulo</h3>
+        <div id="exercise-counter" class="exercise-counter">
+          Cargando...
+        </div>
+      </div>
+    </section>
+
+    <!-- Exercise -->
+    <section id="section-exercise" aria-label="Ejercicio">
+      <nav class="section-nav" aria-label="Navegación">
+        <button class="nav-home-btn" data-section="home" aria-label="Ir al inicio">🏠 Inicio</button>
+        <span class="nav-separator">›</span>
+        <button class="nav-module-btn" data-section="module" aria-label="Volver al módulo" id="nav-back-to-module">Módulo</button>
+        <span class="nav-separator">›</span>
+        <span id="nav-exercise-name" class="nav-current">Ejercicio</span>
+      </nav>
+      <div id="exercise-container" class="exercise-card" role="region" aria-live="polite">
+        <!-- Progress indicator -->
+        <div id="ex-progress" class="ex-progress" aria-label="Progreso del ejercicio"></div>
+        <!-- Prompt text -->
+        <p id="ex-prompt" class="ex-prompt"></p>
+        <!-- Input area (varies by type) -->
+        <div id="ex-input" class="ex-input"></div>
+        <!-- Hint area -->
+        <p id="ex-hint" class="ex-hint"></p>
+        <!-- Feedback area -->
+        <div id="ex-feedback" class="ex-feedback" role="status"></div>
+        <!-- Action buttons -->
+        <div id="ex-actions" class="ex-actions">
+          <button id="ex-submit" class="btn btn-primary" aria-label="Enviar respuesta">Verificar</button>
+          <button id="ex-skip" class="btn btn-secondary" aria-label="Siguiente ejercicio">Siguiente</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Exam (rendered by ExamEngine) -->
+    <section id="section-exam" aria-label="Examen">
+      <!-- Exam content rendered dynamically -->
+    </section>
+
+    <!-- Results (rendered by ExamEngine) -->
+    <section id="section-results" aria-label="Resultados">
+      <!-- Results content rendered dynamically -->
+    </section>
+
+    <!-- Settings -->
+    <section id="section-settings" aria-label="Configuración">
+      <h1>Configuración</h1>
+      <div class="settings-group">
+        <label for="settings-dark-toggle">
+          <span>Modo oscuro</span>
+          <button id="settings-dark-toggle" class="toggle-btn" aria-label="Alternar modo oscuro" role="switch" aria-checked="false">🌙</button>
+        </label>
+      </div>
+      <div class="settings-group">
+        <h2>Gestión de perfiles</h2>
+        <button id="settings-add-profile" class="btn btn-secondary" aria-label="Añadir nuevo alumno">Añadir alumno</button>
+        <ul id="settings-profile-list" class="settings-profile-list"></ul>
+      </div>
+    </section>
+
+    <!-- Profile (first visit) -->
+    <section id="section-profile" aria-label="Crear perfiles">
+      <div class="profile-setup">
+        <h1>🇮🇹 ¡Bienvenidos!</h1>
+        <p>Escribid vuestros nombres para empezar</p>
+        <input type="text" id="profile-name-1" class="text-input profile-input"
+          placeholder="Tu nombre..." maxlength="20" autocomplete="off">
+        <input type="text" id="profile-name-2" class="text-input profile-input"
+          placeholder="Nombre de tu compañera/o..." maxlength="20" autocomplete="off"
+          style="margin-top:8px">
+        <button id="profile-start" class="primary-btn">Empezar</button>
+        <p class="profile-hint">Se crearán ambos perfiles. Podéis alternar desde el menú.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Embedded JSON data -->
+  <script type="application/json" id="data-modules">[
+  {
+    "id": 0,
+    "title": "Benvenuto/a!",
+    "subtitle": "Fondamenti A1 — Presente, articoli, numeri, aggettivi",
+    "description": "Saluti, presente, articoli, numeri, famiglia, aggettivi, domande",
+    "grammar": [
+      "Presente indicativo (verbi regolari: -are, -ere, -ire)",
+      "Verbi ESSERE e AVERE (presente)",
+      "Pronomi personali soggetto",
+      "Articoli determinativi e indeterminativi",
+      "Genere e numero dei sostantivi",
+      "Aggettivi (concordanza e posizione)",
+      "Numeri cardinali (1-100)",
+      "Interrogativi (chi, cosa, dove, quando, perché, come, quale)",
+      "Negazione (non)",
+      "Preposizioni semplici",
+      "C'è / Ci sono",
+      "Aggettivi possessivi (mio, tuo, suo...)"
+    ],
+    "vocabCount": 141,
+    "exerciseCount": 12,
+    "prerequisite": null,
+    "explicacion": "👋 ¡Bienvenido al italiano! En este módulo construimos los cimientos sólidos del nivel A1. Aprenderás el presente de indicativo de los verbos regulares (-are, -ere, -ire) y de los auxiliares ESSERE y AVERE, los artículos (determinativos e indeterminativos), el género y número de los sustantivos, cómo conjugar adjetivos, los números del 1 al 100, cómo hacer preguntas, negar frases, usar 'c'è / ci sono' (hay) y los posesivos. Es la base de TODO lo que viene después — tómatelo con calma y practica hasta que salga solo. 💪",
+    "ejemplos": [
+      {"it": "Io parlo italiano.", "es": "Yo hablo italiano.", "fonetica": "ío párlo italiáno"},
+      {"it": "Tu parli inglese?", "es": "¿Tú hablas inglés?", "fonetica": "tú párli inglése"},
+      {"it": "Lei è di Roma.", "es": "Ella es de Roma.", "fonetica": "léi é di róma"},
+      {"it": "Il libro è sul tavolo.", "es": "El libro está sobre la mesa.", "fonetica": "il líbro é sul távolo"},
+      {"it": "Io sono Maria. Tu come ti chiami?", "es": "Yo soy María. ¿Tú cómo te llamas?", "fonetica": "ío sóne maría. tú kóme ti kyámi"},
+      {"it": "Loro hanno una casa grande.", "es": "Ellos tienen una casa grande.", "fonetica": "lóro áno úna kása gránde"},
+      {"it": "C'è un gatto sul divano.", "es": "Hay un gato en el sofá.", "fonetica": "ché un gáto sul diváno"},
+      {"it": "Quanti anni hai? — Ho 25 anni.", "es": "¿Cuántos años tienes? — Tengo 25 años.", "fonetica": "kuánti áni ái — ó vintichínque áni"},
+      {"it": "Dove abiti? — Abito a Milano.", "es": "¿Dónde vives? — Vivo en Milán.", "fonetica": "dóve ábiti — ábito a miláno"},
+      {"it": "Questo è il mio libro.", "es": "Este es mi libro.", "fonetica": "kuésto é il mío líbro"},
+      {"it": "La mia amica è molto simpatica.", "es": "Mi amiga es muy simpática.", "fonetica": "la mía amíka é mólto simpátika"},
+      {"it": "Non parlo tedesco.", "es": "No hablo alemán.", "fonetica": "non párlo tedésco"},
+      {"it": "Che ore sono? — Sono le tre.", "es": "¿Qué hora es? — Son las tres.", "fonetica": "ké óre sóno — sóno le tré"},
+      {"it": "Noi leggiamo un libro ogni sera.", "es": "Nosotros leemos un libro cada noche.", "fonetica": "nói leyyámo un líbro óñi séra"},
+      {"it": "Marco e Lucia sono sposati da 10 anni.", "es": "Marco y Lucía están casados desde hace 10 años.", "fonetica": "márko e luchía sóno spósati da diéchi áni"},
+      {"it": "Cosa prendi? — Prendo un caffè, per favore.", "es": "¿Qué tomas? — Tomo un café, por favor.", "fonetica": "kósa préndi — préndo un kafé, per favoré"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Pronombres personales",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io", "yo"],
+          ["tu", "tú"],
+          ["lui / lei (Lei)", "él / ella (usted)"],
+          ["noi", "nosotros"],
+          ["voi", "vosotros"],
+          ["loro", "ellos / ellas"]
+        ]
+      },
+      {
+        "titulo": "ESSERE y AVERE (presente)",
+        "encabezados": ["Persona", "ESSERE", "AVERE"],
+        "filas": [
+          ["io", "sono", "ho"],
+          ["tu", "sei", "hai"],
+          ["lui/lei", "è", "ha"],
+          ["noi", "siamo", "abbiamo"],
+          ["voi", "siete", "avete"],
+          ["loro", "sono", "hanno"]
+        ]
+      },
+      {
+        "titulo": "Presente regolare — -ARE (parlare)",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io parlo", "yo hablo"],
+          ["tu parli", "tú hablas"],
+          ["lui/lei parla", "él/ella habla"],
+          ["noi parliamo", "nosotros hablamos"],
+          ["voi parlate", "vosotros habláis"],
+          ["loro parlano", "ellos hablan"]
+        ]
+      },
+      {
+        "titulo": "Presente regolare — -ERE (leggere)",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io leggo", "yo leo"],
+          ["tu leggi", "tú lees"],
+          ["lui/lei legge", "él/ella lee"],
+          ["noi leggiamo", "nosotros leemos"],
+          ["voi leggete", "vosotros leéis"],
+          ["loro leggono", "ellos leen"]
+        ]
+      },
+      {
+        "titulo": "Presente regolare — -IRE (dormire)",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io dormo", "yo duermo"],
+          ["tu dormi", "tú duermes"],
+          ["lui/lei dorme", "él/ella duerme"],
+          ["noi dormiamo", "nosotros dormimos"],
+          ["voi dormite", "vosotros dormís"],
+          ["loro dormono", "ellos duermen"]
+        ]
+      },
+      {
+        "titulo": "Artículos determinativos",
+        "encabezados": ["Italiano", "Español", "Uso"],
+        "filas": [
+          ["il", "el", "masculino singular: il libro"],
+          ["lo", "el", "masculino s+cons, gn, pn, z: lo studente"],
+          ["la", "la", "femenino singular: la casa"],
+          ["i", "los", "masculino plural: i libri"],
+          ["gli", "los", "masculino plural especial: gli studenti"],
+          ["le", "las", "femenino plural: le case"]
+        ]
+      },
+      {
+        "titulo": "Artículos indeterminativos",
+        "encabezados": ["Italiano", "Español", "Uso"],
+        "filas": [
+          ["un", "un", "masculino: un libro, un amico"],
+          ["uno", "un", "masculino s+cons, gn, pn, z: uno studente"],
+          ["una", "una", "femenino: una casa"],
+          ["un'", "una", "femenino que empieza por vocal: un'amica"]
+        ]
+      },
+      {
+        "titulo": "Interrogativos",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["Chi?", "¿Quién?"],
+          ["Che / Cosa?", "¿Qué?"],
+          ["Dove?", "¿Dónde?"],
+          ["Quando?", "¿Cuándo?"],
+          ["Perché?", "¿Por qué?"],
+          ["Come?", "¿Cómo?"],
+          ["Quale?", "¿Cuál?"],
+          ["Quanto?", "¿Cuánto/a?"]
+        ]
+      },
+      {
+        "titulo": "Aggettivi possessivi",
+        "encabezados": ["Persona", "Masculino sing.", "Femenino sing.", "Masculino pl.", "Femenino pl."],
+        "filas": [
+          ["io", "mio", "mia", "miei", "mie"],
+          ["tu", "tuo", "tua", "tuoi", "tue"],
+          ["lui/lei", "suo", "sua", "suoi", "sue"],
+          ["noi", "nostro", "nostra", "nostri", "nostre"],
+          ["voi", "vostro", "vostra", "vostri", "vostre"],
+          ["loro", "loro", "loro", "loro", "loro"]
+        ]
+      },
+      {
+        "titulo": "C'è / Ci sono",
+        "encabezados": ["Italiano", "Español", "Uso"],
+        "filas": [
+          ["c'è", "hay (singular)", "C'è un gatto."],
+          ["ci sono", "hay (plural)", "Ci sono due gatti."]
+        ]
+      },
+      {
+        "titulo": "Género de los sustantivos",
+        "encabezados": ["Terminación", "Género", "Ejemplos"],
+        "filas": [
+          ["-o", "masculino (general)", "libro, gatto, amico"],
+          ["-a", "femenino (general)", "casa, amica, vita"],
+          ["-e", "masculino o femenino", "studente(m), chiave(f)"],
+          ["-ione", "femenino", "stazione, lezione"],
+          ["-ma", "masculino", "problema, tema"]
+        ]
+      },
+      {
+        "titulo": "Números 1-20",
+        "encabezados": ["Número", "Italiano", "Número", "Italiano"],
+        "filas": [
+          ["1", "uno", "11", "undici"],
+          ["2", "due", "12", "dodici"],
+          ["3", "tre", "13", "tredici"],
+          ["4", "quattro", "14", "quattordici"],
+          ["5", "cinque", "15", "quindici"],
+          ["6", "sei", "16", "sedici"],
+          ["7", "sette", "17", "diciassette"],
+          ["8", "otto", "18", "diciotto"],
+          ["9", "nove", "19", "diciannove"],
+          ["10", "dieci", "20", "venti"]
+        ]
+      }
+    ],
+    "leccion": [
+      {
+        "titulo": "👤 ¿Quién habla? — Pronombres y los verbos reyes",
+        "intro": "Piensa en los pronombres como las ETIQUETAS de las personas. Igual que en español: yo, tú, él, nosotros... En italiano es casi lo mismo, solo cambian un par. Y hay DOS verbos que son los reyes de todo: ESSERE (ser/estar) y AVERE (tener). Sin ellos NO puedes hacer casi nada en italiano, así que apréndetelos bien desde el principio.",
+        "atencion": "🧠 Dato curioso: en italiano puedes saltarte el 'io', 'tu', etc. porque la terminación del verbo ya dice quién es. 'Parlo' ya significa 'yo hablo'. Pero al principio úsalos, que ayudan.",
+        "ejemplos": [
+          {"it": "Io sono María. E tu chi sei?", "es": "Yo soy María. ¿Y tú quién eres?", "fonetica": "ío sóne maría. e tú ki séi"},
+          {"it": "Lui è alto e simpatico. Lei è gentile.", "es": "Él es alto y simpático. Ella es amable.", "fonetica": "lúi é álto e simpátiko. léi é yentíle"},
+          {"it": "Io ho fame. Tu hai sete?", "es": "Yo tengo hambre. ¿Tú tienes sed?", "fonetica": "ío ó fáme. tu ái séte"}
+        ],
+        "practica": {
+          "pregunta": "¿Cómo se dice 'Ellos son italianos'?",
+          "opciones": ["Loro hanno italiani", "Loro sono italiani", "Loro è italiani", "Loro siamo italiani"],
+          "correcta": 1,
+          "feedback": "✅ ¡Perfecto! 'Loro sono italiani' — 'sono' es la forma de ESSERE para ellos (y para yo también, ¡ojo!).",
+          "feedback_err": "❌ Casi. La respuesta es 'Loro sono italiani'. Recuerda: ESSERE → io sono, tu sei, lui/lei è, noi siamo, voi siete, loro sono."
+        }
+      },
+      {
+        "titulo": "🗣️ Verbos en -ARE: el patrón que nunca falla",
+        "intro": "Imagina que los verbos son como piezas de Lego. Tienes la base (la raíz: PARL-, MANGI-, STUDI-) y le pones encima la pieza que toca según quién hable. Los verbos en -ARE son los más fáciles porque TODOS siguen el mismo molde. Es como una máquina de chicles: metes la raíz, eliges la persona, y ¡zas! sale la palabra.",
+        "atencion": "🎯 Truco mental: las terminaciones -ARE son como una melodía pegadiza: O-I-A-IAMO-ATE-ANO. Cántalas un par de veces y no las olvidas.",
+        "ejemplos": [
+          {"it": "Io parlo italiano. Tu parli inglese?", "es": "Yo hablo italiano. ¿Tú hablas inglés?", "fonetica": "ío párlo italiáno. tu párli inglése"},
+          {"it": "Noi mangiamo la pizza insieme.", "es": "Nosotros comemos pizza juntos.", "fonetica": "nói manyámo la pítsa insyéme"},
+          {"it": "Loro studiano italiano ogni giorno.", "es": "Ellos estudian italiano cada día.", "fonetica": "lóro stúdiano italiáno óñi yórno"},
+          {"it": "Cosa cerchi? — Cerco il mio libro.", "es": "¿Qué buscas? — Busco mi libro.", "fonetica": "kóza chérki — chérko il mío líbro"}
+        ],
+        "practica": {
+          "pregunta": "Completa: Noi ___ (cucinare) la pasta.",
+          "opciones": ["cucino", "cucini", "cuciniamo", "cucinate"],
+          "correcta": 2,
+          "feedback": "✅ ¡Exacto! 'Noi cuciniamo' — para 'noi' siempre -iamo. Da igual si es -ARE, -ERE o -IRE: noi parliamo, noi leggiamo, noi dormiamo.",
+          "feedback_err": "❌ La respuesta es 'cuciniamo' (nosotros cocinamos). Para 'noi' la terminación SIEMPRE es -iamo. Cucino = yo, cucini = tú, cucinate = vosotros."
+        }
+      },
+      {
+        "titulo": "📚 Verbos en -ERE e -IRE: los primos del -ARE",
+        "intro": "Si ya te sabes los verbos en -ARE, los de -ERE e -IRE son casi igual de fáciles. Solo cambian un par de letras al final. Es como si -ARE fuera la receta original y -ERE e -IRE fueran variaciones con un par de ingredientes distintos. Para que te hagas una idea: LEGGERE (leer), SCRIVERE (escribir), DORMIRE (dormir), PARTIRE (salir).",
+        "atencion": "🔍 Ojo al detalle: en -ERE la 'o' de 'yo' va directa (leggO, scrivO, vedO). En -IRE igual (dormO, partO). Pero algunos verbos en -IRE se cuelan una -isc-: finire → io finisco, tu finisci, lui finisce. Como si el verbo estornudara: ¡-ISC-!",
+        "ejemplos": [
+          {"it": "Io leggo un libro ogni sera prima di dormire.", "es": "Yo leo un libro cada noche antes de dormir.", "fonetica": "ío léggo un líbro óñi séra príma di dormíre"},
+          {"it": "Voi scrivete un email? — Noi scriviamo ai nostri amici.", "es": "¿Vosotros escribís un email? — Nosotros escribimos a nuestros amigos.", "fonetica": "vói skrivéte un emáil — nói skrivyámo ai nóstri amíchi"},
+          {"it": "Loro partono domani per le vacanze.", "es": "Ellos parten mañana de vacaciones.", "fonetica": "lóro pártono dománi per le vakántse"},
+          {"it": "A che ora dormi? — Di solito dormo alle undici.", "es": "¿A qué hora duermes? — Normalmente duermo a las once.", "fonetica": "a ké óra dórmi — di solíto dórmo ále úndichi"}
+        ],
+        "practica": {
+          "pregunta": "¿Cuál es la forma correcta para 'tú' del verbo 'scrivere'?",
+          "opciones": ["io scrivo", "tu scrivi", "lui scrive", "noi scriviamo"],
+          "correcta": 1,
+          "feedback": "✅ ¡Bien! 'Tu scrivi' — para -ERE, la 'tú' termina en -i igual que en -ARE. El truco: -ARE y -ERE comparten las mismas terminaciones para yo (o), tú (i), nosotros (iamo).",
+          "feedback_err": "❌ La respuesta es 'tu scrivi'. Fíjate: -ERE sigue el mismo patrón que -ARE para yo (-o) y tú (-i): io leggo, tu leggi; io scrivo, tu scrivi."
+        }
+      },
+      {
+        "titulo": "🎯 El, la, un, una: los artículos al detalle",
+        "intro": "Los artículos en italiano son como los guardarropas: cada palabra necesita su artículo adecuado según su género y cómo empiece. No es solo 'il' para masculino y 'la' para femenino. Si la palabra masculina empieza de forma 'especial' (s+consonante, gn, pn, z), necesitas LO en lugar de IL. Y para 'un/una' pasa igual: UNO para esos casos especiales, UN' (con apóstrofe) para femenino que empieza por vocal.",
+        "atencion": "😅 Piénsalo así: 'il' es el artículo normal para masculino, pero cuando la palabra es 'difícil de pronunciar' (s+cons, gn, pn, z), usas 'lo' para que suene mejor. Lo studente suena mejor que 'il studente', ¿verdad?",
+        "ejemplos": [
+          {"it": "Il gatto dorme sul divano.", "es": "El gato duerme en el sofá.", "fonetica": "il gáto dórme sul diváno"},
+          {"it": "Lo studente legge. — Gli studenti leggono.", "es": "El estudiante lee. — Los estudiantes leen.", "fonetica": "lo studénte lédde. — lyi studénti léggono"},
+          {"it": "Ho un amico a Roma e un'amica a Milano.", "es": "Tengo un amigo en Roma y una amiga en Milán.", "fonetica": "ó un amíko a róma e unamíka a miláno"},
+          {"it": "Le case sono bianche. I libri sono nuovi.", "es": "Las casas son blancas. Los libros son nuevos.", "fonetica": "le káse sóno byánke. i líbri sóno nuóvi"}
+        ],
+        "practica": {
+          "pregunta": "¿Qué artículo va con 'studente' (masculino)?",
+          "opciones": ["il studente", "lo studente", "la studente", "gli studente"],
+          "correcta": 1,
+          "feedback": "✅ ¡Correcto! 'Lo studente' — porque 'studente' empieza por s+consonante, así que necesita LO en lugar de IL.",
+          "feedback_err": "❌ La respuesta es 'lo studente'. Regla: si empieza por s+consonante, gn, pn, z → usa LO. 'Studente' empieza por st- → LO."
+        }
+      },
+      {
+        "titulo": "🔤 ¿Masculino o femenino? El género de las palabras",
+        "intro": "En italiano las palabras tienen género, como en español. Pero hay una REGLA DE ORO que funciona el 90% de las veces: las palabras que terminan en -O son masculinas (il libr-O), las que terminan en -A son femeninas (la cas-A). Fácil, ¿no? El PROBLEMA son las palabras en -E: pueden ser de cualquier género (studentE es masculino, chiavE es femenino). Y luego los adjetivos — tienen que VESTIRSE igual que el sustantivo. Si el sustantivo es femenino plural, el adjetivo también: 'le case sono nuov-E'.",
+        "atencion": "🎭 Visualízalo así: los sustantivos y adjetivos son como pareja de baile. Si ella (el sustantivo) va de azul (-a), él (el adjetivo) también. Si van en grupo (-e), los dos en grupo. Siempre juntos, siempre iguales.",
+        "ejemplos": [
+          {"it": "Il gatto è nero. — La gatta è nera.", "es": "El gato es negro. — La gata es negra.", "fonetica": "il gáto é néro. — la gáta é néra"},
+          {"it": "Marco è alto e bello. — Maria è alta e bella.", "es": "Marco es alto y guapo. — María es alta y guapa.", "fonetica": "márko é álto e bélo. — maría é álta e béla"},
+          {"it": "I fiori sono gialli. — Le rose sono rosse.", "es": "Las flores son amarillas. — Las rosas son rojas.", "fonetica": "i fyóri sóno yáli. — le róse sóno róse"},
+          {"it": "Il ristorante è buono. — La pizza è buona.", "es": "El restaurante es bueno. — La pizza es buena.", "fonetica": "il ristoránte é buóno. — la pítsa é buóna"}
+        ],
+        "practica": {
+          "pregunta": "Corrige: 'La casa è bianco' — ¿cuál es el error?",
+          "opciones": ["'La' debería ser 'Il'", "'casa' es masculino", "'bianco' debería ser 'bianca'", "No hay error"],
+          "correcta": 2,
+          "feedback": "✅ ¡Eso es! 'Casa' es femenino (-a), así que el adjetivo debe ser 'bianca'. El adjetivo SIEMPRE se viste como el sustantivo.",
+          "feedback_err": "❌ El error es 'bianco' → 'bianca'. Casa es femenino (termina en -a), así que el adjetivo también debe terminar en -a. Regla de oro: -o masc, -a fem, -i masc pl, -e fem pl."
+        }
+      },
+      {
+        "titulo": "❓ Preguntar sin miedo y decir que no",
+        "intro": "Lo bueno del italiano es que para preguntar muchas veces solo necesitas CAMBIAR LA ENTONACIÓN. 'Tu parli italiano' es afirmación. 'Tu parli italiano?' (con tono ascendente al final) es pregunta. Y cuando quieras usar palabras como QUIÉN, QUÉ, DÓNDE... tienes un set de herramientas muy parecido al español: Chi (quién), Cosa/Che (qué), Dove (dónde), Quando (cuándo), Perché (por qué), Come (cómo), Quale (cuál), Quanto (cuánto). Y para negar, pon NON delante del verbo y listo.",
+        "atencion": "🎤 Prueba ahora: di en voz alta 'Tu parli italiano' como afirmación (tono plano) y luego como pregunta (tono subiendo). ¿Notas la diferencia? ¡Eso es todo!",
+        "ejemplos": [
+          {"it": "Dove abiti? — Abito a Milano, in centro.", "es": "¿Dónde vives? — Vivo en Milán, en el centro.", "fonetica": "dóve ábiti — ábito a miláno, in chéntro"},
+          {"it": "Cosa fai stasera? — Non faccio niente, sono stanco.", "es": "¿Qué haces esta noche? — No hago nada, estoy cansado.", "fonetica": "kósa fái staséra — non fácho niénte, sóno stánko"},
+          {"it": "Perché studi italiano? — Perché mi piace la lingua!", "es": "¿Por qué estudias italiano? — ¡Porque me gusta el idioma!", "fonetica": "perké stúdi italiáno — perké mi piáche la língua"},
+          {"it": "Quanto costa questo? — Costa dieci euro.", "es": "¿Cuánto cuesta esto? — Cuesta diez euros.", "fonetica": "kuánto kósta kuésto — kósta diéchi éuro"}
+        ],
+        "practica": {
+          "pregunta": "¿Cómo preguntas '¿Dónde está el baño?' en italiano?",
+          "opciones": ["Cosa è il bagno?", "Dove è il bagno?", "Come è il bagno?", "Quando è il bagno?"],
+          "correcta": 1,
+          "feedback": "✅ ¡Perfecto! 'Dove è il bagno?' — Dove = dónde, y para preguntar ubicación siempre usas 'Dove'.",
+          "feedback_err": "❌ La respuesta es 'Dove è il bagno?' (¿Dónde está el baño?). Dove = dónde. Cosa = qué, Come = cómo, Quando = cuándo."
+        }
+      },
+      {
+        "titulo": "🏠 C'è y Ci sono: cómo decir que algo EXISTE",
+        "intro": "¿Recuerdas cuando dices 'hay un gato en el sofá'? En italiano se dice 'C'È un gatto sul divano'. C'è es para UNA sola cosa (singular). Si hay VARIAS cosas, usas CI SONO: 'Ci sono due gatti sul divano' (hay dos gatos en el sofá). El truco: c'è = singular (uno), ci sono = plural (varios). Es literalmente 'aquí está' / 'aquí están'.",
+        "atencion": "🌟 Etimología curiosa: 'c'è' viene de 'ci' (aquí/allí) + 'è' (es). 'Ci sono' = 'ci' + 'sono' (están). Es como si señalaras y dijeras 'aquí es un gato' o 'aquí están dos gatos'. ¡Tiene hasta lógica!",
+        "ejemplos": [
+          {"it": "C'è un gatto sul divano che dorme.", "es": "Hay un gato en el sofá que duerme.", "fonetica": "ché un gáto sul diváno ke dórme"},
+          {"it": "Nel frigo ci sono la pizza e la frutta.", "es": "En la nevera hay pizza y fruta.", "fonetica": "nel frígo chi sóno la pítsa e la frúta"},
+          {"it": "Quanti studenti ci sono in classe? — Ce ne sono 15.", "es": "¿Cuántos estudiantes hay en clase? — Hay 15.", "fonetica": "kuánti studénti chi sóno in kláse — ché ne sóno quíndichi"},
+          {"it": "C'è un problema? — No, non c'è nessun problema.", "es": "¿Hay un problema? — No, no hay ningún problema.", "fonetica": "ché un probléma — no, non ché nessún probléma"}
+        ],
+        "practica": {
+          "pregunta": "Completa: In biblioteca ___ molti libri.",
+          "opciones": ["c'è", "ci sono", "c'è sono", "ci è"],
+          "correcta": 1,
+          "feedback": "✅ ¡Perfecto! 'Ci sono molti libri' — 'molti libri' es plural (muchos libros), así que necesitas CI SONO.",
+          "feedback_err": "❌ La respuesta es 'ci sono' porque 'molti libri' es plural. Recuerda: C'È = singular, CI SONO = plural. ¡Como 'is' y 'are' en inglés!"
+        }
+      },
+      {
+        "titulo": "👑 Los posesivos: de quién es cada cosa",
+        "intro": "Aquí viene un truco que CONFUNDE a los españoles: en italiano el posesivo CONCUERDA con la cosa poseída, no con el dueño. En español dices 'mi libro' y 'mi casa' (mi = mi, no cambia). En italiano dices 'il MIO libro' (masc) pero 'la MIA casa' (fem). El posesivo se viste como el objeto. Y SIEMPRE lleva artículo delante: il mio, la mia, i miei, le mie. EXCEPCIÓN: con familiares en singular NO lleva artículo: 'mia madre', 'mio padre' (pero sí en plural: 'le mie sorelle').",
+        "atencion": "⚡ Truco definitivo: piensa que el posesivo es un adjetivo más. Igual que 'libro bianco' y 'casa bianca', dices 'libro mio' y 'casa mia'. El artículo (il, la) es el que indica de quién es. 'Il mio libro' = el mi libro. ¡Poco a poco!",
+        "ejemplos": [
+          {"it": "Questo è il mio libro preferito: 'Il Nome della Rosa'.", "es": "Este es mi libro preferido: 'El Nombre de la Rosa'.", "fonetica": "kuésto é il mío líbro preferíto: il nóme déla rósa"},
+          {"it": "La mia casa è piccola ma accogliente.", "es": "Mi casa es pequeña pero acogedora.", "fonetica": "la mía kása é píkkola ma akolyénte"},
+          {"it": "I tuoi amici sono simpatici. — Anche i tuoi!", "es": "Tus amigos son simpáticos. — ¡Los tuyos también!", "fonetica": "i tuói amíchi sóno simpátichi. — ánke i tuói"},
+          {"it": "Mia madre cucina benissimo. Mio padre invece no.", "es": "Mi madre cocina muy bien. Mi padre en cambio no.", "fonetica": "mía mádre kuchína benísimo. mío pádre invéche no"}
+        ],
+        "practica": {
+          "pregunta": "¿Cómo se dice 'mis amigas' en italiano?",
+          "opciones": ["mia amiche", "le mie amiche", "mie amiche", "la mia amiche"],
+          "correcta": 1,
+          "feedback": "✅ ¡Correcto! 'Le mie amiche' — artículo (le) + posesivo (mie, femenino plural) + sustantivo (amiche). Todo en femenino plural porque 'amiche' lo es.",
+          "feedback_err": "❌ La respuesta es 'le mie amiche'. Recuerda: el posesivo concuerda con el objeto (amiche = femenino plural → mie) y SIEMPRE lleva artículo delante EXCEPTO con familiares en singular."
+        }
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "title": "Com'è andata?",
+    "subtitle": "Passato prossimo — azioni completate",
+    "description": "Racconta cosa è successo: il passato prossimo",
+    "grammar": ["Passato prossimo con avere", "Passato prossimo con essere", "Participi passati regolari e irregolari"],
+    "vocabCount": 120,
+    "exerciseCount": 12,
+    "prerequisite": 0,
+    "explicacion": "👋 El passato prossimo es el pasado más usado en italiano. Se forma con el presente de avere o essere + participio pasado. Con avere: ho parlato, hai mangiato. Con essere (movimiento, reflexivos): sono andato/a, ci siamo alzati/e. El participio pasado puede ser irregular: fare→fatto, dire→detto, vedere→visto.",
+    "ejemplos": [
+      {"it": "Ieri ho mangiato una pizza.", "es": "Ayer comí una pizza.", "fonetica": "yéri o manyáto úna pítsa"},
+      {"it": "Lei è andata a Roma.", "es": "Ella fue a Roma.", "fonetica": "léi é andáta a róma"},
+      {"it": "Abbiamo visto un bellissimo film.", "es": "Vimos una película preciosa.", "fonetica": "abyámo vísto un belísimo film"},
+      {"it": "Hai fatto i compiti?", "es": "¿Hiciste los deberes?", "fonetica": "ái fáto i cómpiti"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Passato prossimo — parlare (avere)",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io ho parlato", "yo he hablado"],
+          ["tu hai parlato", "tú has hablado"],
+          ["lui/lei ha parlato", "él/ella ha hablado"],
+          ["noi abbiamo parlato", "nosotros hemos hablado"],
+          ["voi avete parlato", "vosotros habéis hablado"],
+          ["loro hanno parlato", "ellos han hablado"]
+        ]
+      },
+      {
+        "titulo": "Passato prossimo — andare (essere)",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io sono andato/a", "yo he ido"],
+          ["tu sei andato/a", "tú has ido"],
+          ["lui/lei è andato/a", "él/ella ha ido"],
+          ["noi siamo andati/e", "nosotros hemos ido"],
+          ["voi siete andati/e", "vosotros habéis ido"],
+          ["loro sono andati/e", "ellos han ido"]
+        ]
+      },
+      {
+        "titulo": "Participios irregulares comunes",
+        "encabezados": ["Infinitivo", "Participio"],
+        "filas": [
+          ["fare", "fatto"],
+          ["dire", "detto"],
+          ["scrivere", "scritto"],
+          ["prendere", "preso"],
+          ["aprire", "aperto"],
+          ["vedere", "visto"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Quando ero piccolo…",
+    "subtitle": "Imperfetto — descrizioni e abitudini passate",
+    "description": "Descrivi il passato: l'imperfetto e le azioni abituali",
+    "grammar": ["Imperfetto indicativo", "Passato prossimo vs imperfetto", "Stare + gerundio"],
+    "vocabCount": 140,
+    "exerciseCount": 12,
+    "prerequisite": 1,
+    "explicacion": "😊 El imperfetto se usa para describir acciones habituales o estados en el pasado ('cuando era pequeño...'). Se forma añadiendo -avo, -avi, -ava, -avamo, -avate, -avano a los verbos en -are, y -evo, -evi, -eva, -evamo, -evate, -evano para -ere/-ire. Diferencia clave: passato prossimo = acción concreta terminada; imperfetto = descripción, hábito, acción en curso.",
+    "ejemplos": [
+      {"it": "Da bambino giocavo sempre al parco.", "es": "De niño jugaba siempre en el parque.", "fonetica": "da bambíno yocávo sémpre al párko"},
+      {"it": "Mentre mangiavo, è arrivato Marco.", "es": "Mientras comía, llegó Marco.", "fonetica": "métre manyávo é arriváto márko"},
+      {"it": "Quando ero piccolo, avevo un cane.", "es": "Cuando era pequeño, tenía un perro.", "fonetica": "kuándo éro pícolo avévo un káne"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Imperfetto — parlare",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io parlavo", "yo hablaba"],
+          ["tu parlavi", "tú hablabas"],
+          ["lui/lei parlava", "él/ella hablaba"],
+          ["noi parlavamo", "nosotros hablábamos"],
+          ["voi parlavate", "vosotros hablabais"],
+          ["loro parlavano", "ellos hablaban"]
+        ]
+      },
+      {
+        "titulo": "Imperfetto — essere / avere",
+        "encabezados": ["Persona", "essere", "avere"],
+        "filas": [
+          ["io", "ero", "avevo"],
+          ["tu", "eri", "avevi"],
+          ["lui/lei", "era", "aveva"],
+          ["noi", "eravamo", "avevamo"],
+          ["voi", "eravate", "avevate"],
+          ["loro", "erano", "avevano"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "I nostri progetti",
+    "subtitle": "Futuro — progetti, previsioni, promesse",
+    "description": "Parla del futuro: progetti, previsioni e promesse",
+    "grammar": ["Futuro semplice", "Futuro anteriore (cenni)", "Usi del futuro"],
+    "vocabCount": 130,
+    "exerciseCount": 12,
+    "prerequisite": 2,
+    "explicacion": "🚀 El futuro semplice se forma añadiendo -ò, -ai, -à, -emo, -ete, -anno al infinitivo (perdiendo la 'e' final: parlare→parlerò). Verbos irregulares: essere→sarò, avere→avrò, fare→farò, andare→andrò. El futuro anteriore (avrò parlato) expresa una acción futura anterior a otra.",
+    "ejemplos": [
+      {"it": "Domani pioverà tutto il giorno.", "es": "Mañana lloverá todo el día.", "fonetica": "dománi piovéra túto il dyórno"},
+      {"it": "L'anno prossimo andrò in Italia.", "es": "El año que viene iré a Italia.", "fonetica": "lánno prósimo andró in itálya"},
+      {"it": "Quando avrò finito, ti chiamerò.", "es": "Cuando haya terminado, te llamaré.", "fonetica": "kuándo avró finíto ti kyameró"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Futuro semplice — parlare",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io parlerò", "yo hablaré"],
+          ["tu parlerai", "tú hablarás"],
+          ["lui/lei parlerà", "él/ella hablará"],
+          ["noi parleremo", "nosotros hablaremos"],
+          ["voi parlerete", "vosotros hablaréis"],
+          ["loro parleranno", "ellos hablarán"]
+        ]
+      },
+      {
+        "titulo": "Futuro semplice — essere / avere",
+        "encabezados": ["Persona", "essere", "avere"],
+        "filas": [
+          ["io", "sarò", "avrò"],
+          ["tu", "sarai", "avrai"],
+          ["lui/lei", "sarà", "avrà"],
+          ["noi", "saremo", "avremo"],
+          ["voi", "sarete", "avrete"],
+          ["loro", "saranno", "avranno"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Che cosa faresti?",
+    "subtitle": "Condizionale — desideri e ipotesi",
+    "description": "Esprimi desideri e ipotesi con il condizionale",
+    "grammar": ["Condizionale presente", "Frasi ipotetiche 1° tipo", "Richieste cortesi"],
+    "vocabCount": 140,
+    "exerciseCount": 12,
+    "prerequisite": 3,
+    "explicacion": "💭 El condizionale presente equivale al condicional español: 'diría', 'podría'. Se forma añadiendo -ei, -esti, -ebbe, -emmo, -este, -ebbero al infinitivo sin la 'e' final (parlare→parlerei). Usos: deseos (vorrei un caffè), peticiones corteses (potresti aiutarmi?) e hipótesis (se potessi, verrei).",
+    "ejemplos": [
+      {"it": "Vorrei un caffè, per favore.", "es": "Quisiera un café, por favor.", "fonetica": "vórrei un kafé per favóre"},
+      {"it": "Potresti aiutarmi?", "es": "¿Podrías ayudarme?", "fonetica": "potréti ayudármi"},
+      {"it": "Se potessi, viaggerei tutto l'anno.", "es": "Si pudiera, viajaría todo el año.", "fonetica": "se potési viadyeréi túto lánno"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Condizionale presente — parlare",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io parlerei", "yo hablaría"],
+          ["tu parleresti", "tú hablarías"],
+          ["lui/lei parlerebbe", "él/ella hablaría"],
+          ["noi parleremmo", "nosotros hablaríamos"],
+          ["voi parlereste", "vosotros hablaríais"],
+          ["loro parlerebbero", "ellos hablarían"]
+        ]
+      },
+      {
+        "titulo": "Condizionale — verbi modali",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["io vorrei", "yo quisiera"],
+          ["io potrei", "yo podría"],
+          ["io dovrei", "yo debería"],
+          ["io saprei", "yo sabría"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "È il migliore!",
+    "subtitle": "Comparativi e superlativi",
+    "description": "Confronta e superlativi: esprimere opinioni",
+    "grammar": ["Comparativi", "Superlativi assoluti", "Superlativi relativi", "Comparativi irregolari"],
+    "vocabCount": 120,
+    "exerciseCount": 12,
+    "prerequisite": 4,
+    "explicacion": "⭐ Los comparativos: più...di (más...que), meno...di (menos...que), tanto...quanto (tan...como). Superlativo relativo: il più bello di tutti. Superlativo absoluto: bellissimo, molto bello. Irregulares: buono→migliore, cattivo→peggiore, grande→maggiore, piccolo→minore.",
+    "ejemplos": [
+      {"it": "Questo libro è più interessante di quello.", "es": "Este libro es más interesante que aquel.", "fonetica": "kuésto líbro é pyú interesánte di kuélo"},
+      {"it": "Maria è la più brava della classe.", "es": "María es la más lista de la clase.", "fonetica": "maría é la pyú bráva déla kláse"},
+      {"it": "Questo caffè è buonissimo!", "es": "¡Este café está buenísimo!", "fonetica": "kuésto kafé é buonísimo"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Comparativi",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["più ... di", "más ... que"],
+          ["meno ... di", "menos ... que"],
+          ["tanto ... quanto", "tan ... como"],
+          ["migliore / peggiore", "mejor / peor"]
+        ]
+      },
+      {
+        "titulo": "Superlativo",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["bellissimo", "hermosísimo / muy hermoso"],
+          ["importantissimo", "importantísimo"],
+          ["il più bravo", "el más listo"],
+          ["la più bella", "la más guapa"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Bisogna che…",
+    "subtitle": "Congiuntivo presente — opinioni e sentimenti",
+    "description": "Esprimi opinioni e sentimenti: il congiuntivo presente",
+    "grammar": ["Congiuntivo presente", "Congiunzioni + congiuntivo", "Verbi di opinione/timore + congiuntivo"],
+    "vocabCount": 140,
+    "exerciseCount": 12,
+    "prerequisite": 5,
+    "explicacion": "🤔 El congiuntivo presente expresa opinión, duda, emoción o deseo. Se usa tras verbos como penso che, credo che, spero che. Verbos en -are→-i, -i, -i, -iamo, -iate, -ino. Verbos en -ere/-ire→-a, -a, -a, -iamo, -iate, -ano. Importante: en italiano SIEMPRE lleva congiuntivo en estas situaciones, no indicativo como a veces en español.",
+    "ejemplos": [
+      {"it": "Penso che lui abbia ragione.", "es": "Creo que él tiene razón.", "fonetica": "pénso ke lúi ábya radyóne"},
+      {"it": "Spero che tu venga alla festa.", "es": "Espero que vengas a la fiesta.", "fonetica": "spéro ke tú venga ála fésta"},
+      {"it": "Benché sia stanco, esco lo stesso.", "es": "Aunque esté cansado, salgo igual.", "fonetica": "benké sía stánko ésco lo stéso"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Congiuntivo presente — parlare",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["che io parli", "que yo hable"],
+          ["che tu parli", "que tú hables"],
+          ["che lui/lei parli", "que él/ella hable"],
+          ["che noi parliamo", "que nosotros hablemos"],
+          ["che voi parliate", "que vosotros habléis"],
+          ["che loro parlino", "que ellos hablen"]
+        ]
+      },
+      {
+        "titulo": "Verbi che richiedono il congiuntivo",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["penso che", "pienso que"],
+          ["credo che", "creo que"],
+          ["spero che", "espero que"],
+          ["benché / sebbene", "aunque"],
+          ["affinché", "para que"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Ci vado e ne parlo",
+    "subtitle": "Pronomi diretti, indiretti, CI e NE",
+    "description": "Usa ci e ne come un italiano",
+    "grammar": ["Pronomi diretti", "Pronomi indiretti", "CI (luogo, pronominale)", "NE (partitivo e di ciò)"],
+    "vocabCount": 130,
+    "exerciseCount": 12,
+    "prerequisite": 6,
+    "explicacion": "🔗 Pronombres directos (lo, la, li, le) sustituyen al objeto directo: 'Vedo Marco' → 'Lo vedo'. Indirectos (gli, le) sustituyen al indirecto: 'Parlo a Maria' → 'Le parlo'. CI sustituye 'a/en un lugar': 'Vado a Roma' → 'Ci vado'. NE sustituye 'de eso': 'Parlo di questo' → 'Ne parlo'.",
+    "ejemplos": [
+      {"it": "Vado a Roma. → Ci vado.", "es": "Voy a Roma. → Voy allí.", "fonetica": "vádo a róma. chi vádo"},
+      {"it": "Parlo di questo. → Ne parlo.", "es": "Hablo de esto. → Hablo de ello.", "fonetica": "párlo di kuésto. ne párlo"},
+      {"it": "Vedi Marco? → Lo vedo.", "es": "¿Ves a Marco? → Lo veo.", "fonetica": "védi márko. lo védo"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Pronomi diretti (cosa/chi?)",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["mi", "me"],
+          ["ti", "te"],
+          ["lo / la", "lo / la"],
+          ["ci", "nos"],
+          ["vi", "os"],
+          ["li / le", "los / las"]
+        ]
+      },
+      {
+        "titulo": "CI e NE",
+        "encabezados": ["Particella", "Uso", "Ejemplo"],
+        "filas": [
+          ["CI", "lugar = allí", "Vado a Roma → CI vado"],
+          ["CI", "con ci- verbi", "Pensar → CI penso"],
+          ["NE", "de eso", "Parlo di questo → NE parlo"],
+          ["NE", "cantidad", "Quanto NE vuoi?"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Te l'ho detto!",
+    "subtitle": "Pronomi combinati e imperativo",
+    "description": "Combina i pronomi e dai istruzioni",
+    "grammar": ["Pronomi combinati", "Imperativo diretto", "Imperativo con pronomi"],
+    "vocabCount": 120,
+    "exerciseCount": 12,
+    "prerequisite": 7,
+    "explicacion": "🔗 Pronombres combinados unen directo + indirecto: me lo, te lo, glielo, ce lo, ve lo, glielo. Ejemplo: 'Lo dico a te' → 'Te lo dico'. Imperativo directo (tú): parla!, mangia!, dormi! Con pronombres: 'Dimmelo!' (dí-melo), 'Fallo!' (hazlo). Para 'Lei' (usted) se usa el congiuntivo.",
+    "ejemplos": [
+      {"it": "Te l'ho detto ieri.", "es": "Te lo dije ayer.", "fonetica": "te ló déto yéri"},
+      {"it": "Dimmelo! (dimmi + lo)", "es": "¡Dímelo!", "fonetica": "dímmelo"},
+      {"it": "Fallo subito!", "es": "¡Hazlo ahora mismo!", "fonetica": "fálo súbito"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Pronomi combinati",
+        "encabezados": ["Combinación", "Italiano", "Español"],
+        "filas": [
+          ["lo + mi", "me lo", "me lo"],
+          ["lo + ti", "te lo", "te lo"],
+          ["la + mi", "me la", "me la"],
+          ["li + ti", "te li", "te los"],
+          ["le + si", "se le", "se las"],
+          ["ne + mi", "me ne", "me de ello"]
+        ]
+      },
+      {
+        "titulo": "Imperativo + pronomi",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["Dimmelo!", "¡Dímelo!"],
+          ["Fallo!", "¡Hazlo!"],
+          ["Dammelo!", "¡Dámelo!"],
+          ["Vestiti!", "¡Vístete!"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Se potessi…",
+    "subtitle": "Periodo ipotetico — possibilità irreali",
+    "description": "Esprimi possibilità irreali e rimpianti",
+    "grammar": ["Periodo ipotetico 2° tipo", "Periodo ipotetico 3° tipo", "Congiuntivo imperfetto e trapassato"],
+    "vocabCount": 140,
+    "exerciseCount": 12,
+    "prerequisite": 8,
+    "explicacion": "🤞 El periodo ipotetico italiano: 1er tipo (realidad): se + presente, presente/futuro. 2º tipo (posible pero improbable): se + imperfetto congiuntivo, condizionale presente. 3er tipo (imposible, pasado): se + trapassato congiuntivo, condizionale passato. Ejemplo: Se avessi studiato, avrei passato l'esame.",
+    "ejemplos": [
+      {"it": "Se avessi soldi, comprerei una casa.", "es": "Si tuviera dinero, compraría una casa.", "fonetica": "se avési sóldi compreréi úna kása"},
+      {"it": "Se avessi studiato, avrei passato l'esame.", "es": "Si hubiera estudiado, habría aprobado el examen.", "fonetica": "se avési studyáto avréi pasáto lezáme"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Periodo ipotetico",
+        "encabezados": ["Tipo", "Italiano", "Español"],
+        "filas": [
+          ["Realidad", "Se piove, prendo l'ombrello", "Si llueve, cojo el paraguas"],
+          ["Posibilidad", "Se piovesse, prenderei l'ombrello", "Si lloviera, cogería el paraguas"],
+          ["Irrealidad", "Se avesse piovuto, avrei preso l'ombrello", "Si hubiera llovido, habría cogido el paraguas"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Preparazione esame",
+    "subtitle": "Revisione completa B1",
+    "description": "Prepárati para el examen: revisión completa B1",
+    "grammar": ["Revisione completa B1: tutti i tempi verbali", "Pronomi, comparativi, congiuntivo"],
+    "vocabCount": 200,
+    "exerciseCount": 12,
+    "prerequisite": 9,
+    "explicacion": "🎯 Este módulo de preparación al examen B1 repasa todos los tiempos verbales: presente, passato prossimo, imperfetto, futuro, condizionale, congiuntivo. También pronombres, comparativos y el periodo ipotetico. Es una revisión completa para los exámenes CILS/CELI B1.",
+    "ejemplos": [
+      {"it": "Revisione completa: tutti i tempi verbali.", "es": "Revisión completa: todos los tiempos verbales.", "fonetica": "revizyóne compléta túti i témpi verbáli"},
+      {"it": "Allenati con esercizi di grammatica mista.", "es": "Entrénate con ejercicios de gramática mixta.", "fonetica": "alenáti kon eserchítsi di gramátika místa"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Resumen de tiempos verbales B1",
+        "encabezados": ["Tiempo", "Ejemplo", "Uso"],
+        "filas": [
+          ["Presente", "io parlo", "ahora, habitual"],
+          ["Passato prossimo", "io ho parlato", "pasado reciente"],
+          ["Imperfetto", "io parlavo", "pasado continuo / descripción"],
+          ["Futuro", "io parlerò", "futuro / probabilidad"],
+          ["Condizionale", "io parlerei", "cortesía / deseo"],
+          ["Congiuntivo", "che io parli", "duda / emoción"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Cittadinanza",
+    "subtitle": "Cultura e cittadinanza italiana",
+    "description": "Cultura e cittadinanza italiana: preparazione CILS/CELI",
+    "grammar": ["Ripasso strutturato temi civici", "Passato remoto (riconoscimento lettura)"],
+    "vocabCount": 180,
+    "exerciseCount": 12,
+    "prerequisite": 10,
+    "explicacion": "🇮🇹 Este módulo trata sobre cultura y ciudadanía italiana: historia, geografía, instituciones, derechos y deberes. Incluye el reconocimiento del passato remoto (tiempo verbal usado en narrativa y literatura: parlai, dicesti, parlò...). No necesitas producirlo, solo reconocerlo al leer.",
+    "ejemplos": [
+      {"it": "L'Italia è una repubblica fondata sul lavoro.", "es": "Italia es una república fundada en el trabajo.", "fonetica": "litálya é úna repúblika fondáta sul lavóro"},
+      {"it": "Dante Alighieri scrisse la Divina Commedia.", "es": "Dante Alighieri escribió la Divina Comedia.", "fonetica": "dánte aligyéri krísse la divína comédia"}
+    ],
+    "tablas": [
+      {
+        "titulo": "Dati personali — vocabolario",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["il cognome", "el apellido"],
+          ["il nome", "el nombre"],
+          ["la data di nascita", "la fecha de nacimiento"],
+          ["il luogo di nascita", "el lugar de nacimiento"],
+          ["la cittadinanza", "la ciudadanía"],
+          ["la residenza", "la residencia"]
+        ]
+      },
+      {
+        "titulo": "Verbi utili per la cittadinanza",
+        "encabezados": ["Italiano", "Español"],
+        "filas": [
+          ["richiedere", "solicitar"],
+          ["ottenere", "obtener"],
+          ["presentare", "presentar"],
+          ["giurare", "jurar"],
+          ["rinunciare", "renunciar"]
+        ]
+      }
+    ]
+  }
+]</script>
+<script type="application/json" id="data-exercises">[
+  {
+    "id": "mod0-ex0",
+    "type": "multiple-choice",
+    "prompt": "Come ti chiami?",
+    "correctAnswers": ["0"],
+    "options": ["Mi chiamo Marco", "Chiamo Marco", "Mi chiamo di Marco", "Io chiamo Marco"],
+    "hints": ["Ricorda: 'chiamarsi' è un verbo riflessivo.", "Si dice 'mi chiamo' + nome (es. 'Mi chiamo Marco')."],
+    "difficulty": "easy",
+    "explicacion": "👋 ¡Vamos a presentarnos! El verbo 'chiamarsi' (llamarse) es reflexivo. Se conjuga: io mi chiamo, tu ti chiami, lui/lei si chiama, noi ci chiamiamo, voi vi chiamate, loro si chiamano. La opción correcta es 'Mi chiamo Marco'.",
+    "fonetica": "kóme ti kiámi"
+  },
+  {
+    "id": "mod0-ex1",
+    "type": "fill-in-blank",
+    "prompt": "Completa: Io ___ (avere) 30 anni.",
+    "correctAnswers": ["ho"],
+    "hints": ["'Avere' è un verbo irregolare.", "La prima persona singolare del presente è 'ho' (senza 'a' iniziale)."],
+    "difficulty": "easy",
+    "explicacion": "🔑 El verbo 'avere' (tener) es irregular en presente: io ho, tu hai, lui/lei ha, noi abbiamo, voi avete, loro hanno. Recuerda: 'io ho' se escribe sin 'a' — solo 'ho'.",
+    "fonetica": "ío avére trénta áni"
+  },
+  {
+    "id": "mod0-ex2",
+    "type": "reorder-words",
+    "prompt": "Riordina le parole per formare una domanda:",
+    "correctAnswers": ["Come ti chiami ?"],
+    "options": ["Come", "?", "chiami", "ti"],
+    "hints": ["Pensa a una domanda per chiedere il nome a qualcuno.", "La struttura è: Come + pronome + verbo."],
+    "difficulty": "easy",
+    "explicacion": "🤔 Para preguntar el nombre a alguien en italiano se usa: Come + pronombre reflexivo + verbo + ?. 'Come ti chiami?' significa '¿Cómo te llamas?'. La estructura correcta es: Come + ti + chiami + ?.",
+    "fonetica": "riordína le paróle per formáre una dománda"
+  },
+  {
+    "id": "mod0-ex3",
+    "type": "error-correction",
+    "prompt": "Trova l'errore: Io ha 29 anni.",
+    "correctAnswers": ["ha"],
+    "options": ["Io", "ha", "29", "anni"],
+    "hints": ["Quale persona del verbo 'avere' si usa con 'io'?", "'Io' vuole 'ho', non 'ha' (che è per lui/lei)."],
+    "difficulty": "easy",
+    "explicacion": "🔍 Identifica el error de concordancia: el sujeto 'io' (yo) requiere el verbo 'ho', no 'ha'. 'Ha' es para él/ella (lui/lei). La forma correcta es 'Io ho 29 anni'.",
+    "fonetica": "tróva leróre ío a ventinóve áni"
+  },
+  {
+    "id": "mod0-ex4",
+    "type": "multiple-choice",
+    "prompt": "Completa: Loro ___ italiani.",
+    "correctAnswers": ["0"],
+    "options": ["sono", "hanno", "siamo", "è"],
+    "hints": ["'Loro' = tercera persona plural.", "'Essere' (ser/estar) en presente: loro sono."],
+    "difficulty": "easy",
+    "explicacion": "🇮🇹 El verbo 'essere' (ser/estar) en presente: io sono, tu sei, lui/lei è, noi siamo, voi siete, loro sono. Recuerda: 'loro' usa 'sono' igual que 'io'. La forma 'hanno' es del verbo 'avere'.",
+    "fonetica": "lóro sóno italiáni"
+  },
+  {
+    "id": "mod0-ex5",
+    "type": "fill-in-blank",
+    "prompt": "Completa: Noi ___ (mangiare) la pizza insieme.",
+    "correctAnswers": ["mangiamo"],
+    "hints": ["'Mangiare' è un verbo regolare in -are.", "La desinenza per 'noi' al presente è -iamo."],
+    "difficulty": "easy",
+    "explicacion": "🍕 'Mangiare' es un verbo regular de la primera conjugación (-are). Presente: io mangio, tu mangi, lui/lei mangia, noi mangiamo, voi mangiate, loro mangiano. La forma 'mangiamo' es la correcta para 'noi'.",
+    "fonetica": "nói manyámo la pítsa insiéme"
+  },
+  {
+    "id": "mod0-ex6",
+    "type": "multiple-choice",
+    "prompt": "Scegli l'articolo giusto: ___ studente (maschile)",
+    "correctAnswers": ["2"],
+    "options": ["il", "la", "lo", "un"],
+    "hints": ["'Studente' comincia per 'st-' (s+consonante).", "Con s+consonante si usa 'lo' (non 'il')."],
+    "difficulty": "medium",
+    "explicacion": "📚 Los artículos determinativos en italiano: il (normal masc.), lo (masc. ante s+cons, gn, pn, z), la (fem.), i (masc. pl.), gli (masc. pl. especial), le (fem. pl.). 'Studente' empieza por 'st-' → s+consonante → 'lo studente'. Lo mismo: 'lo sport', 'lo gnomo', 'lo psicologo'.",
+    "fonetica": "shéli lartícolo yústo uno studénte"
+  },
+  {
+    "id": "mod0-ex7",
+    "type": "reorder-words",
+    "prompt": "Riordina le parole per formare una domanda:",
+    "correctAnswers": ["Dove abiti ?"],
+    "options": ["Dove", "?", "abiti"],
+    "hints": ["Pensa a una domanda per chiedere la residenza.", "L'interrogativo 'Dove' va all'inizio della frase."],
+    "difficulty": "easy",
+    "explicacion": "🗺️ Las preguntas en italiano se forman con el interrogativo al inicio + verbo conjugado. 'Dove' + 'abiti' (tú vives) + ? = 'Dove abiti?' (¿Dónde vives?). Otros interrogativos: Chi, Cosa, Quando, Perché, Come, Quale, Quanto.",
+    "fonetica": "riordína le paróle per formáre una dománda"
+  },
+  {
+    "id": "mod0-ex8",
+    "type": "multiple-choice",
+    "prompt": "Cosa usi? In biblioteca ___ molti libri.",
+    "correctAnswers": ["1"],
+    "options": ["c'è", "ci sono", "essere", "avere"],
+    "hints": ["'Molti libri' è plurale.", "Per il plurale si usa 'ci sono'."],
+    "difficulty": "medium",
+    "explicacion": "📖 'C'è' (hay) se usa con singular: 'C'è un libro'. 'Ci sono' (hay) se usa con plural: 'Ci sono molti libri'. La contracción 'c'è' viene de 'ci + è'. El orden es: C'è / Ci sono + sujeto + resto de la frase.",
+    "fonetica": "kóza úsi — bi bliutéka chi sóno mólti líbri"
+  },
+  {
+    "id": "mod0-ex9",
+    "type": "multiple-choice",
+    "prompt": "Completa: Questa è ___ macchina. (io)",
+    "correctAnswers": ["1"],
+    "options": ["mio", "mia", "miei", "mie"],
+    "hints": ["'Macchina' (coche) è femminile singolare.", "Il possessivo per 'io' + femminile singolare: mia."],
+    "difficulty": "medium",
+    "explicacion": "🚗 Los posesivos en italiano concuerdan en género y número con el objeto poseído, NO con el poseedor (al revés del español). 'Mia' = femenino singular (macchina). Mio = masculino singular (libro). Miei = masculino plural (libri). Mie = femenino plural (amiche). Y siempre llevan artículo: 'la mia macchina'.",
+    "fonetica": "kuésta é la mía mákina"
+  },
+  {
+    "id": "mod0-ex10",
+    "type": "error-correction",
+    "prompt": "Trova l'errore: La casa è bianco.",
+    "correctAnswers": ["bianco"],
+    "options": ["La", "casa", "è", "bianco"],
+    "hints": ["'Casa' è femminile. L'aggettivo deve concordare.", "L'aggettivo 'bianco' al femminile diventa 'bianca'."],
+    "difficulty": "easy",
+    "explicacion": "🎨 En italiano los adjetivos CONCUERDAN en género y número con el sustantivo. 'Casa' es femenino → el adjetivo debe terminar en -a: 'bianca'. Regla general: masculino→ -o, femenino→ -a, plural masculino→ -i, plural femenino→ -e. 'Bianco' solo se usa con sustantivos masculinos: 'il gatto bianco'.",
+    "fonetica": "tróva leróre la kása é byánko"
+  },
+  {
+    "id": "mod0-ex11",
+    "type": "fill-in-blank",
+    "prompt": "Completa: Voi ___ (leggere) un libro ogni giorno.",
+    "correctAnswers": ["leggete"],
+    "hints": ["'Leggere' è un verbo regolare in -ere.", "La desinenza per 'voi' al presente è -ete."],
+    "difficulty": "medium",
+    "explicacion": "📚 'Leggere' (leer) es un verbo regular de la segunda conjugación (-ere). Presente: io leggo, tu leggi, lui/lei legge, noi leggiamo, voi leggete, loro leggono. Fíjate en el cambio de raíz 'legg-' y las desinencias: -o, -i, -e, -iamo, -ete, -ono.",
+    "fonetica": "vói léddete un líbro óñi yórno"
+  },
+  {
+    "id": "mod1-ex0",
+    "type": "fill-in-blank",
+    "prompt": "Completa: Ieri ___ (andare) al cinema con Maria.",
+    "correctAnswers": ["sono andato", "sono andata"],
+    "hints": ["'Andare' al passato prossimo usa l'ausiliare 'essere'.", "Participio passato di 'andare': andato/a."],
+    "difficulty": "easy",
+    "explicacion": "🚶 'Andare' (ir) en passato prossimo usa el auxiliar 'essere' porque es verbo de movimiento. El participio pasado de 'andare' es 'andato/a'. Concordancia: si el sujeto es masculino → 'sono andato', femenino → 'sono andata'.",
+    "fonetica": "yéri andáre al chínema kon maría"
+  },
+  {
+    "id": "mod1-ex1",
+    "type": "listen-and-repeat",
+    "prompt": "Ascolta e ripeti la frase:",
+    "correctAnswers": ["Sono andato a Roma la settimana scorsa"],
+    "hints": ["Fai attenzione alla pronuncia di 'settimana' (doppia t).", "Dividi: Sono andato / a Roma / la settimana scorsa."],
+    "difficulty": "medium",
+    "explicacion": "🎤 ¡A practicar la pronunciación! La frase usa passato prossimo con 'essere': 'Sono andato a Roma'. Presta atención a las consonantes dobles: settimana (dos 't'), y a la pronunciación de 'scorsa'.",
+    "fonetica": "askólta e ripéti la fráse"
+  },
+  {
+    "id": "mod1-ex2",
+    "type": "multiple-choice",
+    "prompt": "Completa: Hai ___ (vedere) quel film?",
+    "correctAnswers": ["1"],
+    "options": ["veduto", "visto", "vedere", "vedendo"],
+    "hints": ["Il participio passato di 'vedere' è irregolare.", "'Visto' è la forma corretta (non 'veduto')."],
+    "difficulty": "medium",
+    "explicacion": "📝 El verbo 'vedere' tiene participio pasado irregular: 'visto' (no 'veduto'). Otros irregulares: fare→fatto, dire→detto, scrivere→scritto, prendere→preso. Hay que memorizarlos.",
+    "fonetica": "ái védere kuél film"
+  },
+  {
+    "id": "mod1-ex3",
+    "type": "sentence-transformation",
+    "prompt": "Trasforma dal presente al passato prossimo: Vado a casa.",
+    "correctAnswers": ["Sono andato a casa", "Sono andata a casa"],
+    "hints": ["'Vado' è presente indicativo di 'andare'.", "Al passato prossimo usa 'essere' + participio passato."],
+    "difficulty": "medium",
+    "explicacion": "🔄 Transformar del presente al passato prossimo: 'Vado' (presente) → 'Sono andato/a' (passato prossimo). 'Andare' usa 'essere' como auxiliar y el participio cambia según el género del sujeto.",
+    "fonetica": "vádo a kása"
+  },
+  {
+    "id": "mod1-ex4",
+    "type": "situational-dialogue",
+    "prompt": "Il tuo amico è appena tornato dalle vacanze. Cosa gli chiedi?",
+    "correctAnswers": ["0"],
+    "options": ["Dove sei stato?", "Dove stai andando?", "Dove andrai?", "Dove vai tutti i giorni?"],
+    "hints": ["Le vacanze sono finite: devi usare il passato.", "'Stato' è il participio passato di 'stare'."],
+    "difficulty": "medium",
+    "explicacion": "🏖️ Cuando preguntas a alguien sobre sus vacaciones pasadas, usas passato prossimo. 'Dove sei stato?' = '¿Dónde has estado?'. 'Stato' es el participio pasado de 'stare' (estar). Las otras opciones usan presente, futuro o gerundio — incorrectas aquí.",
+    "fonetica": "il túo amíko é apéna tornáto dále vakántse"
+  },
+  {
+    "id": "mod2-ex0",
+    "type": "fill-in-blank",
+    "prompt": "Completa: Da bambino ___ (giocare) sempre al parco.",
+    "correctAnswers": ["giocavo"],
+    "hints": ["Imperfetto dei verbi in -are: -avo, -avi, -ava...", "Io gioc-AVO: desinenza -avo per la prima persona."],
+    "difficulty": "easy",
+    "explicacion": "⚽ El imperfetto del verbo 'giocare' en primera persona singular: io giocavo. Las desinencias del imperfetto para verbos en -are son: -avo, -avi, -ava, -avamo, -avate, -avano.",
+    "fonetica": "da bambíno yocáre sémpre al párko"
+  },
+  {
+    "id": "mod2-ex1",
+    "type": "error-correction",
+    "prompt": "Trova l'errore: Mentre mangiavo, il telefono squilla.",
+    "correctAnswers": ["squilla"],
+    "options": ["Mentre", "mangiavo", "il", "telefono", "squilla"],
+    "hints": ["Due azioni nel passato: una in corso, l'altra interrompe.", "La seconda azione deve essere all'imperfetto: squill-AVA."],
+    "difficulty": "medium",
+    "explicacion": "⏳ Dos acciones en el pasado: una en curso (mangiavo - imperfetto) y otra que ocurre simultáneamente. Ambas deben ir en imperfetto: 'mentre mangiavo, il telefono squillava'. 'Squilla' es presente, no pasado.",
+    "fonetica": "métre manyávo il teléfono skuíla"
+  },
+  {
+    "id": "mod2-ex2",
+    "type": "multiple-choice",
+    "prompt": "Completa: Quando ___ (essere) piccolo, avevo un cane.",
+    "correctAnswers": ["2"],
+    "options": ["sono", "era", "ero", "fui"],
+    "hints": ["'Essere' all'imperfetto è irregolare.", "Io ero, tu eri, lui/lei era, noi eravamo..."],
+    "difficulty": "easy",
+    "explicacion": "📖 El verbo 'essere' en imperfetto: io ero, tu eri, lui/lei era, noi eravamo, voi eravate, loro erano. 'Ero' es la forma correcta para 'io' (primera persona singular).",
+    "fonetica": "kuándo ésere pícolo avévo un káne"
+  },
+  {
+    "id": "mod2-ex3",
+    "type": "listen-and-repeat",
+    "prompt": "Ascolta e ripeti:",
+    "correctAnswers": ["Quando ero piccolo andavo a scuola in bicicletta"],
+    "hints": ["Attenzione alla pronuncia: bicicletta (tre 'c').", "Er-oh, an-DAH-vo — l'accento cade sulla terzultima."],
+    "difficulty": "medium",
+    "explicacion": "🎤 ¡A practicar! Ejercicio de pronunciación con imperfetto. 'Quando ero piccolo andavo a scuola in bicicletta' — fíjate en la entonación y la pronunciación de 'bicicletta' (tres 'c'). El imperfetto 'ero' y 'andavo' describen hábitos del pasado.",
+    "fonetica": "askólta e ripéti"
+  },
+  {
+    "id": "mod3-ex0",
+    "type": "fill-in-blank",
+    "prompt": "Completa: Domani ___ (piovere). Secondo le previsioni...",
+    "correctAnswers": ["pioverà"],
+    "hints": ["'Piovere' al futuro: piover-à.", "Terza persona singolare del futuro semplice."],
+    "difficulty": "easy",
+    "explicacion": "☔ El futuro simple de 'piovere' (llover): pioverò, pioverai, pioverà, pioveremo, pioverete, pioveranno. Para 'domani' (mañana) usamos la tercera persona singular: pioverà.",
+    "fonetica": "dománi pyóvere sekúndo le previzyóni"
+  },
+  {
+    "id": "mod3-ex1",
+    "type": "reorder-words",
+    "prompt": "Riordina le parole per formare una frase:",
+    "correctAnswers": ["Il prossimo anno mi sposerò"],
+    "options": ["mi", "sposerò", "Il", "prossimo", "anno"],
+    "hints": ["La frase inizia con 'Il prossimo anno'.", "'Sposerò' con il pronome riflessivo 'mi' davanti."],
+    "difficulty": "medium",
+    "explicacion": "🧩 Ordena las palabras para formar una frase en futuro. 'Sposerò' es el futuro de 'sposarsi' (casarse): mi sposerò, ti sposerai, si sposerà, ci sposeremo, vi sposerete, si sposeranno.",
+    "fonetica": "riordína le paróle per formáre una fráse"
+  },
+  {
+    "id": "mod3-ex2",
+    "type": "multiple-choice",
+    "prompt": "Completa: Tra cinque anni, ___ (fare) il medico.",
+    "correctAnswers": ["0"],
+    "options": ["farò", "faccio", "facevo", "farei"],
+    "hints": ["'Fare' al futuro perde la 'e' e diventa 'far-' + desinenze.", "Far-ò, far-ai, far-à, far-emo..."],
+    "difficulty": "medium",
+    "explicacion": "🔧 El verbo 'fare' en futuro es irregular: farò, farai, farà, faremo, farete, faranno. Pierde la 'e' y se acorta a 'far-' más las desinencias. 'Farò' es la primera persona singular.",
+    "fonetica": "tra chínkue áni fáre il médiko"
+  },
+  {
+    "id": "mod3-ex3",
+    "type": "describe-image",
+    "prompt": "Descrivi cosa faranno queste persone in questa scena: una famiglia al parco in una giornata di sole.",
+    "correctAnswers": ["famiglia", "parco", "bambini", "giocano", "albero", "sole", "prato", "felice", "pomeriggio", "genitori"],
+    "hints": ["Pensa a cosa fanno le persone in un parco.", "Usa il futuro per descrivere cosa faranno: 'giocheranno', 'passeggeranno'..."],
+    "difficulty": "hard",
+    "explicacion": "🖼️ Describe en futuro lo que harán las personas en la escena. Usa el futuro semplice: giocheranno, passeggeranno, leggeranno... Los verbos en -are cambian la 'a' por 'e' en el futuro (giocare→giocheranno, passeggiare→passeggeranno).",
+    "fonetica": "deskrívi kósa faránno kuéste persóne in úna shéna úna famílya al párko in úna dyornáta di sóle"
+  },
+  {
+    "id": "mod4-ex0",
+    "module": 4,
+    "type": "multiple-choice",
+    "prompt": "Completa con il condizionale: Io ___ (volere) un caffè.",
+    "options": ["voglio", "volevo", "vorrei", "vorrò"],
+    "correctAnswers": ["2"],
+    "explicacion": "El condizionale presente se usa para pedir algo de forma cortés. 'Vorrei' = 'quisiera' (de 'volere').",
+    "fonetica": "ío vorréi un kafé"
+  },
+  {
+    "id": "mod4-ex1",
+    "module": 4,
+    "type": "fill-in-blank",
+    "prompt": "Completa: Tu ___ (dovere) studiare di più.",
+    "correctAnswers": ["dovresti"],
+    "explicacion": "'Dovresti' es la forma de condizionale de 'dovere' (deber). Se usa para dar consejos suaves.",
+    "fonetica": "tú dovrèsti studiáre di pyú"
+  },
+  {
+    "id": "mod4-ex2",
+    "module": 4,
+    "type": "sentence-transformation",
+    "prompt": "Transforma usando el condizionale para ser cortés: 'Voglio un gelato.' → '___'",
+    "correctAnswers": ["Vorrei un gelato"],
+    "explicacion": "Para sonar más cortés, cambiamos 'voglio' (quiero) por 'vorrei' (quisiera).",
+    "fonetica": "vorréi un geláto"
+  },
+  {
+    "id": "mod4-ex3",
+    "module": 4,
+    "type": "error-correction",
+    "prompt": "Trova l'errore: Se potessi, viaggio in Italia.",
+    "options": ["Se", "potessi", "viaggio", "in", "Italia"],
+    "correctAnswers": ["viaggio"],
+    "explicacion": "En una oración condicional con 'se potessi', la segunda parte debe usar condizionale: 'viaggerei', no 'viaggio'.",
+    "fonetica": "se potési viádyo in itálya"
+  },
+  {
+    "id": "mod5-ex0",
+    "module": 5,
+    "type": "multiple-choice",
+    "prompt": "Completa: Marco è ___ (alto) di Luca.",
+    "options": ["alto come", "più alto", "altissimo", "tanto alto"],
+    "correctAnswers": ["1"],
+    "explicacion": "El comparativo de superioridad se forma con 'più + adjetivo + di'. 'Marco è più alto di Luca'.",
+    "fonetica": "márko é pyú álto di lúka"
+  },
+  {
+    "id": "mod5-ex1",
+    "module": 5,
+    "type": "fill-in-blank",
+    "prompt": "Completa con el superlativo: Questa pizza è ___ (buona). È la migliore!",
+    "correctAnswers": ["buonissima", "molto buona"],
+    "explicacion": "El superlativo absoluto se forma quitando la última vocal y añadiendo '-issimo': buono → buonissimo.",
+    "fonetica": "kuésta pítsa é buonísima"
+  },
+  {
+    "id": "mod5-ex2",
+    "module": 5,
+    "type": "multiple-choice",
+    "prompt": "Completa: Sara è intelligente ___ Maria.",
+    "options": ["più di", "meno di", "tanto quanto", "che"],
+    "correctAnswers": ["2"],
+    "explicacion": "Para decir 'tan... como' usamos 'tanto... quanto' o 'così... come'. Pero en esta estructura: 'tanto quanto'.",
+    "fonetica": "sára é inteligénte tánto kuánto maría"
+  },
+  {
+    "id": "mod5-ex3",
+    "module": 5,
+    "type": "reorder-words",
+    "prompt": "Riordina le parole per formare una frase al superlativo:",
+    "options": ["Questo", "è", "il", "più", "bel", "film"],
+    "correctAnswers": ["Questo è il più bel film"],
+    "explicacion": "El superlativo relativo se forma con 'il/la/i/le più + adjetivo'. 'Questo è il più bel film'.",
+    "fonetica": "kuésto é il pyú bél film"
+  },
+  {
+    "id": "mod6-ex0",
+    "module": 6,
+    "type": "multiple-choice",
+    "prompt": "Completa: Spero che tu ___ (venire) alla festa.",
+    "options": ["vieni", "verrai", "venga", "venivi"],
+    "correctAnswers": ["2"],
+    "explicacion": "Después de 'spero che' usamos el congiuntivo presente. 'Venire' → 'che tu venga'.",
+    "fonetica": "spéro ke tú vénga ála fésta"
+  },
+  {
+    "id": "mod6-ex1",
+    "module": 6,
+    "type": "fill-in-blank",
+    "prompt": "Completa: Penso che loro ___ (arrivare) domani.",
+    "correctAnswers": ["arrivino"],
+    "explicacion": "'Penso che' requiere congiuntivo. 'Arrivare' → 'che loro arrivino'.",
+    "fonetica": "pénso ke lóro arivíno dománi"
+  },
+  {
+    "id": "mod6-ex2",
+    "module": 6,
+    "type": "error-correction",
+    "prompt": "Trova l'errore: Benché è stanco, esce lo stesso.",
+    "options": ["Benché", "è", "stanco", "esce", "lo", "stesso"],
+    "correctAnswers": ["è"],
+    "explicacion": "Después de 'benché' (aunque) se usa congiuntivo: 'benché sia stanco', no 'benché è'.",
+    "fonetica": "benké é stánko éshe lo stéso"
+  },
+  {
+    "id": "mod6-ex3",
+    "module": 6,
+    "type": "situational-dialogue",
+    "prompt": "Il tuo amico dice: 'Marco non viene alla festa.' Come rispondi esprimendo un'opinione?",
+    "options": ["Penso che Marco non viene.", "Penso che Marco non venga.", "Marco non viene, lo so.", "Secondo me Marco non è venuto."],
+    "correctAnswers": ["1"],
+    "explicacion": "Cuando expresas una opinión con 'penso che', debes usar congiuntivo: 'Penso che Marco non venga'.",
+    "fonetica": "pénso ke márko non vénga"
+  },
+  {
+    "id": "mod7-ex0",
+    "module": 7,
+    "type": "multiple-choice",
+    "prompt": "Completa con CI o NE: 'Vado a Roma. ___ vado domani.'",
+    "options": ["Ne", "Ci", "Lo", "Gli"],
+    "correctAnswers": ["1"],
+    "explicacion": "'CI' sustituye un lugar: 'Vado a Roma' → 'Ci vado' (voy allí).",
+    "fonetica": "chi vádo dománi"
+  },
+  {
+    "id": "mod7-ex1",
+    "module": 7,
+    "type": "multiple-choice",
+    "prompt": "Completa: 'Quanto pane vuoi? ___ voglio molto.'",
+    "options": ["Ci", "Lo", "Ne", "La"],
+    "correctAnswers": ["2"],
+    "explicacion": "'NE' sustituye una cantidad: 'Quanto pane?' → 'Ne voglio molto' (de ello quiero mucho).",
+    "fonetica": "ne vólyo mólt"
+  },
+  {
+    "id": "mod7-ex2",
+    "module": 7,
+    "type": "sentence-transformation",
+    "prompt": "Sustituye la parte subrayada por CI o NE: 'Parlo spesso di questo problema.' → '___ parlo spesso.'",
+    "correctAnswers": ["Ne"],
+    "explicacion": "'NE' sustituye 'di questo problema' (hablo de esto → hablo DE ELLO → NE parlo).",
+    "fonetica": "ne párlo spésso"
+  },
+  {
+    "id": "mod7-ex3",
+    "module": 7,
+    "type": "fill-in-blank",
+    "prompt": "Completa con CI: 'A quel ristorante ___ siamo già stati.'",
+    "correctAnswers": ["ci"],
+    "explicacion": "'CI' también se usa con 'essere stati' para indicar 'estar en un lugar': 'A quel ristorante ci siamo già stati'.",
+    "fonetica": "a kuél ristoránte chi syámo dyá státi"
+  },
+  {
+    "id": "mod8-ex0",
+    "module": 8,
+    "type": "fill-in-blank",
+    "prompt": "Completa: 'Il libro? A Maria ___ ho dato ieri.' (glielo / te lo / me lo)",
+    "correctAnswers": ["glielo"],
+    "explicacion": "'A Maria' = 'a lei' = 'le' + 'lo' = 'glielo'. 'Glielo ho dato' = 'se lo di'.",
+    "fonetica": "lyélo ó dáto yéri"
+  },
+  {
+    "id": "mod8-ex1",
+    "module": 8,
+    "type": "multiple-choice",
+    "prompt": "Completa: 'A te il regalo? ___ do subito.'",
+    "options": ["Glielo", "Te lo", "Me lo", "Ce lo"],
+    "correctAnswers": ["1"],
+    "explicacion": "'A te' = 'ti' + 'lo' → 'te lo'. Porque ti + lo se fusiona en 'te lo'.",
+    "fonetica": "té lo dó súbito"
+  },
+  {
+    "id": "mod8-ex2",
+    "module": 8,
+    "type": "sentence-transformation",
+    "prompt": "Transforma al imperativo con pronombre: 'Devi dire a me la verità.' → '___!' (dimmela / dimmelo / dilla)",
+    "correctAnswers": ["Dimmela"],
+    "explicacion": "'Dire a me' = 'mi' + 'la verità' = 'la'. En imperativo: 'di' + 'mi' + 'la' = 'dimmela'. Ojo: 'dì' pierde la i.",
+    "fonetica": "dímela"
+  },
+  {
+    "id": "mod9-ex0",
+    "module": 9,
+    "type": "multiple-choice",
+    "prompt": "Completa: Se ___ (avere) soldi, comprerei una casa.",
+    "options": ["ho", "avevo", "avessi", "avrò"],
+    "correctAnswers": ["2"],
+    "explicacion": "El periodo ipotetico de posibilidad usa: Se + congiuntivo imperfetto + condizionale. 'Se avessi soldi, comprerei una casa.'",
+    "fonetica": "se avési sóldi compreréi úna kása"
+  },
+  {
+    "id": "mod9-ex1",
+    "module": 9,
+    "type": "fill-in-blank",
+    "prompt": "Completa: Se avessi studiato, ___ (passare) l'esame.",
+    "correctAnswers": ["avrei passato"],
+    "explicacion": "Periodo ipotetico de irrealidad: Se + congiuntivo trapassato + condizionale passato. 'Se avessi studiato, avrei passato l'esame.'",
+    "fonetica": "avréi pasáto lezáme"
+  },
+  {
+    "id": "mod9-ex2",
+    "module": 9,
+    "type": "reorder-words",
+    "prompt": "Riordina le parole per formare una frase ipotetica:",
+    "options": ["potessi", "Se", "tutto", "viaggerei", "l'anno"],
+    "correctAnswers": ["Se potessi viaggerei tutto l'anno"],
+    "explicacion": "'Se potessi' (congiuntivo) + 'viaggerei' (condizionale). Orden: Se + congiuntivo + condizionale.",
+    "fonetica": "se potési viadyeréi túto lánno"
+  },
+  {
+    "id": "mod10-ex0",
+    "module": 10,
+    "type": "multiple-choice",
+    "prompt": "Completa: L'anno scorso ___ (andare) in Italia per la prima volta.",
+    "options": ["vado", "sono andato", "andavo", "andrò"],
+    "correctAnswers": ["1"],
+    "explicacion": "Acción completada en el pasado → passato prossimo con 'essere': 'sono andato'.",
+    "fonetica": "lánno skórso sóno andáto in itálya"
+  },
+  {
+    "id": "mod10-ex1",
+    "module": 10,
+    "type": "fill-in-blank",
+    "prompt": "Completa con la preposición correcta: Vado ___ scuola ogni giorno.",
+    "correctAnswers": ["a"],
+    "explicacion": "Con 'scuola' y lugares públicos se usa 'a': 'vado a scuola'. Con 'il' se fusiona: 'vado al cinema'.",
+    "fonetica": "vádo a skuóla ónyi dyórno"
+  },
+  {
+    "id": "mod10-ex2",
+    "module": 10,
+    "type": "error-correction",
+    "prompt": "Trova l'errore: Ieri ho andato al mercato con Maria.",
+    "options": ["Ieri", "ho", "andato", "al", "mercato", "con", "Maria"],
+    "correctAnswers": ["ho"],
+    "explicacion": "'Andare' usa 'essere' como auxiliar, no 'avere'. Lo correcto es 'sono andato'.",
+    "fonetica": "sóno andáto al merkáto"
+  },
+  {
+    "id": "mod11-ex0",
+    "module": 11,
+    "type": "multiple-choice",
+    "prompt": "Completa: Per richiedere la cittadinanza devi presentare il ___ di nascita.",
+    "options": ["libro", "certificato", "foglio", "documento"],
+    "correctAnswers": ["1"],
+    "explicacion": "'Certificato di nascita' = 'certificado de nacimiento'. Es el documento oficial que se necesita para la ciudadanía.",
+    "fonetica": "per rikyédere la chitadinántsa dévi presentáre il chertifikáto di nashíta"
+  },
+  {
+    "id": "mod11-ex1",
+    "module": 11,
+    "type": "fill-in-blank",
+    "prompt": "Completa: Dopo 10 anni di residenza, puoi ___ (solicitar) la cittadinanza italiana.",
+    "correctAnswers": ["richiedere"],
+    "explicacion": "'Richiedere' = 'solicitar'. Otros verbos útiles: 'ottenere' (obtener), 'presentare' (presentar), 'giurare' (jurar).",
+    "fonetica": "ríkyédere la chitadinántsa"
+  },
+  {
+    "id": "mod11-ex2",
+    "module": 11,
+    "type": "situational-dialogue",
+    "prompt": "Sei all'ufficio cittadinanza. L'impiegato ti chiede: 'Da quanto tempo vive in Italia?' Cosa rispondi?",
+    "options": ["Vivo in Italia da ieri.", "Vivo in Italia da cinque anni.", "Vive in Italia da molto.", "Abito in Italia per sempre."],
+    "correctAnswers": ["1"],
+    "explicacion": "La respuesta natural: 'Vivo in Italia da cinque anni.' Da + periodo = desde hace.",
+    "fonetica": "vívo in itálya da chínkue áni"
+  }
+]</script>
+<script type="application/json" id="data-vocabulary">[
+  {"word": "ciao", "translation": "hola / adiós", "module": 0, "pos": "interjection", "example": "Ciao, come stai?"},
+  {"word": "buongiorno", "translation": "buenos días", "module": 0, "pos": "interjection", "example": "Buongiorno, signora Rossi."},
+  {"word": "buonasera", "translation": "buenas tardes / noches", "module": 0, "pos": "interjection", "example": "Buonasera, arrivederci."},
+  {"word": "arrivederci", "translation": "hasta luego", "module": 0, "pos": "interjection", "example": "Arrivederci e grazie!"},
+  {"word": "grazie", "translation": "gracias", "module": 0, "pos": "interjection", "example": "Grazie mille per il regalo."},
+  {"word": "prego", "translation": "de nada / por favor", "module": 0, "pos": "interjection", "example": "Prego, si accomodi."},
+  {"word": "per favore", "translation": "por favor", "module": 0, "pos": "phrase", "example": "Un caffè, per favore."},
+  {"word": "come", "translation": "cómo", "module": 0, "pos": "adverb", "example": "Come ti chiami?"},
+  {"word": "bene", "translation": "bien", "module": 0, "pos": "adverb", "example": "Sto bene, grazie."},
+  {"word": "male", "translation": "mal", "module": 0, "pos": "adverb", "example": "Oggi mi sento male."},
+  {"word": "chiamarsi", "translation": "llamarse", "module": 0, "pos": "verb", "example": "Mi chiamo Luca."},
+  {"word": "avere", "translation": "tener", "module": 0, "pos": "verb", "example": "Ho due fratelli."},
+  {"word": "essere", "translation": "ser / estar", "module": 0, "pos": "verb", "example": "Sono italiano."},
+  {"word": "fare", "translation": "hacer", "module": 0, "pos": "verb", "example": "Che fai stasera?"},
+  {"word": "dire", "translation": "decir", "module": 0, "pos": "verb", "example": "Come si dice in italiano?"},
+  {"word": "andare", "translation": "ir", "module": 0, "pos": "verb", "example": "Vado a scuola."},
+  {"word": "venire", "translation": "venir", "module": 0, "pos": "verb", "example": "Vieni con me?"},
+  {"word": "stare", "translation": "estar", "module": 0, "pos": "verb", "example": "Come stai?"},
+  {"word": "potere", "translation": "poder", "module": 0, "pos": "verb", "example": "Posso entrare?"},
+  {"word": "volere", "translation": "querer", "module": 0, "pos": "verb", "example": "Voglio un gelato."},
+  {"word": "dovere", "translation": "deber", "module": 0, "pos": "verb", "example": "Devo studiare."},
+  {"word": "sapere", "translation": "saber", "module": 0, "pos": "verb", "example": "Non so la risposta."},
+  {"word": "parlare", "translation": "hablar", "module": 0, "pos": "verb", "example": "Parlo italiano e inglese."},
+  {"word": "leggere", "translation": "leer", "module": 0, "pos": "verb", "example": "Leggo un libro ogni sera."},
+  {"word": "scrivere", "translation": "escribir", "module": 0, "pos": "verb", "example": "Scrivo una lettera alla mamma."},
+  {"word": "dormire", "translation": "dormir", "module": 0, "pos": "verb", "example": "Dormo otto ore ogni notte."},
+  {"word": "mangiare", "translation": "comer", "module": 0, "pos": "verb", "example": "Mangio sempre la colazione."},
+  {"word": "casa", "translation": "casa", "module": 0, "pos": "noun", "gender": "f", "example": "La casa è grande."},
+  {"word": "scuola", "translation": "escuela", "module": 0, "pos": "noun", "gender": "f", "example": "Vado a scuola in autobus."},
+  {"word": "libro", "translation": "libro", "module": 0, "pos": "noun", "gender": "m", "example": "Il libro è interessante."},
+  {"word": "amico", "translation": "amigo", "module": 0, "pos": "noun", "gender": "m", "example": "Lui è il mio amico Marco."},
+  {"word": "amica", "translation": "amiga", "module": 0, "pos": "noun", "gender": "f", "example": "Lei è la mia amica Sara."},
+  {"word": "uomo", "translation": "hombre", "module": 0, "pos": "noun", "gender": "m", "example": "L'uomo legge il giornale."},
+  {"word": "donna", "translation": "mujer", "module": 0, "pos": "noun", "gender": "f", "example": "La donna parla al telefono."},
+  {"word": "bambino", "translation": "niño", "module": 0, "pos": "noun", "gender": "m", "example": "Il bambino gioca nel parco."},
+  {"word": "bambina", "translation": "niña", "module": 0, "pos": "noun", "gender": "f", "example": "La bambina canta una canzone."},
+  {"word": "vita", "translation": "vida", "module": 0, "pos": "noun", "gender": "f", "example": "La vita è bella."},
+  {"word": "giorno", "translation": "día", "module": 0, "pos": "noun", "gender": "m", "example": "Buon giorno!"},
+  {"word": "settimana", "translation": "semana", "module": 0, "pos": "noun", "gender": "f", "example": "La settimana ha sette giorni."},
+  {"word": "mese", "translation": "mes", "module": 0, "pos": "noun", "gender": "m", "example": "Gennaio è il primo mese."},
+  {"word": "anno", "translation": "año", "module": 0, "pos": "noun", "gender": "m", "example": "Buon anno nuovo!"},
+  {"word": "ora", "translation": "hora", "module": 0, "pos": "noun", "gender": "f", "example": "Che ora è?"},
+  {"word": "minuto", "translation": "minuto", "module": 0, "pos": "noun", "gender": "m", "example": "Aspetta un minuto!"},
+  {"word": "notte", "translation": "noche", "module": 0, "pos": "noun", "gender": "f", "example": "Buona notte, a domani!"},
+  {"word": "mattina", "translation": "mañana (parte del día)", "module": 0, "pos": "noun", "gender": "f", "example": "La mattina bevo il caffè."},
+  {"word": "pomeriggio", "translation": "tarde (parte del día)", "module": 0, "pos": "noun", "gender": "m", "example": "Nel pomeriggio studio."},
+  {"word": "sera", "translation": "noche (temprano)", "module": 0, "pos": "noun", "gender": "f", "example": "La sera guardo la TV."},
+  {"word": "adesso", "translation": "ahora", "module": 0, "pos": "adverb", "example": "Adesso mangiamo."},
+  {"word": "poi", "translation": "luego / después", "module": 0, "pos": "adverb", "example": "Prima studio, poi gioco."},
+  {"word": "sempre", "translation": "siempre", "module": 0, "pos": "adverb", "example": "Mangio sempre la stessa cosa."},
+  {"word": "mai", "translation": "nunca", "module": 0, "pos": "adverb", "example": "Non bevo mai il caffè."},
+  {"word": "oggi", "translation": "hoy", "module": 0, "pos": "adverb", "example": "Oggi è una bella giornata."},
+  {"word": "domani", "translation": "mañana (día)", "module": 0, "pos": "adverb", "example": "Domani vado al mare."},
+  {"word": "ieri", "translation": "ayer", "module": 0, "pos": "adverb", "example": "Ieri ho mangiato la pizza."},
+  {"word": "molto", "translation": "muy / mucho", "module": 0, "pos": "adverb", "example": "Sei molto gentile!"},
+  {"word": "poco", "translation": "poco", "module": 0, "pos": "adverb", "example": "Parlo poco italiano."},
+  {"word": "anche", "translation": "también", "module": 0, "pos": "adverb", "example": "Anch'io voglio un gelato."},
+  {"word": "perché", "translation": "por qué / porque", "module": 0, "pos": "adverb", "example": "Perché non vieni con noi?"},
+  {"word": "dove", "translation": "dónde", "module": 0, "pos": "adverb", "example": "Dove abiti?"},
+  {"word": "cosa", "translation": "qué / cosa", "module": 0, "pos": "adverb", "example": "Cosa fai stasera?"},
+  {"word": "quando", "translation": "cuándo", "module": 0, "pos": "adverb", "example": "Quando arrivi?"},
+  {"word": "quanto", "translation": "cuánto", "module": 0, "pos": "adverb", "example": "Quanto costa?"},
+  {"word": "chi", "translation": "quién", "module": 0, "pos": "adverb", "example": "Chi è lui?"},
+  {"word": "non", "translation": "no (negación)", "module": 0, "pos": "particle", "example": "Non parlo francese."},
+  {"word": "sì", "translation": "sí", "module": 0, "pos": "particle", "example": "Sì, voglio un gelato."},
+  {"word": "uno", "translation": "uno", "module": 0, "pos": "numeral", "example": "Ho un fratello."},
+  {"word": "due", "translation": "dos", "module": 0, "pos": "numeral", "example": "Due caffè, per favore."},
+  {"word": "tre", "translation": "tres", "module": 0, "pos": "numeral", "example": "Tre bicchieri di vino, grazie."},
+  {"word": "quattro", "translation": "cuatro", "module": 0, "pos": "numeral", "example": "Quattro libri."},
+  {"word": "cinque", "translation": "cinco", "module": 0, "pos": "numeral", "example": "Cinque minuti, per favore."},
+  {"word": "sei", "translation": "seis", "module": 0, "pos": "numeral", "example": "Sei euro, per favore."},
+  {"word": "sette", "translation": "siete", "module": 0, "pos": "numeral", "example": "Sette giorni alla settimana."},
+  {"word": "otto", "translation": "ocho", "module": 0, "pos": "numeral", "example": "Otto ore di sonno."},
+  {"word": "nove", "translation": "nueve", "module": 0, "pos": "numeral", "example": "Nove mesi di scuola."},
+  {"word": "dieci", "translation": "diez", "module": 0, "pos": "numeral", "example": "Dieci minuti di pausa."},
+  {"word": "cento", "translation": "cien", "module": 0, "pos": "numeral", "example": "Cento euro."},
+  {"word": "lunedì", "translation": "lunes", "module": 0, "pos": "noun", "gender": "m", "example": "Lunedì vado al lavoro."},
+  {"word": "martedì", "translation": "martes", "module": 0, "pos": "noun", "gender": "m", "example": "Martedì ho lezione di italiano."},
+  {"word": "mercoledì", "translation": "miércoles", "module": 0, "pos": "noun", "gender": "m", "example": "Mercoledì studio tutto il giorno."},
+  {"word": "giovedì", "translation": "jueves", "module": 0, "pos": "noun", "gender": "m", "example": "Giovedì vado in palestra."},
+  {"word": "venerdì", "translation": "viernes", "module": 0, "pos": "noun", "gender": "m", "example": "Finalmente è venerdì!"},
+  {"word": "sabato", "translation": "sábado", "module": 0, "pos": "noun", "gender": "m", "example": "Sabato vado al mercato."},
+  {"word": "domenica", "translation": "domingo", "module": 0, "pos": "noun", "gender": "f", "example": "La domenica mi riposo."},
+  {"word": "gennaio", "translation": "enero", "module": 0, "pos": "noun", "gender": "m", "example": "Gennaio è il primo mese dell'anno."},
+  {"word": "febbraio", "translation": "febrero", "module": 0, "pos": "noun", "gender": "m", "example": "Febbraio ha 28 giorni."},
+  {"word": "marzo", "translation": "marzo", "module": 0, "pos": "noun", "gender": "m", "example": "Marzo è il mese della primavera."},
+  {"word": "aprile", "translation": "abril", "module": 0, "pos": "noun", "gender": "m", "example": "Aprile è un bel mese."},
+  {"word": "maggio", "translation": "mayo", "module": 0, "pos": "noun", "gender": "m", "example": "Maggio è il mio mese preferito."},
+  {"word": "giugno", "translation": "junio", "module": 0, "pos": "noun", "gender": "m", "example": "Giugno inizia l'estate."},
+  {"word": "luglio", "translation": "julio", "module": 0, "pos": "noun", "gender": "m", "example": "Luglio è molto caldo."},
+  {"word": "agosto", "translation": "agosto", "module": 0, "pos": "noun", "gender": "m", "example": "Agosto vado al mare."},
+  {"word": "settembre", "translation": "septiembre", "module": 0, "pos": "noun", "gender": "m", "example": "Settembre ricomincia la scuola."},
+  {"word": "ottobre", "translation": "octubre", "module": 0, "pos": "noun", "gender": "m", "example": "Ottobre è un mese autunnale."},
+  {"word": "novembre", "translation": "noviembre", "module": 0, "pos": "noun", "gender": "m", "example": "Novembre fa freddo."},
+  {"word": "dicembre", "translation": "diciembre", "module": 0, "pos": "noun", "gender": "m", "example": "Dicembre è il mese di Natale."},
+  {"word": "rosso", "translation": "rojo", "module": 0, "pos": "adjective", "example": "La mela è rossa."},
+  {"word": "blu", "translation": "azul", "module": 0, "pos": "adjective", "example": "Il cielo è blu."},
+  {"word": "verde", "translation": "verde", "module": 0, "pos": "adjective", "example": "L'erba è verde."},
+  {"word": "giallo", "translation": "amarillo", "module": 0, "pos": "adjective", "example": "Il sole è giallo."},
+  {"word": "bianco", "translation": "blanco", "module": 0, "pos": "adjective", "example": "La neve è bianca."},
+  {"word": "nero", "translation": "negro", "module": 0, "pos": "adjective", "example": "Il gatto è nero."},
+  {"word": "grande", "translation": "grande", "module": 0, "pos": "adjective", "example": "La casa è grande."},
+  {"word": "piccolo", "translation": "pequeño", "module": 0, "pos": "adjective", "example": "Il gatto è piccolo."},
+  {"word": "buono", "translation": "bueno", "module": 0, "pos": "adjective", "example": "Il cibo è buono."},
+  {"word": "cattivo", "translation": "malo", "module": 0, "pos": "adjective", "example": "Questo film è cattivo."},
+  {"word": "bello", "translation": "hermoso / bonito", "module": 0, "pos": "adjective", "example": "Che bella giornata!"},
+  {"word": "brutto", "translation": "feo", "module": 0, "pos": "adjective", "example": "Il tempo è brutto oggi."},
+  {"word": "nuovo", "translation": "nuevo", "module": 0, "pos": "adjective", "example": "Ho una macchina nuova."},
+  {"word": "vecchio", "translation": "viejo", "module": 0, "pos": "adjective", "example": "La casa è vecchia."},
+  {"word": "giovane", "translation": "joven", "module": 0, "pos": "adjective", "example": "Lui è giovane e forte."},
+  {"word": "caldo", "translation": "caliente / calor", "module": 0, "pos": "adjective", "example": "Oggi fa molto caldo."},
+  {"word": "freddo", "translation": "frío", "module": 0, "pos": "adjective", "example": "L'acqua è fredda."},
+  {"word": "bravo", "translation": "bueno / hábil", "module": 0, "pos": "adjective", "example": "Sei molto bravo a cantare!"},
+  {"word": "gentile", "translation": "amable", "module": 0, "pos": "adjective", "example": "La signora è molto gentile."},
+  {"word": "alto", "translation": "alto", "module": 0, "pos": "adjective", "example": "Marco è alto."},
+  {"word": "basso", "translation": "bajo", "module": 0, "pos": "adjective", "example": "Sofia è bassa."},
+  {"word": "pane", "translation": "pan", "module": 0, "pos": "noun", "gender": "m", "example": "Il pane è fresco."},
+  {"word": "acqua", "translation": "agua", "module": 0, "pos": "noun", "gender": "f", "example": "Un bicchiere d'acqua, per favore."},
+  {"word": "latte", "translation": "leche", "module": 0, "pos": "noun", "gender": "m", "example": "Bevo il latte la mattina."},
+  {"word": "caffè", "translation": "café", "module": 0, "pos": "noun", "gender": "m", "example": "Prendo un caffè, per favore."},
+  {"word": "vino", "translation": "vino", "module": 0, "pos": "noun", "gender": "m", "example": "Il vino italiano è buono."},
+  {"word": "frutta", "translation": "fruta", "module": 0, "pos": "noun", "gender": "f", "example": "La frutta è sana."},
+  {"word": "verdura", "translation": "verdura", "module": 0, "pos": "noun", "gender": "f", "example": "Mangio la verdura ogni giorno."},
+  {"word": "carne", "translation": "carne", "module": 0, "pos": "noun", "gender": "f", "example": "La carne è al forno."},
+  {"word": "pesce", "translation": "pescado", "module": 0, "pos": "noun", "gender": "m", "example": "Il pesce è fresco."},
+  {"word": "tavolo", "translation": "mesa", "module": 0, "pos": "noun", "gender": "m", "example": "Il libro è sul tavolo."},
+  {"word": "sedia", "translation": "silla", "module": 0, "pos": "noun", "gender": "f", "example": "La sedia è rotta."},
+  {"word": "porta", "translation": "puerta", "module": 0, "pos": "noun", "gender": "f", "example": "La porta è aperta."},
+  {"word": "finestra", "translation": "ventana", "module": 0, "pos": "noun", "gender": "f", "example": "La finestra è chiusa."},
+  {"word": "madre", "translation": "madre", "module": 0, "pos": "noun", "gender": "f", "example": "Mia madre è gentile."},
+  {"word": "padre", "translation": "padre", "module": 0, "pos": "noun", "gender": "m", "example": "Mio padre è alto."},
+  {"word": "fratello", "translation": "hermano", "module": 0, "pos": "noun", "gender": "m", "example": "Mio fratello ha 20 anni."},
+  {"word": "sorella", "translation": "hermana", "module": 0, "pos": "noun", "gender": "f", "example": "Mia sorella studia medicina."},
+  {"word": "figlio", "translation": "hijo", "module": 0, "pos": "noun", "gender": "m", "example": "Mio figlio gioca a calcio."},
+  {"word": "figlia", "translation": "hija", "module": 0, "pos": "noun", "gender": "f", "example": "Mia figlia ha 5 anni."},
+  {"word": "marito", "translation": "marido", "module": 0, "pos": "noun", "gender": "m", "example": "Mio marito è cuoco."},
+  {"word": "moglie", "translation": "esposa", "module": 0, "pos": "noun", "gender": "f", "example": "Mia moglie è insegnante."},
+  {"word": "zio", "translation": "tío", "module": 0, "pos": "noun", "gender": "m", "example": "Mio zio abita a Roma."},
+  {"word": "zia", "translation": "tía", "module": 0, "pos": "noun", "gender": "f", "example": "Mia zia fa la pasta."},
+  {"word": "nonno", "translation": "abuelo", "module": 0, "pos": "noun", "gender": "m", "example": "Mio nonno ha 80 anni."},
+  {"word": "nonna", "translation": "abuela", "module": 0, "pos": "noun", "gender": "f", "example": "Mia nonna cucina bene."},
+
+  {"word": "ieri", "translation": "ayer", "module": 1, "pos": "adverb", "example": "Ieri sono andato al mare."},
+  {"word": "oggi", "translation": "hoy", "module": 1, "pos": "adverb", "example": "Oggi studio italiano."},
+  {"word": "viaggio", "translation": "viaje", "module": 1, "pos": "noun", "gender": "m", "example": "Il viaggio a Roma è stato bellissimo."},
+  {"word": "vacanza", "translation": "vacaciones", "module": 1, "pos": "noun", "gender": "f", "example": "Siamo andati in vacanza al mare."},
+  {"word": "mare", "translation": "mar", "module": 1, "pos": "noun", "gender": "m", "example": "Il mare oggi è calmo."},
+  {"word": "montagna", "translation": "montaña", "module": 1, "pos": "noun", "gender": "f", "example": "D'inverno vado in montagna a sciare."},
+  {"word": "città", "translation": "ciudad", "module": 1, "pos": "noun", "gender": "f", "example": "Roma è una città antica."},
+  {"word": "ristorante", "translation": "restaurante", "module": 1, "pos": "noun", "gender": "m", "example": "Ieri sera siamo andati al ristorante."},
+  {"word": "cibo", "translation": "comida", "module": 1, "pos": "noun", "gender": "m", "example": "Il cibo italiano è buonissimo."},
+  {"word": "pizza", "translation": "pizza", "module": 1, "pos": "noun", "gender": "f", "example": "Abbiamo mangiato la pizza."},
+  {"word": "vino", "translation": "vino", "module": 1, "pos": "noun", "gender": "m", "example": "Ho bevuto un buon vino rosso."},
+  {"word": "amore", "translation": "amor", "module": 1, "pos": "noun", "gender": "m", "example": "È stato amore a prima vista."},
+  {"word": "tempo", "translation": "tiempo / clima", "module": 1, "pos": "noun", "gender": "m", "example": "Che tempo ha fatto?"},
+  {"word": "volta", "translation": "vez / ocasión", "module": 1, "pos": "noun", "gender": "f", "example": "Una volta sono andato a Venezia."},
+  {"word": "finito", "translation": "terminado", "module": 1, "pos": "adjective", "example": "Ho finito i compiti."},
+  {"word": "visto", "translation": "visto (part. pas. vedere)", "module": 1, "pos": "verb", "example": "Hai visto quel film?"},
+  {"word": "fatto", "translation": "hecho (part. pas. fare)", "module": 1, "pos": "verb", "example": "Che cosa hai fatto ieri?"},
+  {"word": "detto", "translation": "dicho (part. pas. dire)", "module": 1, "pos": "verb", "example": "Mi hai detto la verità?"},
+  {"word": "preso", "translation": "tomado (part. pas. prendere)", "module": 1, "pos": "verb", "example": "Ho preso il treno delle otto."},
+  {"word": "aperto", "translation": "abierto (part. pas. aprire)", "module": 1, "pos": "verb", "example": "Ho aperto la finestra."},
+  {"word": "chiuso", "translation": "cerrado (part. pas. chiudere)", "module": 1, "pos": "verb", "example": "Ho chiuso la porta."},
+  {"word": "scritto", "translation": "escrito (part. pas. scrivere)", "module": 1, "pos": "verb", "example": "Lei ha scritto una lettera."},
+  {"word": "successo", "translation": "ocurrido (part. pas. succedere)", "module": 1, "pos": "verb", "example": "Cos'è successo ieri?"},
+  {"word": "partire", "translation": "partir", "module": 1, "pos": "verb", "example": "Siamo partiti alle otto."},
+  {"word": "arrivare", "translation": "llegar", "module": 1, "pos": "verb", "example": "Siamo arrivati in ritardo."},
+  {"word": "mangiare", "translation": "comer", "module": 1, "pos": "verb", "example": "Abbiamo mangiato benissimo."},
+  {"word": "bere", "translation": "beber", "module": 1, "pos": "verb", "example": "Ho bevuto un caffè."},
+  {"word": "dormire", "translation": "dormir", "module": 1, "pos": "verb", "example": "Ho dormito fino a tardi."},
+  {"word": "vedere", "translation": "ver", "module": 1, "pos": "verb", "example": "Ti ho visto ieri al parco."},
+  {"word": "conoscere", "translation": "conocer", "module": 1, "pos": "verb", "example": "Ho conosciuto Maria ieri."},
+  {"word": "leggere", "translation": "leer", "module": 1, "pos": "verb", "example": "Ho letto un libro interessante."},
+  {"word": "studiare", "translation": "estudiar", "module": 1, "pos": "verb", "example": "Ho studiato tutta la sera."},
+  {"word": "giocare", "translation": "jugar", "module": 1, "pos": "verb", "example": "Hai giocato a calcio?"},
+  {"word": "camminare", "translation": "caminar", "module": 1, "pos": "verb", "example": "Abbiamo camminato per ore."},
+
+  {"word": "prima", "translation": "antes", "module": 2, "pos": "adverb", "example": "Prima vivevo a Milano."},
+  {"word": "dopo", "translation": "después", "module": 2, "pos": "adverb", "example": "Dopo mangiavo sempre un gelato."},
+  {"word": "spesso", "translation": "a menudo", "module": 2, "pos": "adverb", "example": "Da piccolo giocavo spesso al parco."},
+  {"word": "sempre", "translation": "siempre", "module": 2, "pos": "adverb", "example": "Mangiavo sempre la stessa cosa."},
+  {"word": "mai", "translation": "nunca", "module": 2, "pos": "adverb", "example": "Non andavo mai a letto tardi."},
+  {"word": "infanzia", "translation": "infancia", "module": 2, "pos": "noun", "gender": "f", "example": "La mia infanzia è stata felice."},
+  {"word": "ricordo", "translation": "recuerdo", "module": 2, "pos": "noun", "gender": "m", "example": "Ho bei ricordi della scuola."},
+  {"word": "abitudine", "translation": "costumbre", "module": 2, "pos": "noun", "gender": "f", "example": "Ogni estate andavamo al mare per abitudine."},
+  {"word": "scuola elementare", "translation": "escuela primaria", "module": 2, "pos": "noun", "gender": "f", "example": "Alle elementari avevo tanti amici."},
+  {"word": "cane", "translation": "perro", "module": 2, "pos": "noun", "gender": "m", "example": "Da piccolo avevo un cane nero."},
+  {"word": "gatto", "translation": "gato", "module": 2, "pos": "noun", "gender": "m", "example": "La nonna aveva due gatti."},
+  {"word": "nonno", "translation": "abuelo", "module": 2, "pos": "noun", "gender": "m", "example": "Mio nonno mi raccontava storie."},
+  {"word": "nonna", "translation": "abuela", "module": 2, "pos": "noun", "gender": "f", "example": "La nonna faceva la pasta fatta in casa."},
+  {"word": "paese", "translation": "pueblo / país", "module": 2, "pos": "noun", "gender": "m", "example": "Vivevo in un piccolo paese."},
+  {"word": "campagna", "translation": "campo", "module": 2, "pos": "noun", "gender": "f", "example": "D'estate andavo in campagna dai nonni."},
+  {"word": "sole", "translation": "sol", "module": 2, "pos": "noun", "gender": "m", "example": "Quando c'era il sole, giocavo fuori."},
+  {"word": "pioggia", "translation": "lluvia", "module": 2, "pos": "noun", "gender": "f", "example": "Quando pioveva, restavo a casa."},
+  {"word": "neve", "translation": "nieve", "module": 2, "pos": "noun", "gender": "f", "example": "D'inverno nevicava spesso."},
+  {"word": "freddo", "translation": "frío", "module": 2, "pos": "adjective", "example": "Faceva molto freddo d'inverno."},
+  {"word": "caldo", "translation": "calor", "module": 2, "pos": "adjective", "example": "D'estate faceva caldo."},
+  {"word": "alto", "translation": "alto", "module": 2, "pos": "adjective", "example": "Da piccolo ero più alto dei miei amici."},
+  {"word": "basso", "translation": "bajo", "module": 2, "pos": "adjective", "example": "Ero il più basso della classe."},
+  {"word": "bello", "translation": "hermoso", "module": 2, "pos": "adjective", "example": "Era un paese molto bello."},
+  {"word": "felice", "translation": "feliz", "module": 2, "pos": "adjective", "example": "Ero sempre felice quando giocavo."},
+  {"word": "triste", "translation": "triste", "module": 2, "pos": "adjective", "example": "Era triste quando pioveva."},
+  {"word": "arrabbiato", "translation": "enojado", "module": 2, "pos": "adjective", "example": "Mia madre si arrabbiava sempre."},
+  {"word": "aver paura", "translation": "tener miedo", "module": 2, "pos": "phrase", "example": "Da piccolo avevo paura del buio."},
+  {"word": "voler bene", "translation": "querer (a alguien)", "module": 2, "pos": "phrase", "example": "La nonna mi voleva tanto bene."},
+  {"word": "raccontare", "translation": "contar", "module": 2, "pos": "verb", "example": "Mio nonno mi raccontava storie."},
+  {"word": "crescere", "translation": "crecer", "module": 2, "pos": "verb", "example": "Crescevo in una piccola città."},
+  {"word": "ricordare", "translation": "recordar", "module": 2, "pos": "verb", "example": "Ricordo che andavamo al mare ogni estate."},
+  {"word": "sembrare", "translation": "parecer", "module": 2, "pos": "verb", "example": "Sembrava tutto più facile."},
+  {"word": "piacere", "translation": "gustar", "module": 2, "pos": "verb", "example": "Mi piaceva giocare a calcio."},
+  {"word": "avere", "translation": "tener (idiomatico: età, sensazioni)", "module": 2, "pos": "verb", "example": "Avevo 10 anni quando..."},
+
+  {"word": "domani", "translation": "mañana", "module": 3, "pos": "adverb", "example": "Domani andrò al mare."},
+  {"word": "futuro", "translation": "futuro", "module": 3, "pos": "noun", "gender": "m", "example": "Il futuro sarà migliore."},
+  {"word": "progetto", "translation": "proyecto", "module": 3, "pos": "noun", "gender": "m", "example": "Ho tanti progetti per il futuro."},
+  {"word": "piano", "translation": "plan", "module": 3, "pos": "noun", "gender": "m", "example": "Il piano è di trasferirci a Roma."},
+  {"word": "speranza", "translation": "esperanza", "module": 3, "pos": "noun", "gender": "f", "example": "La speranza è che tutto vada bene."},
+  {"word": "previsto", "translation": "previsto (part. pas. prevedere)", "module": 3, "pos": "adjective", "example": "Domani è prevista pioggia."},
+  {"word": "probabilmente", "translation": "probablemente", "module": 3, "pos": "adverb", "example": "Probabilmente studierò medicina."},
+  {"word": "forse", "translation": "quizás", "module": 3, "pos": "adverb", "example": "Forse andremo in Italia l'anno prossimo."},
+  {"word": "carriera", "translation": "carrera profesional", "module": 3, "pos": "noun", "gender": "f", "example": "Farò carriera nel marketing."},
+  {"word": "lavoro", "translation": "trabajo", "module": 3, "pos": "noun", "gender": "m", "example": "Troverò un lavoro interessante."},
+  {"word": "università", "translation": "universidad", "module": 3, "pos": "noun", "gender": "f", "example": "L'anno prossimo andrò all'università."},
+  {"word": "medico", "translation": "médico", "module": 3, "pos": "noun", "gender": "m", "example": "Da grande farò il medico."},
+  {"word": "ingegnere", "translation": "ingeniero", "module": 3, "pos": "noun", "gender": "m", "example": "Mio fratello sarà ingegnere."},
+  {"word": "insegnante", "translation": "profesor", "module": 3, "pos": "noun", "gender": "m/f", "example": "La mia amica diventerà insegnante."},
+  {"word": "tecnologia", "translation": "tecnología", "module": 3, "pos": "noun", "gender": "f", "example": "La tecnologia cambierà il mondo."},
+  {"word": "computer", "translation": "ordenador", "module": 3, "pos": "noun", "gender": "m", "example": "Il computer funzionerà meglio."},
+  {"word": "internet", "translation": "internet", "module": 3, "pos": "noun", "gender": "m", "example": "Con internet potremo comunicare subito."},
+  {"word": "intelligenza artificiale", "translation": "inteligencia artificial", "module": 3, "pos": "noun", "gender": "f", "example": "L'intelligenza artificiale rivoluzionerà il lavoro."},
+  {"word": "ambiente", "translation": "medio ambiente", "module": 3, "pos": "noun", "gender": "m", "example": "Dobbiamo proteggere l'ambiente."},
+  {"word": "clima", "translation": "clima", "module": 3, "pos": "noun", "gender": "m", "example": "Il clima cambierà nei prossimi anni."},
+  {"word": "energia", "translation": "energía", "module": 3, "pos": "noun", "gender": "f", "example": "Useremo energie rinnovabili."},
+  {"word": "sostenibile", "translation": "sostenible", "module": 3, "pos": "adjective", "example": "Vivremo in modo più sostenibile."},
+  {"word": "sposarsi", "translation": "casarse", "module": 3, "pos": "verb", "example": "Il prossimo anno mi sposerò."},
+  {"word": "trasferirsi", "translation": "mudarse", "module": 3, "pos": "verb", "example": "Ci trasferiremo a Milano."},
+  {"word": "diventare", "translation": "llegar a ser", "module": 3, "pos": "verb", "example": "Diventerò un bravo medico."},
+  {"word": "migliorare", "translation": "mejorar", "module": 3, "pos": "verb", "example": "La situazione migliorerà."},
+  {"word": "cambiare", "translation": "cambiar", "module": 3, "pos": "verb", "example": "Cambierò lavoro il prossimo anno."},
+  {"word": "viaggiare", "translation": "viajar", "module": 3, "pos": "verb", "example": "Viaggeremo in tutta Italia."},
+  {"word": "scoprire", "translation": "descubrir", "module": 3, "pos": "verb", "example": "Scopriremo posti meravigliosi."},
+  {"word": "superare", "translation": "superar", "module": 3, "pos": "verb", "example": "Supererò l'esame di italiano."},
+  {"word": "riuscire", "translation": "conseguir / lograr", "module": 3, "pos": "verb", "example": "Riuscirò a parlare italiano fluentemente."},
+  {"word": "decidere", "translation": "decidir", "module": 3, "pos": "verb", "example": "Deciderò cosa fare dopo l'estate."},
+  {"word": "promettere", "translation": "prometer", "module": 3, "pos": "verb", "example": "Ti prometto che studierò di più."},
+  {"word": "garantire", "translation": "garantizar", "module": 3, "pos": "verb", "example": "Ti garantisco che andrà tutto bene."},
+  {"word": "nuovo", "translation": "nuevo", "module": 3, "pos": "adjective", "example": "Comprerò una macchina nuova."}
+]</script>
+<script type="application/json" id="data-exam">{
+  "sections": [
+    {
+      "id": "comprensione-scritta",
+      "title": "Comprensione Scritta",
+      "timeMinutes": 30,
+      "questions": [
+        {
+          "id": "cs-1",
+          "type": "multiple-choice",
+          "prompt": "Leggi: 'Carla va spesso al mercato centrale perch\u00e9 trova frutta e verdura fresca. Preferisce andare la mattina presto, quando c'\u00e8 meno gente.'\n\nDove va Carla spesso?",
+          "options": ["Al supermercato", "Al mercato centrale", "Alla farmacia", "Alla stazione"],
+          "correctAnswer": 1,
+          "points": 5
+        },
+        {
+          "id": "cs-2",
+          "type": "multiple-choice",
+          "prompt": "Secondo il testo, perch\u00e9 Carla preferisce la mattina presto?",
+          "options": ["Perch\u00e9 i prezzi sono pi\u00f9 bassi", "Perch\u00e9 c'\u00e8 meno gente", "Perch\u00e9 il mercato chiude presto", "Perch\u00e9 trova solo frutta"],
+          "correctAnswer": 1,
+          "points": 5
+        },
+        {
+          "id": "cs-3",
+          "type": "multiple-choice",
+          "prompt": "Leggi: 'Marco si \u00e8 iscritto a un corso di fotografia. Ogni mercoled\u00ec sera frequenta le lezioni teoriche, mentre il sabato mattina esce con il gruppo per fare pratica all'aperto.'\n\nQuando fa pratica Marco?",
+          "options": ["Il mercoled\u00ec sera", "Il sabato mattina", "Tutti i giorni", "La domenica"],
+          "correctAnswer": 1,
+          "points": 5
+        },
+        {
+          "id": "cs-4",
+          "type": "multiple-choice",
+          "prompt": "Cosa fa Marco il mercoled\u00ec sera?",
+          "options": ["Esce a fare foto", "Frequenta lezioni teoriche", "Riposa", "Lavora"],
+          "correctAnswer": 1,
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "grammatica",
+      "title": "Grammatica e Lessico",
+      "timeMinutes": 25,
+      "questions": [
+        {
+          "id": "gr-1",
+          "type": "fill-in-blank",
+          "prompt": "Ieri noi ___ (andare) al cinema.",
+          "correctAnswers": ["siamo andati", "siamo andate"],
+          "points": 5
+        },
+        {
+          "id": "gr-2",
+          "type": "fill-in-blank",
+          "prompt": "Quando ___ (essere) piccolo, giocavo sempre all'aperto.",
+          "correctAnswers": ["ero"],
+          "points": 5
+        },
+        {
+          "id": "gr-3",
+          "type": "fill-in-blank",
+          "prompt": "Domani ___ (piovere) tutto il giorno.",
+          "correctAnswers": ["piover\u00e0"],
+          "points": 5
+        },
+        {
+          "id": "gr-4",
+          "type": "multiple-choice",
+          "prompt": "Scegli la forma corretta: 'Penso che lei ___ ragione.'",
+          "options": ["ha", "abbia", "avr\u00e0", "aveva"],
+          "correctAnswer": 1,
+          "points": 5
+        },
+        {
+          "id": "gr-5",
+          "type": "fill-in-blank",
+          "prompt": "Se ___ (avere) pi\u00f9 tempo, viaggerei di pi\u00f9.",
+          "correctAnswers": ["avessi"],
+          "points": 5
+        },
+        {
+          "id": "gr-6",
+          "type": "error-correction",
+          "prompt": "Trova l'errore in questa frase e correggilo:\n\n'Loro sono andato a Roma la settimana scorsa.'",
+          "correctAnswers": ["andato"],
+          "options": ["Loro", "sono", "andato", "a", "Roma", "la", "settimana", "scorsa"],
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "produzione-orale",
+      "title": "Produzione Orale",
+      "timeMinutes": 15,
+      "questions": [
+        {
+          "id": "po-1",
+          "type": "listen-and-repeat",
+          "prompt": "Presentati in italiano: di' il tuo nome, da dove vieni e cosa fai nella vita.",
+          "correctAnswers": ["mi chiamo", "vengo da", "faccio", "lavoro", "studio"],
+          "points": 10
+        },
+        {
+          "id": "po-2",
+          "prompt": "Descrivi la tua giornata tipo. Cosa fai dalla mattina alla sera?",
+          "correctAnswers": ["mi sveglio", "faccio colazione", "lavoro", "pranzo", "cena", "dormo"],
+          "type": "describe-image",
+          "points": 10,
+          "options": ["Descrivi la tua giornata tipo in 3-4 frasi"]
+        }
+      ]
+    }
+  ]
+}</script>
+  <!-- Scripts: order matters -->
+  <script src="js/progress.js"></script>
+  <script src="js/curriculum.js"></script>
+  <script src="js/exercises.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

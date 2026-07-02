@@ -1,0 +1,922 @@
+/* ============================================
+   Italiano B1 — exercises.css
+   Exercise card, input variants, feedback, mic
+   ============================================ */
+
+/* --- Exercise Card --- */
+.exercise-card {
+  background: linear-gradient(145deg, var(--bg-card) 0%, rgba(37,99,235,0.03) 100%);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-hover);
+  max-width: 780px;
+  margin: 0 auto;
+  transition: var(--transition-theme);
+  border: 1px solid var(--border);
+  position: relative;
+}
+.exercise-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--accent), #60a5fa, var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+/* --- Progress Indicator --- */
+.ex-progress {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --- Prompt Text --- */
+.ex-prompt {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+  line-height: 1.5;
+  padding: 24px 28px;
+  background: linear-gradient(135deg, var(--bg) 0%, rgba(37,99,235,0.04) 100%);
+  border-radius: var(--radius-sm);
+  border-left: 6px solid var(--accent);
+  text-align: center;
+}
+
+/* --- Input Variants --- */
+
+/* Single text input */
+.ex-input input[type="text"] {
+  width: 100%;
+  padding: 18px 24px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1.35rem;
+  font-family: inherit;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+  min-height: 56px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.04), 0 1px 0 rgba(0,0,0,0.03);
+}
+
+.ex-input input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.04), 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Multiple choice buttons */
+.mc-options {
+  display: grid;
+  gap: 10px;
+}
+
+.mc-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 28px;
+  font-size: 1.35rem;
+  font-weight: 500;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-height: 52px;
+  transition: transform 80ms ease, box-shadow 80ms ease, border-color 150ms ease, background 150ms ease;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.06);
+  transform: translateY(0);
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  color: var(--text);
+}
+.mc-option:hover {
+  border-color: var(--accent);
+  background: rgba(37, 99, 235, 0.04);
+  box-shadow: 0 3px 0 rgba(37, 99, 235, 0.15);
+}
+.mc-option:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+}
+.mc-option.selected {
+  border-color: var(--accent);
+  background: rgba(37, 99, 235, 0.1);
+  box-shadow: 0 3px 0 var(--accent);
+}
+.mc-option.selected::before {
+  content: '✓';
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.3rem;
+}
+
+/* Reorder words */
+.reorder-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px;
+  min-height: 56px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.word-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 26px;
+  margin: 4px;
+  font-size: 1.35rem;
+  font-weight: 600;
+  background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg) 100%);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 80ms ease, border-color 150ms ease, background 150ms ease;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.06);
+  transform: translateY(0);
+  user-select: none;
+  min-height: 44px;
+}
+.word-chip:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+}
+.word-chip.selected {
+  border-color: var(--accent);
+  background: rgba(37, 99, 235, 0.1);
+  box-shadow: 0 3px 0 var(--accent);
+}
+.word-chip.placed {
+  border-color: var(--text-secondary);
+  background-color: var(--bg-card);
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Error correction: inline clickable words */
+.error-correction-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 0;
+}
+
+.error-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 26px;
+  margin: 4px;
+  font-size: 1.35rem;
+  font-weight: 600;
+  background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg) 100%);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 80ms ease, border-color 150ms ease;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.06);
+  transform: translateY(0);
+  user-select: none;
+  min-height: 44px;
+}
+.error-word:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+}
+.error-word.marked {
+  border-color: var(--error);
+  background: rgba(220, 38, 38, 0.08);
+  box-shadow: 0 3px 0 rgba(220, 38, 38, 0.3);
+  color: var(--error);
+  text-decoration: line-through;
+}
+
+/* --- Feedback Colors --- */
+.ex-feedback {
+  margin-top: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.ex-feedback.correct {
+  background-color: #052e16;
+  border: 1px solid var(--success);
+  color: #bbf7d0;
+}
+
+.ex-feedback.incorrect {
+  background-color: #450a0a;
+  border: 1px solid var(--error);
+  color: #fecaca;
+}
+
+/* --- Word-level Pronunciation Feedback --- */
+.word-pronunciation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.word-green {
+  color: var(--success);
+  font-weight: 500;
+}
+
+.word-yellow {
+  color: var(--warning);
+  font-weight: 500;
+}
+
+.word-red {
+  color: var(--error);
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+/* --- Hint --- */
+.ex-hint {
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* --- Feedback Result Display --- */
+.feedback-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.feedback-icon {
+  font-size: 1.4rem;
+}
+
+.feedback-score {
+  font-size: 1.2rem;
+}
+
+.correct-answer {
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* --- Image prompt (describe-image type) --- */
+.image-prompt {
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+/* --- Exercise Nav --- */
+.exercise-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.exercise-nav .nav-btn {
+  flex: 1;
+}
+
+/* --- Retry button --- */
+.retry-btn {
+  margin-top: 12px;
+}
+
+/* --- Module grammar list --- */
+.module-grammar {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* --- Existing profiles selector --- */
+.existing-profiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.existing-profiles p {
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+/* --- Exercise type icon in list --- */
+.exercise-type-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.exercise-number {
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+.exercise-title {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+/* --- Placeholder chip for reorder --- */
+.word-chip.placeholder {
+  font-style: italic;
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* --- Action Buttons --- */
+.ex-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.ex-actions .btn {
+  flex: 1;
+}
+
+.ex-actions .btn-primary {
+  background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 0 #166534, 0 6px 12px rgba(22, 163, 74, 0.25);
+  font-size: 1.25rem;
+  padding: 18px 36px;
+  font-weight: 700;
+  transform: translateY(0);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+.ex-actions .btn-primary:hover {
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+  box-shadow: 0 4px 0 #166534, 0 8px 16px rgba(22, 163, 74, 0.3);
+}
+.ex-actions .btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #166534, 0 3px 6px rgba(22, 163, 74, 0.2);
+}
+.ex-actions .btn-secondary {
+  font-size: 1.2rem;
+  padding: 18px 36px;
+  font-weight: 600;
+}
+
+/* --- Mic Button --- */
+.mic-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  transition: background-color 200ms ease, transform 200ms ease;
+  flex-shrink: 0;
+}
+
+.mic-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+.mic-btn.recording {
+  background-color: var(--error);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.mic-btn.supported {
+  display: flex;
+}
+
+.mic-btn.unsupported {
+  display: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+  }
+}
+
+/* --- Input row (mic + text) --- */
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.input-row input[type="text"] {
+  flex: 1;
+}
+
+/* --- Score Display --- */
+.score-display {
+  text-align: center;
+  padding: 24px;
+}
+
+.score-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.score-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* --- Timer --- */
+.timer {
+  font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+  font-size: 1.5rem;
+  transition: color 200ms ease;
+}
+
+.timer.normal {
+  color: var(--accent);
+}
+
+.timer.warning {
+  color: var(--warning);
+}
+
+.timer.danger {
+  color: var(--error);
+}
+
+/* --- Exam timer --- */
+.exam-timer {
+  font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+
+.exam-timer.warning {
+  color: var(--warning);
+}
+
+.exam-timer.danger {
+  color: var(--error);
+}
+
+/* --- Generic text input (shared by exam engine, profile, etc.) --- */
+.text-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: border-color 200ms ease, background-color 200ms ease, color 200ms ease;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+.text-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.text-input.textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+/* --- Exam Styles --- */
+.exam-header {
+  text-align: center;
+  padding: 24px 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.exam-header h2 {
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+}
+.exam-progress {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.exam-timer {
+  font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-top: 8px;
+  transition: color 200ms ease;
+}
+.exam-timer.urgent {
+  animation: pulse-timer 1s ease-in-out infinite;
+}
+@keyframes pulse-timer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.exam-questions {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--border);
+  max-width: 640px;
+  margin: 0 auto;
+}
+.exam-q-counter {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.exam-points {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-left: 8px;
+}
+.exam-prompt {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.exam-choice-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  margin-bottom: 8px;
+  min-height: var(--touch-min);
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+.exam-choice-btn:hover {
+  border-color: var(--accent);
+}
+.exam-choice-btn.selected {
+  border-color: var(--accent);
+  background-color: rgba(37, 99, 235, 0.08);
+}
+.exam-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+}
+.exam-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  cursor: pointer;
+  min-height: var(--touch-min);
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+.exam-chip:hover {
+  border-color: var(--accent);
+}
+.exam-chip.selected {
+  border-color: var(--error);
+  background-color: rgba(220, 38, 38, 0.1);
+  text-decoration: line-through;
+}
+.exam-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+  justify-content: space-between;
+}
+.exam-nav .nav-btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-family: inherit;
+  min-height: var(--touch-min);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  transition: background-color 200ms ease;
+}
+.exam-nav .nav-btn:hover {
+  background: var(--bg);
+}
+.exam-nav .nav-btn.primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.exam-nav .nav-btn.primary:hover {
+  background: var(--accent-hover);
+}
+
+/* --- Exam Results --- */
+.exam-mode-label {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+.exam-total-score {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 24px;
+}
+.exam-level {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+.exam-section-result {
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+}
+.exam-section-result h3 {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.exam-section-score {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* --- Explanation Button & Panel --- */
+.explanation-btn {
+  display: block;
+  margin: 12px 0;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.9rem;
+  min-height: var(--touch-min);
+}
+.explanation-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+.explanation-panel {
+  display: none;
+  background: var(--bg-card);
+  border-left: 3px solid var(--accent);
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+.explanation-panel.visible {
+  display: block;
+}
+
+/* --- Responsive adjustments --- */
+@media (max-width: 480px) {
+  .exercise-card {
+    padding: 16px;
+  }
+
+  .ex-prompt {
+    font-size: 1.15rem;
+    padding: 12px 16px;
+  }
+
+  .ex-actions {
+    flex-direction: column;
+  }
+}
+
+/* --- Voice Feedback Word Display --- */
+.voice-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 1.2rem;
+  padding: 12px;
+  margin: 12px 0;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.word-correct {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.word-typo {
+  color: var(--warning);
+  font-weight: 600;
+  border-bottom: 2px dashed var(--warning);
+}
+
+.word-wrong {
+  color: var(--error);
+  font-weight: 600;
+  text-decoration: line-through;
+}
+
+.word-wrong::after {
+  content: attr(data-expected);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.word-missing {
+  color: var(--error);
+  opacity: 0.6;
+  text-decoration: underline wavy var(--error);
+}
+
+.word-extra {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.voice-score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 8px 0;
+}
+
+.voice-feedback-text {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text);
+  font-style: italic;
+}
+
+.tts-btn {
+  display: block;
+  margin: 12px auto 0;
+  padding: 8px 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-height: var(--touch-min);
+  font-size: 0.95rem;
+}
+
+.tts-btn:hover {
+  background: var(--accent-hover);
+}
+
+/* --- Voice Notice (unsupported / error) --- */
+.voice-notice {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.voice-notice.error {
+  color: var(--error);
+}
+
+/* Hide mic record button when browser does not support SpeechRecognition */
+.no-voice .mic-btn-record {
+  display: none;
+}
+
+/* --- Mini-Lección (auto-show at top of exercise) --- */
+.mini-lesson {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+[data-theme="dark"] .mini-lesson {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a2d4a 100%);
+  border-color: #2d4a7a;
+}
+.mini-lesson.collapsed .lesson-body {
+  display: none;
+}
+.mini-lesson.collapsed {
+  padding: 8px 16px;
+  opacity: 0.7;
+}
+.lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.lesson-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent);
+  flex: 1;
+}
+.lesson-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  min-width: unset;
+  min-height: unset;
+  padding: 0;
+}
+.lesson-toggle:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.lesson-body {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text);
+  margin-top: 8px;
+  padding: 8px 4px;
+}
+
+/* Prompt section separator */
+.prompt-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.prompt-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+/* Remove old explanation button styles (replaced by mini-lesson) */
+.explanation-btn,
+.explanation-panel {
+  display: none !important;
+}
