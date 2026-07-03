@@ -768,6 +768,10 @@ function updateLearnerUI(name) {
   var streakEl = document.getElementById('streak-count');
   if (streakEl) streakEl.textContent = streak || 0;
 
+  var points = App.Progress.getTotalPoints(name);
+  var ptsEl = document.getElementById('points-header-count');
+  if (ptsEl) ptsEl.textContent = points;
+
   renderSidebar();
 }
 

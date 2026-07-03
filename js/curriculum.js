@@ -517,7 +517,80 @@ App.Curriculum = (function() {
     var startBtn = document.getElementById('start-exercises-btn');
     if (startBtn) startBtn.style.display = 'none';
 
-    renderStepperStep(mod);
+    // Show welcome screen for module 0 if not seen yet
+    var welcomeKey = 'italian-b1_welcome_' + moduleId;
+    var welcomeDone = localStorage.getItem(welcomeKey);
+    if (!welcomeDone && moduleId === 0) {
+      renderModuleWelcome(mod, moduleId, welcomeKey);
+    } else {
+      renderStepperStep(mod);
+    }
+  }
+
+  /** Render a gamified welcome screen before the lesson stepper */
+  function renderModuleWelcome(mod, moduleId, welcomeKey) {
+    var stepperEl = document.getElementById('lesson-stepper');
+    if (!stepperEl) return;
+
+    var pointsTotal = (mod.leccion && mod.leccion.length || 0) * 100;
+    var vocabCount = mod.vocabCount || 0;
+    var stepCount = mod.leccion ? mod.leccion.length : 0;
+
+    var html = '';
+    html += '<div class="module-welcome">';
+
+    // Hero emoji
+    html += '<div class="welcome-hero">🇮🇹</div>';
+
+    // Title
+    html += '<h2 class="welcome-title">¡Prepárate para tu<br>viaje italiano!</h2>';
+    html += '<p class="welcome-subtitle">' + stepCount + ' pasos interactivos para dominar los fundamentos del italiano desde cero</p>';
+
+    // Stats badges
+    html += '<div class="welcome-stats">';
+    html += '  <div class="welcome-stat">';
+    html += '    <span class="welcome-stat-icon">🎯</span>';
+    html += '    <span class="welcome-stat-value">' + pointsTotal + '</span>';
+    html += '    <span class="welcome-stat-label">puntos por ganar</span>';
+    html += '  </div>';
+    html += '  <div class="welcome-stat">';
+    html += '    <span class="welcome-stat-icon">📚</span>';
+    html += '    <span class="welcome-stat-value">' + vocabCount + '</span>';
+    html += '    <span class="welcome-stat-label">palabras nuevas</span>';
+    html += '  </div>';
+    html += '  <div class="welcome-stat">';
+    html += '    <span class="welcome-stat-icon">🎤</span>';
+    html += '    <span class="welcome-stat-value">' + stepCount + '</span>';
+    html += '    <span class="welcome-stat-label">lecciones con voz</span>';
+    html += '  </div>';
+    html += '</div>';
+
+    // Feature list
+    html += '<div class="welcome-features">';
+    html += '  <div class="welcome-feature">✅ Explicaciones claras con ejemplos</div>';
+    html += '  <div class="welcome-feature">🎯 Micro-prácticas después de cada tema</div>';
+    html += '  <div class="welcome-feature">🔊 Pronunciación con audio real</div>';
+    html += '  <div class="welcome-feature">🏆 Compite con Sandra por los puntos</div>';
+    html += '</div>';
+
+    // Start button
+    html += '<button id="welcome-start-btn" class="primary-btn welcome-start-btn">';
+    html += '  🚀 ¡Comenzar aventura!';
+    html += '</button>';
+
+    html += '<p class="welcome-hint">Tus puntos se guardan automáticamente</p>';
+    html += '</div>';
+
+    stepperEl.innerHTML = html;
+
+    // Wire start button
+    var startBtn = document.getElementById('welcome-start-btn');
+    if (startBtn) {
+      startBtn.addEventListener('click', function() {
+        localStorage.setItem(welcomeKey, '1');
+        renderStepperStep(mod);
+      });
+    }
   }
 
   /** Get a professional emoji and label for a given lesson step */

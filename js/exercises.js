@@ -299,6 +299,18 @@ App.ExerciseEngine = (function() {
       }
     }
 
+    // Update points header display
+    if (learner && result.score > 0) {
+      var newPoints = App.Progress.getTotalPoints(learner);
+      var ptsEl = document.getElementById('points-header-count');
+      if (ptsEl) {
+        ptsEl.textContent = newPoints;
+        ptsEl.style.transition = 'transform 300ms ease';
+        ptsEl.style.transform = 'scale(1.3)';
+        setTimeout(function() { ptsEl.style.transform = 'scale(1)'; }, 300);
+      }
+    }
+
     // Refresh competition display on home page
     if (App.renderCompetition && learner) {
       App.renderCompetition();

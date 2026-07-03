@@ -185,6 +185,19 @@ header {
   font-size: 0.9rem;
   white-space: nowrap;
 }
+.points-header {
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--accent);
+  background: rgba(37,99,235,0.08);
+  padding: 2px 10px;
+  border-radius: 100px;
+}
+[data-theme="dark"] .points-header {
+  background: rgba(96,165,250,0.12);
+  color: #60a5fa;
+}
 
 /* --- Buttons --- */
 button,
@@ -1229,6 +1242,134 @@ main > section > h2:first-child::after {
   font-weight: 600;
   margin-top: 8px;
   margin-bottom: 24px;
+}
+
+/* --- Module Welcome (gamified onboarding) --- */
+.module-welcome {
+  text-align: center;
+  padding: 32px 24px 40px;
+  background: var(--bg-card);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  border: 1px solid var(--border);
+  animation: welcomeIn 0.6s ease-out;
+}
+[data-theme="dark"] .module-welcome {
+  box-shadow: 0 4px 32px rgba(0,0,0,0.3);
+}
+@keyframes welcomeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.welcome-hero {
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+  animation: heroBounce 2s ease-in-out infinite;
+}
+@keyframes heroBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.welcome-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  color: var(--text);
+  background: linear-gradient(135deg, var(--accent), #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+[data-theme="dark"] .welcome-title {
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.welcome-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 500px;
+  margin: 0 auto 28px;
+}
+.welcome-stats {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.welcome-stat {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 18px 20px;
+  min-width: 120px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.welcome-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.welcome-stat-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.welcome-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.welcome-stat-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.welcome-features {
+  max-width: 400px;
+  margin: 0 auto 28px;
+  text-align: left;
+}
+.welcome-feature {
+  padding: 8px 0;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+.welcome-start-btn {
+  font-size: 1.2rem !important;
+  padding: 18px 40px !important;
+  border-radius: 100px !important;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.3) !important;
+  transition: all 250ms ease !important;
+  display: inline-flex !important;
+  width: auto !important;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+[data-theme="dark"] .welcome-start-btn {
+  box-shadow: 0 4px 24px rgba(59,130,246,0.25) !important;
+}
+.welcome-start-btn:hover {
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow: 0 8px 32px rgba(37,99,235,0.4) !important;
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(37,99,235,0.3); }
+  50% { box-shadow: 0 4px 28px rgba(37,99,235,0.5); }
+}
+.welcome-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 16px;
+  opacity: 0.6;
 }
 
 /* --- Lesson Stepper (interactive step-by-step) --- */
