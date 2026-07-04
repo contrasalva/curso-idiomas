@@ -16,7 +16,9 @@ App.state = {
   examInProgress: false,
   examMode: 'practice',
   examTimer: null,
-  darkMode: false
+  darkMode: false,
+  activeUnit: null,
+  currentStep: 0
 };
 
 /* --- Navigation --- */
@@ -48,6 +50,9 @@ App.nav = (function() {
         break;
       case 'exercise':
         renderExercise(params);
+        break;
+      case 'unit':
+        renderUnit(params);
         break;
     }
 
@@ -363,6 +368,20 @@ App.nav = (function() {
     App.state.currentExercise = exerciseId;
     App.ExerciseEngine.load(exerciseId);
     App.ExerciseEngine.render();
+  }
+
+  function renderUnit(params) {
+    var unitId = (params && params.unit !== undefined) ? params.unit : (App.state.activeUnit || 0);
+    App.state.activeUnit = unitId;
+
+    var navName = document.getElementById('nav-unit-name');
+    if (navName) {
+      navName.textContent = 'Unidad ' + (parseInt(unitId, 10) + 1);
+    }
+
+    if (App.UnitRenderer) {
+      App.UnitRenderer.render(parseInt(unitId, 10));
+    }
   }
 
   function updateSidebar() {
