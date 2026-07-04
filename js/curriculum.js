@@ -517,18 +517,16 @@ App.Curriculum = (function() {
     var startBtn = document.getElementById('start-exercises-btn');
     if (startBtn) startBtn.style.display = 'none';
 
-    // Show welcome screen for module 0 if not seen yet
-    var welcomeKey = 'italian-b1_welcome_' + moduleId;
-    var welcomeDone = localStorage.getItem(welcomeKey);
-    if (!welcomeDone && moduleId === 0) {
-      renderModuleWelcome(mod, moduleId, welcomeKey);
+    // Always show welcome screen for module 0
+    if (moduleId === 0) {
+      renderModuleWelcome(mod);
     } else {
       renderStepperStep(mod);
     }
   }
 
   /** Render a gamified welcome screen before the lesson stepper */
-  function renderModuleWelcome(mod, moduleId, welcomeKey) {
+  function renderModuleWelcome(mod) {
     var stepperEl = document.getElementById('lesson-stepper');
     if (!stepperEl) return;
 
@@ -587,7 +585,6 @@ App.Curriculum = (function() {
     var startBtn = document.getElementById('welcome-start-btn');
     if (startBtn) {
       startBtn.addEventListener('click', function() {
-        localStorage.setItem(welcomeKey, '1');
         renderStepperStep(mod);
       });
     }
