@@ -38,9 +38,9 @@ App.UnitRenderer = (function() {
 
   /* --- Step Renderer Registry --- */
   var STEP_RENDERERS = {
-    'situacion-comunicativa': renderDialogue,
-    'descubrimiento':         renderDialogue,
-    'comprension':            renderComingSoon,
+    'situacion-comunicativa': renderStep1,
+    'descubrimiento':         renderStep2,
+    'comprension':            renderComprehension,
     'gramatica-del-dia':      renderGrammar,
     'construccion':           renderComingSoon,
     'regla':                  renderRule,
@@ -417,6 +417,7 @@ App.UnitRenderer = (function() {
 
   /**
    * Wire TTS play buttons and play-all buttons in the container.
+   * Also wires dialogue extras (translation toggle, hint icons) and comprehension quiz.
    * @param {HTMLElement} container
    */
   function wireTtsButtons(container) {
@@ -433,6 +434,35 @@ App.UnitRenderer = (function() {
     if (playAll) {
       playAll.addEventListener('click', handlePlayAllClick);
     }
+
+    // Translation toggle button
+    var toggleBtn = container.querySelector('.dialogue-translation-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', handleTranslationToggle);
+    }
+
+    // Hint icon clicks (step 2)
+    var hintIcons = container.querySelectorAll('.dialogue-hint-icon');
+    for (var h = 0; h < hintIcons.length; h++) {
+      hintIcons[h].addEventListener('click', handleHintIconClick);
+      hintIcons[h].addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleHintIconClick(e);
+        }
+      });
+    }
+
+    // Volver button
+    var volverBtn = container.querySelector('.dialogue-volver-btn');
+    if (volverBtn) {
+      volverBtn.addEventListener('click', function() {
+        App.nav.show('home');
+      });
+    }
+
+    // Comprehension quiz wiring (step 3)
+    wireComprehension(container);
   }
 
   /**
@@ -477,18 +507,265 @@ App.UnitRenderer = (function() {
     }, 1000);
   }
 
+  /**
+   * Handle translation toggle button click.
+   * Shows or hides all .dialogue-translation elements.
+   * @param {Event} e
+   */
+  function handleTranslationToggle(e) {
+    var btn = e.currentTarget;
+    var container = btn.closest('.dialogue-viewer');
+    if (!container) return;
+    var isVisible = btn.getAttribute('data-visible') === 'true';
+    var translations = container.querySelectorAll('.dialogue-translation');
+    for (var t = 0; t < translations.length; t++) {
+      translations[t].style.display = isVisible ? 'none' : '';
+    }
+    btn.setAttribute('data-visible', isVisible ? 'false' : 'true');
+    btn.textContent = isVisible ? 'Mostrar traducciones' : 'Ocultar traducciones';
+  }
+
+  /**
+   * Handle hint icon click (step 2) — toggles tooltip visibility.
+   * @param {Event} e
+   */
+  function handleHintIconClick(e) {
+    var icon = e.currentTarget;
+    var tooltip = icon.parentNode.querySelector('.dialogue-hint-tooltip');
+    if (tooltip) {
+      tooltip.classList.toggle('visible');
+    }
+  }
+
+  /* ==========================================
+     COMPREHENSION QUIZ WIRING
+     ========================================== */
+
+  /**
+   * Wire comprehension quiz interactions (step 3).
+   * @param {HTMLElement} container
+   */
+  function wireComprehension(container) {
+    var quiz = container.querySelector('.comprehension-quiz');
+    if (!quiz) {
+      // Also check if step 3 needs Next disabled initially
+      // (when comprehension data exists but quiz element wasn't found)
+      if (_state.currentStep === 2) {
+        var dataStep = _state.data.steps && _state.data.steps[2];
+        if (dataStep && dataStep.type === 'comprension') {
+          disableNextBtn();
+        }
+      }
+      return;
+    }
+
+    // Step 3 always starts with Next disabled
+    disableNextBtn();
+
+    // Wire radio buttons
+    var radios = quiz.querySelectorAll('.comprehension-radio');
+    for (var r = 0; r < radios.length; r++) {
+      radios[r].addEventListener('change', handleComprehensionAnswer);
+    }
+
+    // Wire retry button
+    var retryBtn = quiz.querySelector('.comprehension-retry-btn');
+    if (retryBtn) {
+      retryBtn.addEventListener('click', function() {
+        resetComprehension(quiz);
+      });
+    }
+  }
+
+  /**
+   * Handle a comprehension answer selection.
+   * @param {Event} e
+   */
+  function handleComprehensionAnswer(e) {
+    var radio = e.currentTarget;
+    var questionEl = radio.closest('.comprehension-question');
+    if (!questionEl) return;
+    if (questionEl.getAttribute('data-answered') === 'true') return;
+
+    var quiz = questionEl.closest('.comprehension-quiz');
+    if (!quiz) return;
+
+    var selectedIndex = parseInt(radio.value, 10);
+    var correctIndex = parseInt(questionEl.getAttribute('data-correctindex'), 10);
+    var isCorrect = selectedIndex === correctIndex;
+
+    // Mark question as answered
+    questionEl.setAttribute('data-answered', 'true');
+
+    // Disable all radios in this question
+    var qRadios = questionEl.querySelectorAll('.comprehension-radio');
+    for (var r = 0; r < qRadios.length; r++) {
+      qRadios[r].disabled = true;
+    }
+
+    // Highlight correct and incorrect options
+    var options = questionEl.querySelectorAll('.comprehension-option');
+    for (var o = 0; o < options.length; o++) {
+      var optRadio = options[o].querySelector('.comprehension-radio');
+      if (!optRadio) continue;
+      var optVal = parseInt(optRadio.value, 10);
+      if (optVal === correctIndex) {
+        options[o].classList.add('comprehension-correct');
+      } else if (optVal === selectedIndex && !isCorrect) {
+        options[o].classList.add('comprehension-incorrect');
+      }
+    }
+
+    // Show per-question feedback
+    var feedback = questionEl.querySelector('.comprehension-feedback');
+    if (feedback) {
+      feedback.textContent = isCorrect ? '✓ ¡Correcto!' : '✗ Incorrecto';
+      feedback.className = 'comprehension-feedback ' + (isCorrect ? 'comprehension-feedback--correct' : 'comprehension-feedback--incorrect');
+    }
+
+    // Update global quiz counters
+    var total = parseInt(quiz.getAttribute('data-total'), 10);
+    var answered = parseInt(quiz.getAttribute('data-answered'), 10) + 1;
+    var correct = parseInt(quiz.getAttribute('data-correct'), 10) + (isCorrect ? 1 : 0);
+    quiz.setAttribute('data-answered', answered);
+    quiz.setAttribute('data-correct', correct);
+
+    // Check if all questions are answered
+    if (answered >= total) {
+      showComprehensionResult(quiz, correct, total);
+    }
+  }
+
+  /**
+   * Show the final comprehension result and enable/disable Next.
+   * @param {HTMLElement} quiz
+   * @param {number} correct
+   * @param {number} total
+   */
+  function showComprehensionResult(quiz, correct, total) {
+    var pct = Math.round((correct / total) * 100);
+    var resultEl = quiz.querySelector('.comprehension-result');
+    var scoreEl = quiz.querySelector('.comprehension-score');
+    var msgEl = quiz.querySelector('.comprehension-message');
+    var navHint = quiz.querySelector('.comprehension-nav-hint');
+
+    if (resultEl) resultEl.style.display = 'block';
+    if (scoreEl) scoreEl.textContent = 'Puntuación: ' + correct + '/' + total + ' (' + pct + '%)';
+    if (navHint) navHint.style.display = 'block';
+
+    if (pct >= 80) {
+      if (msgEl) msgEl.textContent = '✅ ¡Bien hecho! Puedes continuar a la siguiente lección.';
+      enableNextBtn();
+    } else {
+      if (msgEl) {
+        msgEl.innerHTML = '📖 Necesitas un 80% o más. <a href="#" class="comprehension-review-link" data-go-step="0">Revisa el diálogo</a> y vuelve a intentarlo.';
+        var link = msgEl.querySelector('.comprehension-review-link');
+        if (link) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            goToStep(0);
+          });
+        }
+      }
+      disableNextBtn();
+    }
+  }
+
+  /**
+   * Reset the comprehension quiz for a retry.
+   * @param {HTMLElement} quiz
+   */
+  function resetComprehension(quiz) {
+    quiz.setAttribute('data-answered', '0');
+    quiz.setAttribute('data-correct', '0');
+
+    var questions = quiz.querySelectorAll('.comprehension-question');
+    for (var q = 0; q < questions.length; q++) {
+      questions[q].setAttribute('data-answered', 'false');
+
+      // Re-enable and uncheck radios
+      var radios = questions[q].querySelectorAll('.comprehension-radio');
+      for (var r = 0; r < radios.length; r++) {
+        radios[r].disabled = false;
+        radios[r].checked = false;
+      }
+
+      // Remove highlight classes
+      var options = questions[q].querySelectorAll('.comprehension-option');
+      for (var o = 0; o < options.length; o++) {
+        options[o].classList.remove('comprehension-correct', 'comprehension-incorrect');
+      }
+
+      // Clear feedback
+      var feedback = questions[q].querySelector('.comprehension-feedback');
+      if (feedback) {
+        feedback.textContent = '';
+        feedback.className = 'comprehension-feedback';
+      }
+    }
+
+    // Hide result
+    var resultEl = quiz.querySelector('.comprehension-result');
+    if (resultEl) resultEl.style.display = 'none';
+
+    var navHint = quiz.querySelector('.comprehension-nav-hint');
+    if (navHint) navHint.style.display = 'none';
+
+    // Disable Next until they pass again
+    disableNextBtn();
+  }
+
+  /**
+   * Enable the Next navigation button.
+   */
+  function enableNextBtn() {
+    var nextBtn = document.querySelector('.step-next');
+    if (nextBtn) {
+      nextBtn.disabled = false;
+    }
+  }
+
+  /**
+   * Disable the Next navigation button.
+   */
+  function disableNextBtn() {
+    var nextBtn = document.querySelector('.step-next');
+    if (nextBtn) {
+      nextBtn.disabled = true;
+    }
+  }
+
   /* ==========================================
      STEP 1 & 2: Dialogue Viewer
      ========================================== */
 
   /**
-   * Render dialogue bubbles for steps 1 (situacion-comunicativa) and 2 (descubrimiento).
+   * Render step 1 — situacion-comunicativa dialogue viewer.
    * @param {object} stepData
    * @returns {string} HTML
    */
-  function renderDialogue(stepData) {
+  function renderStep1(stepData) {
+    return renderDialogueViewer(stepData, { isStep2: false });
+  }
+
+  /**
+   * Render step 2 — descubrimiento dialogue viewer with observation prompt and hints.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderStep2(stepData) {
+    return renderDialogueViewer(stepData, { isStep2: true });
+  }
+
+  /**
+   * Render dialogue bubbles for steps 1 (situacion-comunicativa) and 2 (descubrimiento).
+   * @param {object} stepData
+   * @param {object} opts - { isStep2 }
+   * @returns {string} HTML
+   */
+  function renderDialogueViewer(stepData, opts) {
+    var isStep2 = opts && opts.isStep2;
     var lines = stepData.dialogue || [];
-    var isStep2 = stepData.type === 'descubrimiento';
     var hasObservation = isStep2 && stepData.observation_prompt;
 
     // Empty dialogue fallback
@@ -502,7 +779,29 @@ App.UnitRenderer = (function() {
       allTexts.push(lines[i].text);
     }
 
-    var html = '<div class="dialogue-viewer"><div class="dialogue-scene">';
+    var html = '<div class="dialogue-viewer">';
+
+    // Volver button at top
+    html += '<div class="dialogue-volver">' +
+      '<button class="dialogue-volver-btn" data-action="go-home" aria-label="Volver al inicio">← Volver al inicio</button>' +
+    '</div>';
+
+    // Objective (step 1) or observation_prompt (step 2) at TOP
+    if (!isStep2 && stepData.objective) {
+      html += '<div class="dialogue-objective">🎯 ' + escapeHtml(stepData.objective) + '</div>';
+    }
+    if (hasObservation) {
+      html += '<div class="observation-prompt" style="margin-bottom:12px">' + escapeHtml(stepData.observation_prompt) + '</div>';
+    }
+
+    // Play-all + translation toggle row
+    html += '<div class="dialogue-controls">' +
+      '<button class="secondary-btn dialogue-play-all-btn" data-texts=\'' + JSON.stringify(allTexts) + '\'>▶ Reproducir todo</button>' +
+      '<button class="secondary-btn dialogue-translation-toggle" data-visible="true">Ocultar traducciones</button>' +
+    '</div>';
+
+    // Dialogue bubbles
+    html += '<div class="dialogue-scene">';
 
     for (var j = 0; j < lines.length; j++) {
       var line = lines[j];
@@ -517,42 +816,81 @@ App.UnitRenderer = (function() {
       html += '<div class="dialogue-content">' +
         '<div class="dialogue-text">' + escapeHtml(line.text) + '</div>';
 
-      // Translation (shown on step 1, also available on step 2)
-      if (line.translation) {
-        html += '<div class="dialogue-translation">' + escapeHtml(line.translation) + '</div>';
-      }
+      // Translation (always rendered, toggleable via CSS class)
+      html += '<div class="dialogue-translation">' + escapeHtml(line.translation || '') + '</div>';
 
-      // Hint (step 2 only)
+      // Hint (step 2 only — displayed as clickable 💡 icon with tooltip)
       if (line.hint && isStep2) {
-        html += '<div class="dialogue-hint">💡 ' + escapeHtml(line.hint) + '</div>';
+        html += '<div class="dialogue-hint-container">' +
+          '<span class="dialogue-hint-icon" title="Ver pista gramatical" role="button" tabindex="0">💡</span>' +
+          '<div class="dialogue-hint-tooltip">' + escapeHtml(line.hint) + '</div>' +
+        '</div>';
       }
 
       html += '</div>'; // .dialogue-content
 
-      // TTS button
+      // TTS button — call with language hint
       html += '<button class="dialogue-tts-btn" data-text="' + escapeAttr(line.text) + '" title="Escuchar" aria-label="Escuchar">🔊</button>';
 
       html += '</div>'; // .dialogue-bubble
     }
 
     html += '</div>'; // .dialogue-scene
+    html += '</div>'; // .dialogue-viewer
+    return html;
+  }
 
-    // Play-all button
-    html += '<div class="dialogue-play-all">' +
-      '<button class="secondary-btn dialogue-play-all-btn" data-texts=\'' + JSON.stringify(allTexts) + '\'>▶ Reproducir todo</button>' +
+  /* ==========================================
+     STEP 3: Comprehension Quiz
+     ========================================== */
+
+  /**
+   * Render step 3 — comprension: inline multiple-choice quiz over dialogue content.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderComprehension(stepData) {
+    var questions = stepData.questions || [];
+
+    if (!questions || questions.length === 0) {
+      return '<div class="coming-soon-card">' +
+        '<div class="coming-soon-icon">🔜</div>' +
+        '<div class="coming-soon-title">Próximamente</div>' +
+        '<p class="coming-soon-message">Las preguntas de comprensión estarán disponibles pronto.</p></div>';
+    }
+
+    var html = '<div class="comprehension-quiz" data-total="' + questions.length + '" data-answered="0" data-correct="0">' +
+      '<p class="comprehension-intro">Responde las siguientes preguntas sobre el diálogo:</p>';
+
+    for (var i = 0; i < questions.length; i++) {
+      var q = questions[i];
+      html += '<div class="comprehension-question" data-index="' + i + '" data-answered="false" data-correctindex="' + q.correctIndex + '">' +
+        '<div class="comprehension-question-text">' + (i + 1) + '. ' + escapeHtml(q.question) + '</div>' +
+        '<div class="comprehension-options">';
+
+      for (var j = 0; j < q.options.length; j++) {
+        html += '<label class="comprehension-option">' +
+          '<input type="radio" name="cq-' + i + '" value="' + j + '" class="comprehension-radio" data-qindex="' + i + '">' +
+          '<span class="comprehension-option-text">' + escapeHtml(q.options[j]) + '</span>' +
+        '</label>';
+      }
+
+      html += '</div>' + // .comprehension-options
+        '<div class="comprehension-feedback"></div>' +
+      '</div>'; // .comprehension-question
+    }
+
+    // Result area (hidden until all answered)
+    html += '<div class="comprehension-result" style="display:none">' +
+      '<div class="comprehension-score"></div>' +
+      '<div class="comprehension-message"></div>' +
+      '<button class="secondary-btn comprehension-retry-btn">🔄 Reintentar</button>' +
     '</div>';
 
-    // Step 1: objective at bottom
-    if (!isStep2 && stepData.objective) {
-      html += '<div class="dialogue-objective">🎯 ' + escapeHtml(stepData.objective) + '</div>';
-    }
+    // Navigation hint
+    html += '<p class="comprehension-nav-hint" style="display:none">✅ Todas las preguntas respondidas. Revisa tu resultado arriba.</p>';
 
-    // Step 2: observation prompt at bottom
-    if (hasObservation) {
-      html += '<div class="observation-prompt">' + escapeHtml(stepData.observation_prompt) + '</div>';
-    }
-
-    html += '</div>'; // .dialogue-viewer
+    html += '</div>'; // .comprehension-quiz
     return html;
   }
 

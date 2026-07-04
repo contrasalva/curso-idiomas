@@ -252,7 +252,7 @@
 .dialogue-objective {
   padding: 16px 20px;
   background: rgba(59,130,246,0.04);
-  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   font-size: 0.9rem;
   color: var(--text-secondary);
   text-align: center;
@@ -730,4 +730,256 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 600;
+}
+
+/* ============================================
+   DIALOGUE EXTRAS (Phase 1)
+   ============================================ */
+
+/* Volver button */
+.dialogue-volver {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dialogue-volver-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: opacity 200ms ease;
+}
+
+.dialogue-volver-btn:hover {
+  opacity: 0.7;
+}
+
+/* Dialogue controls row (play-all + translation toggle) */
+.dialogue-controls {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.dialogue-translation-toggle {
+  margin-left: auto;
+}
+
+/* Hint tooltip system (step 2) */
+.dialogue-hint-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  position: relative;
+}
+
+.dialogue-hint-icon {
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px;
+  border-radius: 50%;
+  transition: background 200ms ease;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.dialogue-hint-icon:hover {
+  background: rgba(59,130,246,0.1);
+}
+
+.dialogue-hint-tooltip {
+  display: none;
+  font-size: 0.8rem;
+  color: var(--text);
+  font-style: italic;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  position: absolute;
+  left: 28px;
+  top: -4px;
+  z-index: 10;
+  max-width: 280px;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+[data-theme="dark"] .dialogue-hint-tooltip {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  background: var(--bg);
+}
+
+.dialogue-hint-tooltip.visible {
+  display: block;
+}
+
+/* ============================================
+   STEP 3: COMPREHENSION QUIZ
+   ============================================ */
+
+.comprehension-quiz {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.comprehension-intro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.comprehension-question {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.comprehension-question:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.comprehension-question-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.comprehension-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comprehension-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.comprehension-option:hover {
+  border-color: var(--accent);
+  background: rgba(59,130,246,0.04);
+}
+
+.comprehension-option.comprehension-correct {
+  background: rgba(16,185,129,0.1);
+  border-color: #10b981;
+  color: #065f46;
+}
+
+[data-theme="dark"] .comprehension-option.comprehension-correct {
+  background: rgba(16,185,129,0.15);
+  color: #6ee7b7;
+}
+
+.comprehension-option.comprehension-incorrect {
+  background: rgba(239,68,68,0.1);
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+[data-theme="dark"] .comprehension-option.comprehension-incorrect {
+  background: rgba(239,68,68,0.15);
+  color: #fca5a5;
+}
+
+.comprehension-radio {
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.comprehension-option-text {
+  flex: 1;
+}
+
+.comprehension-feedback {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 4px 0;
+}
+
+.comprehension-feedback--correct {
+  color: #10b981;
+}
+
+.comprehension-feedback--incorrect {
+  color: #ef4444;
+}
+
+.comprehension-result {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.comprehension-score {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.comprehension-message {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.comprehension-message a {
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.comprehension-message a:hover {
+  opacity: 0.8;
+}
+
+.comprehension-retry-btn {
+  margin-top: 8px;
+}
+
+.comprehension-nav-hint {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 16px;
+  padding: 8px;
+  background: rgba(16,185,129,0.06);
+  border-radius: 8px;
+}
+
+/* Disabled navigation button state */
+.step-next:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }

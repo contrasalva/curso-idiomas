@@ -42,9 +42,35 @@
       },
       {
         "step": 3,
-        "type": "coming-soon",
+        "type": "comprension",
         "title": "Comprensión",
-        "message": "🔜 Próximamente: preguntas sobre el diálogo para comprobar lo que has entendido."
+        "questions": [
+          {
+            "question": "¿Quién saluda primero en el diálogo?",
+            "options": ["Marco", "Lucia", "Mario", "Giulia"],
+            "correctIndex": 0
+          },
+          {
+            "question": "¿Qué significa \"Piacere di conoscerti\"?",
+            "options": ["Hola, ¿cómo estás?", "Bien, gracias", "Mucho gusto", "Hasta luego"],
+            "correctIndex": 2
+          },
+          {
+            "question": "¿De dónde es Lucia?",
+            "options": ["Milán", "Roma", "Nápoles", "Florencia"],
+            "correctIndex": 1
+          },
+          {
+            "question": "¿Cómo se despide Marco?",
+            "options": ["Ciao", "Arrivederci", "Buongiorno", "Piacere"],
+            "correctIndex": 1
+          },
+          {
+            "question": "¿Qué responde Lucia cuando Marco pregunta \"Come stai?\"",
+            "options": ["Bene, grazie", "Sono di Roma", "Arrivederci", "Piacere"],
+            "correctIndex": 0
+          }
+        ]
       },
       {
         "step": 4,
