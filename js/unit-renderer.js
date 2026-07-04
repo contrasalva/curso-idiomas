@@ -77,7 +77,7 @@ App.UnitRenderer = (function() {
       }
     }
 
-    if (data) {
+    if (data && data.length > 0) {
       return findUnit(data, unitId);
     }
 
