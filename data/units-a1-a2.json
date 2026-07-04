@@ -1,0 +1,233 @@
+[
+  {
+    "id": 0,
+    "title": "Saludos y presentaciones",
+    "level": "A1",
+    "track": "a1-a2",
+    "objectives": [
+      "Saludar y despedirte en italiano",
+      "Presentarte y preguntar el nombre",
+      "Usar los pronombres personales",
+      "Conjugar el verbo ESSERE (ser/estar)",
+      "Conjugar el verbo AVERE (tener)"
+    ],
+    "steps": [
+      {
+        "step": 1,
+        "type": "situacion-comunicativa",
+        "title": "En la fiesta",
+        "dialogue": [
+          { "speaker": "Marco", "text": "Ciao! Io sono Marco. E tu come ti chiami?", "translation": "¡Hola! Yo soy Marco. ¿Y tú cómo te llamas?" },
+          { "speaker": "Lucia", "text": "Ciao Marco! Io sono Lucia. Piacere di conoscerti.", "translation": "¡Hola Marco! Yo soy Lucia. Mucho gusto." },
+          { "speaker": "Marco", "text": "Piacere mio, Lucia! Come stai?", "translation": "El gusto es mío, Lucia. ¿Cómo estás?" },
+          { "speaker": "Lucia", "text": "Bene, grazie! E tu?", "translation": "¡Bien, gracias! ¿Y tú?" },
+          { "speaker": "Marco", "text": "Anche io bene, grazie. Di dove sei?", "translation": "Yo también bien, gracias. ¿De dónde eres?" },
+          { "speaker": "Lucia", "text": "Sono di Roma. E tu?", "translation": "Soy de Roma. ¿Y tú?" },
+          { "speaker": "Marco", "text": "Io sono di Milano. Bene, ora devo andare. Arrivederci Lucia!", "translation": "Yo soy de Milán. Bien, ahora me tengo que ir. ¡Hasta luego Lucia!" },
+          { "speaker": "Lucia", "text": "Arrivederci Marco! È stato un piacere.", "translation": "¡Hasta luego Marco! Fue un placer." }
+        ],
+        "objective": "Al terminar esta unidad podrás saludar, presentarte y preguntar el nombre de otra persona en italiano."
+      },
+      {
+        "step": 2,
+        "type": "descubrimiento",
+        "title": "Observa el diálogo",
+        "dialogue": [
+          { "speaker": "Marco", "text": "Ciao! Io sono Marco.", "hint": "Marco se presenta. ¿Notas cómo dice su nombre?" },
+          { "speaker": "Lucia", "text": "Ciao Marco! Io sono Lucia.", "hint": "Lucia responde de forma similar." },
+          { "speaker": "Marco", "text": "Come stai?", "hint": "Marco pregunta cómo está Lucia." },
+          { "speaker": "Lucia", "text": "Bene, grazie! E tu?", "hint": "Lucia responde y devuelve la pregunta." }
+        ],
+        "observation_prompt": "Sin explicación todavía. Solo observa el diálogo. Fíjate en cómo se presentan: ¿qué palabras usan para decir quiénes son?"
+      },
+      {
+        "step": 3,
+        "type": "coming-soon",
+        "title": "Comprensión",
+        "message": "🔜 Próximamente: preguntas sobre el diálogo para comprobar lo que has entendido."
+      },
+      {
+        "step": 4,
+        "type": "gramatica-del-dia",
+        "title": "Pronombres personales",
+        "explanation": "Los pronombres personales en italiano son las palabras que usamos para referirnos a las personas que hablan (io, noi), a quienes escuchan (tu, voi) y de quienes se habla (lui, lei, loro). A diferencia del español, en italiano se usan con más frecuencia porque las terminaciones verbales no siempre son únicas.",
+        "table": {
+          "title": "Pronombres personales sujeto",
+          "headers": ["Italiano", "Español", "Pronunciación", "Ejemplo"],
+          "rows": [
+            ["io", "yo", "//ío//", "Io sono Marco"],
+            ["tu", "tú", "//tú//", "Tu sei Lucia"],
+            ["lui", "él", "//lúi//", "Lui è Marco"],
+            ["lei", "ella", "//léi//", "Lei è Lucia"],
+            ["Lei", "usted (formal)", "//léi//", "Lei è il dottore"],
+            ["noi", "nosotros", "//nói//", "Noi siamo amici"],
+            ["voi", "vosotros", "//vói//", "Voi siete studenti"],
+            ["loro", "ellos/ellas", "//lóro//", "Loro sono italiani"]
+          ]
+        },
+        "audio_examples": [
+          { "word": "io", "example": "Io sono Marco" },
+          { "word": "tu", "example": "Tu sei Lucia" },
+          { "word": "lui", "example": "Lui è alto" },
+          { "word": "lei", "example": "Lei è gentile" },
+          { "word": "noi", "example": "Noi siamo amici" },
+          { "word": "voi", "example": "Voi siete studenti" },
+          { "word": "loro", "example": "Loro sono simpatici" }
+        ],
+        "tips": [
+          "💡 En italiano 'Lei' con mayúscula significa 'usted' (formal). Es muy usado con desconocidos.",
+          "💡 'Loro' sirve tanto para grupos masculinos como femeninos. No hay cambio como en español (ellos/ellas).",
+          "💡 Puedes omitir el pronombre porque la terminación del verbo ya indica quién es. 'Parlo' = (yo) hablo."
+        ]
+      },
+      {
+        "step": 5,
+        "type": "coming-soon",
+        "title": "Construcción",
+        "message": "🔜 Próximamente: construye frases arrastrando palabras coloreadas (azul=sujeto, verde=verbo, naranja=complemento)."
+      },
+      {
+        "step": 6,
+        "type": "regla",
+        "title": "El verbo ESSERE",
+        "rule": "El verbo ESSERE (ser/estar) cambia su forma según el pronombre. Es el verbo más importante del italiano y también es irregular, así que hay que memorizar sus formas.",
+        "conjugation": {
+          "verb": "ESSERE (ser/estar)",
+          "pattern": [
+            { "pronoun": "io", "form": "sono", "example": "Io sono Marco" },
+            { "pronoun": "tu", "form": "sei", "example": "Tu sei Lucia" },
+            { "pronoun": "lui/lei", "form": "è", "example": "Lui è Marco" },
+            { "pronoun": "noi", "form": "siamo", "example": "Noi siamo amici" },
+            { "pronoun": "voi", "form": "siete", "example": "Voi siete studenti" },
+            { "pronoun": "loro", "form": "sono", "example": "Loro sono simpatici" }
+          ]
+        },
+        "exceptions": "Ninguna por ahora. ESSERE es irregular pero sigue este patrón fijo. No hay excepciones en presente de indicativo.",
+        "common_mistakes": [
+          "❌ No confundir 'è' (es, con acento) con 'e' (y, sin acento).",
+          "❌ 'Sono' sirve para io y para loro. El contexto te dice quién es."
+        ]
+      },
+      {
+        "step": 7,
+        "type": "tabla-referencia",
+        "title": "Chuleta rápida",
+        "cheat_sheet": {
+          "sections": [
+            {
+              "title": "Pronombres personales",
+              "headers": ["Pronombre", "Español"],
+              "rows": [
+                ["io", "yo"],
+                ["tu", "tú"],
+                ["lui", "él"],
+                ["lei", "ella"],
+                ["noi", "nosotros"],
+                ["voi", "vosotros"],
+                ["loro", "ellos/ellas"]
+              ]
+            },
+            {
+              "title": "Verbo ESSERE (presente)",
+              "headers": ["Pronombre", "Forma"],
+              "rows": [
+                ["io", "sono"],
+                ["tu", "sei"],
+                ["lui/lei", "è"],
+                ["noi", "siamo"],
+                ["voi", "siete"],
+                ["loro", "sono"]
+              ]
+            },
+            {
+              "title": "Saludos y despedidas",
+              "headers": ["Italiano", "Español", "Cuándo usarlo"],
+              "rows": [
+                ["Ciao!", "Hola / Adiós", "Informal, cualquier momento"],
+                ["Buongiorno!", "Buenos días", "Formal, hasta mediodía"],
+                ["Buonasera!", "Buenas tardes/noches", "Formal, desde tarde"],
+                ["Arrivederci!", "Hasta luego", "Formal, despedida"],
+                ["Piacere!", "Mucho gusto", "Al conocerse"],
+                ["Come stai?", "¿Cómo estás?", "Informal, preguntar estado"],
+                ["Bene, grazie!", "Bien, gracias", "Respuesta estándar"],
+                ["E tu?", "¿Y tú?", "Devolver la pregunta"]
+              ]
+            },
+            {
+              "title": "Errores comunes",
+              "headers": ["Error", "Correcto", "Explicación"],
+              "rows": [
+                ["Io è Marco", "Io SONO Marco", "'Io' siempre lleva 'sono', no 'è'"],
+                ["Lei sono Lucia", "Lei È Lucia", "'Lei' (ella) siempre lleva 'è'"],
+                ["Noi sono amici", "Noi SIAMO amici", "'Noi' siempre lleva 'siamo'"],
+                ["è (sin acento)", "è (con acento)", "'è' = es, 'e' = y. ¡El acento importa!"]
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "type": "coming-soon",
+        "title": "Ejercicios escalonados",
+        "message": "🔜 Próximamente: ejercicios desde nivel 1 (reconocer) hasta nivel 7 (hablar) con desbloqueo progresivo."
+      },
+      {
+        "step": 9,
+        "type": "coming-soon",
+        "title": "Vocabulario",
+        "message": "🔜 Próximamente: palabras nuevas con imagen, audio, pronunciación y ejemplos."
+      },
+      {
+        "step": 10,
+        "type": "coming-soon",
+        "title": "Pronunciación",
+        "message": "🔜 Próximamente: escucha y repite frases en voz alta con corrección por palabra."
+      },
+      {
+        "step": 11,
+        "type": "cultura",
+        "title": "El saludo italiano",
+        "note": "En Italia, saludar es todo un arte. El 'Ciao' se usa con amigos y familia, pero con desconocidos o en situaciones formales se usa 'Buongiorno' o 'Buonasera'. Además, los italianos suelen saludarse con dos besos (uno en cada mejilla), incluso entre hombres. ¡Pero solo si hay confianza! Con desconocidos, un apretón de manos basta.",
+        "icon": "🇮🇹",
+        "curiosities": [
+          "🍝 'Ciao' viene del veneciano 's-ciao' que significaba 'soy tu esclavo'.",
+          "🤝 En el norte de Italia los dos besos son la norma; en el sur, a veces solo uno.",
+          "☕ Pedir un caffè sin más significa 'espresso'. Si quieres otro tipo, especifícalo."
+        ]
+      },
+      {
+        "step": 12,
+        "type": "coming-soon",
+        "title": "Conversación guiada",
+        "message": "🔜 Próximamente: conversa con la IA con ayuda y sugerencias."
+      },
+      {
+        "step": 13,
+        "type": "coming-soon",
+        "title": "Conversación libre",
+        "message": "🔜 Próximamente: conversa sin ayuda. La IA cambiará las preguntas para que no memorices respuestas."
+      },
+      {
+        "step": 14,
+        "type": "resumen-visual",
+        "title": "¡Lo lograste!",
+        "items": [
+          { "icon": "👤", "label": "Pronombres personales: io, tu, lui, lei, noi, voi, loro", "mastered": true },
+          { "icon": "🔵", "label": "Verbo ESSERE: sono, sei, è, siamo, siete, sono", "mastered": true },
+          { "icon": "💬", "label": "Saludos: ciao, buongiorno, arrivederci, piacere", "mastered": true },
+          { "icon": "🎯", "label": "Expresiones: come stai?, bene grazie!, e tu?", "mastered": true },
+          { "icon": "📝", "label": "Palabras nuevas", "count": 15 },
+          { "icon": "🎓", "label": "Objetivo: presentarte y preguntar el nombre", "mastered": true }
+        ],
+        "encouragement": "¡Excelente trabajo! Has completado la primera unidad. Ya puedes saludar y presentarte en italiano. 👏"
+      },
+      {
+        "step": 15,
+        "type": "coming-soon",
+        "title": "Repaso inteligente",
+        "message": "🔜 Próximamente: repaso automático solo de los ejercicios que fallaste."
+      }
+    ]
+  }
+]

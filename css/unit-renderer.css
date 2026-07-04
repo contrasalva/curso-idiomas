@@ -1,0 +1,733 @@
+/* ============================================
+   Unit Renderer — 15-Step Pedagogical System
+   Italiano B1 / Curso Idiomas
+   ============================================ */
+
+/* --- Step Container --- */
+.step-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+/* --- Step Indicator (15 dots, color-coded) --- */
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 0;
+  flex-wrap: wrap;
+}
+
+.step-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid transparent;
+  transition: all 250ms ease;
+  cursor: default;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.step-dot.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  transform: scale(1.15);
+}
+
+.step-dot.completed {
+  background: var(--accent);
+}
+
+.step-dot.coming-soon {
+  opacity: 0.35;
+}
+
+/* Phase color overrides (set via inline style or JS) */
+.step-dot.phase-blue    { --dot-color: #3b82f6; }
+.step-dot.phase-green   { --dot-color: #10b981; }
+.step-dot.phase-orange  { --dot-color: #f59e0b; }
+.step-dot.phase-purple  { --dot-color: #8b5cf6; }
+.step-dot.phase-gray    { --dot-color: #94a3b8; }
+
+[data-theme="dark"] .step-dot.active {
+  box-shadow: 0 0 0 3px rgba(96,165,250,0.25);
+}
+
+/* --- Step Progress Bar --- */
+.step-progress {
+  margin-bottom: 24px;
+}
+
+.step-progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.step-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 400ms ease;
+}
+
+.step-progress-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* --- Step Navigation (prev/next) --- */
+.step-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.step-nav-spacer {
+  flex: 1;
+}
+
+/* --- Coming Soon Stub --- */
+.coming-soon-card {
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 2px dashed var(--border);
+}
+
+.coming-soon-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.coming-soon-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.coming-soon-message {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* --- Step Header --- */
+.step-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.step-phase-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 8px;
+}
+
+.step-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+/* ============================================
+   STEP 1-2: Dialogue Viewer
+   ============================================ */
+.dialogue-viewer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.dialogue-scene {
+  padding: 4px 0;
+}
+
+.dialogue-bubble {
+  display: flex;
+  gap: 12px;
+  padding: 12px 20px;
+  transition: background 200ms ease;
+}
+
+.dialogue-bubble.highlighted {
+  background: rgba(59,130,246,0.06);
+}
+
+[data-theme="dark"] .dialogue-bubble.highlighted {
+  background: rgba(96,165,250,0.08);
+}
+
+.dialogue-speaker {
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--accent);
+  min-width: 60px;
+  padding-top: 2px;
+}
+
+.dialogue-content {
+  flex: 1;
+}
+
+.dialogue-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.dialogue-translation {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.dialogue-hint {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-style: italic;
+  margin-top: 4px;
+  padding: 6px 10px;
+  background: rgba(59,130,246,0.06);
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .dialogue-hint {
+  background: rgba(96,165,250,0.08);
+}
+
+.dialogue-tts-btn {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 200ms ease;
+  align-self: flex-start;
+}
+
+.dialogue-tts-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.dialogue-play-all {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.dialogue-objective {
+  padding: 16px 20px;
+  background: rgba(59,130,246,0.04);
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+}
+
+[data-theme="dark"] .dialogue-objective {
+  background: rgba(96,165,250,0.04);
+}
+
+/* --- Observation prompt (step 2) --- */
+.observation-prompt {
+  padding: 16px 20px;
+  background: rgba(245,158,11,0.06);
+  border-top: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+[data-theme="dark"] .observation-prompt {
+  background: rgba(245,158,11,0.08);
+}
+
+/* ============================================
+   STEP 4: Grammar Card
+   ============================================ */
+.grammar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.grammar-explanation {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.grammar-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.grammar-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.grammar-table th {
+  background: var(--accent);
+  color: white;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.grammar-table th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.grammar-table th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.grammar-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.grammar-table tr:last-child td {
+  border-bottom: none;
+}
+
+.grammar-table tr:hover td {
+  background: rgba(59,130,246,0.03);
+}
+
+.grammar-tips {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(16,185,129,0.06);
+  border-radius: 12px;
+  border-left: 3px solid #10b981;
+}
+
+[data-theme="dark"] .grammar-tips {
+  background: rgba(16,185,129,0.08);
+}
+
+.grammar-tip {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.grammar-tip:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   STEP 6: Rule Card
+   ============================================ */
+.rule-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  border-left: 4px solid #10b981;
+}
+
+.rule-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.rule-conjugation {
+  margin-bottom: 16px;
+}
+
+.rule-conjugation-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rule-pattern {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 6px;
+}
+
+.rule-pattern-item {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(59,130,246,0.04);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+[data-theme="dark"] .rule-pattern-item {
+  background: rgba(96,165,250,0.06);
+}
+
+.rule-pattern-pronoun {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 36px;
+}
+
+.rule-pattern-form {
+  font-weight: 600;
+  color: #10b981;
+}
+
+.rule-exceptions {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding: 10px 14px;
+  background: rgba(245,158,11,0.06);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+[data-theme="dark"] .rule-exceptions {
+  background: rgba(245,158,11,0.08);
+}
+
+.rule-mistakes {
+  margin-top: 12px;
+}
+
+.rule-mistake {
+  font-size: 0.85rem;
+  color: var(--text);
+  padding: 6px 0;
+  line-height: 1.4;
+}
+
+/* ============================================
+   STEP 7: Reference Table (Cheat Sheet)
+   ============================================ */
+.reference-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.reference-card .grammar-table {
+  margin-bottom: 24px;
+}
+
+.reference-card .grammar-table:last-child {
+  margin-bottom: 0;
+}
+
+.reference-section-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent);
+  margin-bottom: 8px;
+  margin-top: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.reference-section-title:first-child {
+  margin-top: 0;
+}
+
+/* ============================================
+   STEP 11: Culture Card
+   ============================================ */
+.culture-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+}
+
+.culture-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.culture-note {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text);
+  max-width: 550px;
+  margin: 0 auto 16px;
+}
+
+.culture-curiosities {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.culture-curiosity {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding: 6px 0;
+  line-height: 1.5;
+}
+
+/* ============================================
+   STEP 14: Summary Card
+   ============================================ */
+.summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.summary-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.summary-encouragement {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.summary-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  max-width: 550px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(59,130,246,0.04);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  transition: transform 200ms ease;
+}
+
+[data-theme="dark"] .summary-item {
+  background: rgba(96,165,250,0.06);
+}
+
+.summary-item:hover {
+  transform: translateY(-1px);
+}
+
+.summary-item-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.summary-item-label {
+  font-size: 0.9rem;
+  color: var(--text);
+  flex: 1;
+  line-height: 1.3;
+}
+
+.summary-item-check {
+  color: #10b981;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.summary-item-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+
+/* --- Unit Grid (replaces module grid) --- */
+.unit-grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.track-selector {
+  display: flex;
+  gap: 0;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid var(--border);
+}
+
+.track-btn {
+  padding: 8px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.track-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
+.track-btn:hover:not(.active) {
+  color: var(--text);
+}
+
+.unit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.unit-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 200ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.unit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+[data-theme="dark"] .unit-card:hover {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+
+.unit-card.locked {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.unit-card.locked:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.unit-card-level {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.unit-card-level.A1 { background: rgba(16,185,129,0.12); color: #10b981; }
+.unit-card-level.A2 { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.unit-card-level.B1 { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+
+[data-theme="dark"] .unit-card-level.A1 { background: rgba(16,185,129,0.2); color: #34d399; }
+[data-theme="dark"] .unit-card-level.A2 { background: rgba(59,130,246,0.2); color: #60a5fa; }
+[data-theme="dark"] .unit-card-level.B1 { background: rgba(139,92,246,0.2); color: #a78bfa; }
+
+.unit-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.unit-card-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.unit-card-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unit-card-progress-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.unit-card-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 300ms ease;
+}
+
+.unit-card-progress-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}

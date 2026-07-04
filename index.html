@@ -7,6 +7,7 @@
   <title>Italiano B1</title>
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/exercises.css">
+  <link rel="stylesheet" href="css/unit-renderer.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido</a>
@@ -114,6 +115,18 @@
         <div id="exercise-counter" class="exercise-counter">
           Cargando...
         </div>
+      </div>
+    </section>
+
+    <!-- Unit (new pedagogical lesson structure) -->
+    <section id="section-unit" aria-label="Unidad didáctica" style="display:none">
+      <nav class="section-nav" aria-label="Navegación">
+        <button class="nav-home-btn" data-section="home" aria-label="Ir al inicio">🏠 Inicio</button>
+        <span class="nav-separator">›</span>
+        <span id="nav-unit-name" class="nav-current">Unidad</span>
+      </nav>
+      <div id="step-container" class="step-container">
+        <!-- Rendered by App.UnitRenderer -->
       </div>
     </section>
 
@@ -1923,6 +1936,7 @@
     }
   ]
 }</script>
+<script type="application/json" id="data-units-a1a2" data-src="data/units-a1-a2.json">[]</script>
   <!-- Scripts: order matters -->
   <script src="js/progress.js"></script>
   <script src="js/curriculum.js"></script>
