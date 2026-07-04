@@ -629,6 +629,14 @@ function getProgressDots(total, done) {
       }
     }
 
+    // --- Test Unit button (temporary) ---
+    var testUnitBtn = document.getElementById('test-unit-btn');
+    if (testUnitBtn) {
+      testUnitBtn.addEventListener('click', function() {
+        App.nav.show('unit', { unit: 0 });
+      });
+    }
+
     // --- Exam start buttons ---
     var startExamBtn = document.getElementById('start-exam-btn');
     if (startExamBtn) {
