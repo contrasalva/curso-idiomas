@@ -1325,3 +1325,115 @@
 [data-theme="dark"] .word-token:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
+
+/* ============================================
+   STEP 10: Pronunciation (Pronunciación)
+   ============================================ */
+
+.pronunciation-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.pronunciation-phrase-card {
+  animation: fadeInCard 300ms ease;
+}
+
+@keyframes fadeInCard {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pronunciation-word {
+  display: inline-block;
+  padding: 6px 14px;
+  margin: 2px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  transition: all 200ms ease;
+}
+
+.pronunciation-word--speaking {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+  transform: scale(1.1);
+  box-shadow: 0 2px 12px rgba(245,158,11,0.3);
+}
+
+[data-theme="dark"] .pronunciation-word--speaking {
+  background: rgba(245,158,11,0.2);
+  border-color: #f59e0b;
+  color: #fbbf24;
+  box-shadow: 0 2px 12px rgba(245,158,11,0.2);
+}
+
+.pronunciation-word--correct {
+  background: rgba(22,163,74,0.12) !important;
+  border-color: #16a34a !important;
+  color: #16a34a !important;
+}
+
+[data-theme="dark"] .pronunciation-word--correct {
+  background: rgba(22,163,74,0.2) !important;
+  color: #4ade80 !important;
+  border-color: #4ade80 !important;
+}
+
+.pronunciation-word--partial {
+  background: rgba(245,158,11,0.12) !important;
+  border-color: #f59e0b !important;
+  color: #b45309 !important;
+}
+
+[data-theme="dark"] .pronunciation-word--partial {
+  background: rgba(245,158,11,0.2) !important;
+  color: #fbbf24 !important;
+  border-color: #fbbf24 !important;
+}
+
+.pronunciation-word--incorrect {
+  background: rgba(220,38,38,0.12) !important;
+  border-color: #dc2626 !important;
+  color: #dc2626 !important;
+}
+
+[data-theme="dark"] .pronunciation-word--incorrect {
+  background: rgba(220,38,38,0.2) !important;
+  color: #f87171 !important;
+  border-color: #f87171 !important;
+}
+
+.pronunciation-feedback--correct {
+  color: #16a34a;
+}
+
+.pronunciation-feedback--incorrect {
+  color: #dc2626;
+}
+
+.pronunciation-feedback--warning {
+  color: #f59e0b;
+}
+
+/* Reusable word speaking class for other components */
+.word--speaking {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+  transform: scale(1.1);
+  transition: all 200ms ease;
+}
+
+[data-theme="dark"] .word--speaking {
+  background: rgba(245,158,11,0.2);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}

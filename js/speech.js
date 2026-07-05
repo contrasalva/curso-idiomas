@@ -169,6 +169,75 @@ App.SpeechManager = (function() {
   }
 
   /**
+   * Speak text with word-level boundary callbacks and returns a Promise.
+   * Highlights each word as it's spoken via the onWordBoundary callback.
+   * @param {string} text - Text to speak
+   * @param {function} onWordBoundary - callback(wordIndex, charIndex, charLength, word)
+   * @returns {Promise<{wordResults: Array, score: number}>}
+   */
+  function speakWithHighlight(text, onWordBoundary) {
+    if (!synth) {
+      return Promise.resolve({ wordResults: [], score: 0 });
+    }
+
+    synth.cancel();
+
+    if (!voicesLoaded) cacheItalianVoice();
+
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'it-IT';
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    // Prefer Italian female voice (e.g. "female" or "microsoft" in name)
+    var voices = synth.getVoices();
+    var italianFemaleVoice = voices && voices.find(function(v) {
+      return (v.lang === 'it-IT' || (v.lang && v.lang.indexOf('it') === 0)) &&
+             v.name && (v.name.toLowerCase().indexOf('female') !== -1 ||
+                        v.name.toLowerCase().indexOf('microsoft') !== -1);
+    });
+    if (italianFemaleVoice) {
+      utterance.voice = italianFemaleVoice;
+    } else if (cachedItalianVoice) {
+      utterance.voice = cachedItalianVoice;
+    }
+
+    var wordIdx = 0;
+
+    utterance.onboundary = function(event) {
+      if (event.name !== 'word') return;
+      var charIndex = event.charIndex;
+      var charLength = event.charLength || 1;
+      var word = text.substring(charIndex, charIndex + charLength).trim();
+
+      if (typeof onWordBoundary === 'function') {
+        onWordBoundary(wordIdx, charIndex, charLength, word);
+      }
+      wordIdx++;
+    };
+
+    return new Promise(function(resolve) {
+      utterance.onend = function() {
+        var detail = {
+          phrase: text,
+          wordResults: [],
+          score: 0
+        };
+        var evt = new CustomEvent('speech:pronunciation', { detail: detail });
+        document.dispatchEvent(evt);
+        resolve(detail);
+      };
+
+      utterance.onerror = function() {
+        resolve({ wordResults: [], score: 0 });
+      };
+
+      synth.speak(utterance);
+    });
+  }
+
+  /**
    * Check if SpeechRecognition is supported in this browser.
    */
   function isRecognitionSupported() {
@@ -193,6 +262,7 @@ App.SpeechManager = (function() {
     start: start,
     stop: stop,
     speak: speak,
+    speakWithHighlight: speakWithHighlight,
     isSupported: isRecognitionSupported,
     isListening: function() { return isListening; }
   };

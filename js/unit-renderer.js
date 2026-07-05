@@ -47,7 +47,7 @@ App.UnitRenderer = (function() {
     'tabla-referencia':       renderReference,
     'ejercicios-escalonados': renderStep8,
     'vocabulario':            renderStep9,
-    'pronunciacion':          renderComingSoon,
+    'pronunciacion':          renderStep10,
     'cultura':                renderCulture,
     'conversacion-guiada':    renderComingSoon,
     'conversacion-libre':     renderComingSoon,
@@ -570,6 +570,9 @@ App.UnitRenderer = (function() {
 
     // Step 9 — vocabulario wiring
     wireStep9(container);
+
+    // Step 10 — pronunciacion wiring
+    wireStep10(container);
   }
 
   /**
@@ -1969,6 +1972,421 @@ App.UnitRenderer = (function() {
 
     container.appendChild(grid);
     renderPage(0);
+  }
+
+  /* ==========================================
+     STEP 10: Pronunciación
+     ========================================== */
+
+  /**
+   * Normalize a word for comparison: lowercase, strip diacritics and punctuation.
+   * @param {string} word
+   * @returns {string}
+   */
+  function normalizeWord(word) {
+    return word.toLowerCase().trim()
+      .replace(/[àáâãäå]/g, 'a')
+      .replace(/[èéêë]/g, 'e')
+      .replace(/[ìíîï]/g, 'i')
+      .replace(/[òóôõö]/g, 'o')
+      .replace(/[ùúûü]/g, 'u')
+      .replace(/[.,!?;:'"¿¡-]/g, '');
+  }
+
+  /**
+   * Compare an expected word against a recognized/typed word.
+   * @param {string} expected
+   * @param {string} recognized
+   * @returns {{ status: string, score: number }}
+   */
+  function compareWord(expected, recognized) {
+    var normExp = normalizeWord(expected);
+    var normRec = normalizeWord(recognized);
+
+    if (normExp === normRec) {
+      return { status: 'correct', score: 100 };
+    }
+
+    // Check if one contains the other (partial match)
+    if (normExp.indexOf(normRec) !== -1 || normRec.indexOf(normExp) !== -1) {
+      return { status: 'partial', score: 50 };
+    }
+
+    // Check common prefix for close matches (e.g. "stai" vs "stay")
+    if (normExp.length > 2 && normRec.length > 2) {
+      var minLen = normExp.length < normRec.length ? normExp.length : normRec.length;
+      var commonLen = 0;
+      for (var ci = 0; ci < minLen; ci++) {
+        if (normExp[ci] === normRec[ci]) commonLen++; else break;
+      }
+      if (commonLen >= Math.ceil(normExp.length * 0.6)) {
+        return { status: 'partial', score: 50 };
+      }
+    }
+
+    return { status: 'incorrect', score: 0 };
+  }
+
+  /**
+   * Render step 10 — pronunciacion: listen, repeat, word-by-word feedback.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderStep10(stepData) {
+    var phrases = stepData.phrases || [];
+    if (!phrases || phrases.length === 0) return renderComingSoon(stepData);
+
+    var html = '<div class="pronunciation-container" data-step10="true">';
+
+    // Intro
+    html += '<p class="pronunciation-intro" style="margin-bottom:20px;font-size:0.95rem;color:var(--text-secondary);line-height:1.6">' +
+      'Escucha cada frase, luego repítela en voz alta. Recibirás retroalimentación palabra por palabra.' +
+    '</p>';
+
+    // Phrase cards
+    for (var pi = 0; pi < phrases.length; pi++) {
+      var phrase = phrases[pi];
+
+      html += '<div class="pronunciation-phrase-card" data-phrase-index="' + pi + '" style="' + (pi > 0 ? 'display:none' : '') + '">';
+
+      // Phrase text
+      html += '<div class="pronunciation-phrase-text" style="font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:4px">' +
+        escapeHtml(phrase.text) +
+      '</div>';
+
+      // Translation
+      if (phrase.translation) {
+        html += '<div class="pronunciation-phrase-translation" style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px">' +
+          escapeHtml(phrase.translation) +
+        '</div>';
+      }
+
+      // Word containers (for highlighting and feedback coloring)
+      html += '<div class="pronunciation-words" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;justify-content:center">';
+      if (phrase.words) {
+        for (var wi = 0; wi < phrase.words.length; wi++) {
+          html += '<span class="pronunciation-word" data-word-index="' + wi + '">' +
+            escapeHtml(phrase.words[wi]) +
+          '</span>';
+        }
+      }
+      html += '</div>';
+
+      // Controls
+      html += '<div class="pronunciation-controls" style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">' +
+        '<button class="secondary-btn pronunciation-play-btn" data-phrase-index="' + pi + '" data-phrase-text="' + escapeAttr(phrase.text) + '">🔊 Reproducir</button>' +
+        '<button class="primary-btn pronunciation-record-btn" data-phrase-index="' + pi + '">🎤 Grabar</button>' +
+      '</div>';
+
+      // Feedback area
+      html += '<div class="pronunciation-feedback" data-phrase-index="' + pi + '" style="text-align:center;font-size:1rem;font-weight:600;min-height:28px;margin-bottom:4px"></div>';
+
+      // Retry count
+      html += '<div class="pronunciation-retry-count" data-phrase-index="' + pi + '" style="text-align:center;font-size:0.85rem;color:var(--text-secondary);min-height:22px"></div>';
+
+      html += '</div>'; // .pronunciation-phrase-card
+    }
+
+    // Progress indicator
+    html += '<div class="pronunciation-progress" style="text-align:center;font-size:0.9rem;color:var(--text-secondary);margin-top:16px">Frase 1 de ' + phrases.length + '</div>';
+
+    // Text input fallback (hidden by default)
+    html += '<div class="pronunciation-text-fallback" style="display:none;margin-top:16px;text-align:center">' +
+      '<input type="text" class="pronunciation-text-input" placeholder="Escribe lo que escuchaste" style="padding:10px 14px;font-size:1rem;border:2px solid var(--border);border-radius:10px;width:80%;max-width:360px;margin-bottom:8px">' +
+      '<div><button class="primary-btn pronunciation-check-btn">Comprobar</button></div>' +
+    '</div>';
+
+    html += '</div>'; // .pronunciation-container
+
+    return html;
+  }
+
+  /**
+   * Wire step 10 interactions: play, record, word comparison, progression.
+   * @param {HTMLElement} container
+   */
+  function wireStep10(container) {
+    var step10 = container.querySelector('.pronunciation-container');
+    if (!step10) return;
+
+    var stepData = _state.data.steps[_state.currentStep];
+    var phrases = stepData.phrases || [];
+    if (!phrases || phrases.length === 0) return;
+
+    // Per-phrase state
+    var phraseStates = {};
+    for (var psi = 0; psi < phrases.length; psi++) {
+      phraseStates[psi] = { retries: 0, passed: false };
+    }
+
+    var currentPhraseIdx = 0;
+    var totalPhrases = phrases.length;
+
+    // Disable Next until all phrases are completed
+    disableNextBtn();
+
+    /** Show only the current phrase card, hide others */
+    function showCurrentPhrase() {
+      var cards = step10.querySelectorAll('.pronunciation-phrase-card');
+      for (var sci = 0; sci < cards.length; sci++) {
+        cards[sci].style.display = (sci === currentPhraseIdx) ? '' : 'none';
+      }
+
+      // Update progress
+      var progEl = step10.querySelector('.pronunciation-progress');
+      if (progEl) {
+        progEl.textContent = 'Frase ' + (currentPhraseIdx + 1) + ' de ' + totalPhrases;
+      }
+
+      // Clear word classes and feedback for current phrase
+      var card = step10.querySelector('.pronunciation-phrase-card[data-phrase-index="' + currentPhraseIdx + '"]');
+      if (card) {
+        var wordEls = card.querySelectorAll('.pronunciation-word');
+        for (var wei = 0; wei < wordEls.length; wei++) {
+          wordEls[wei].className = 'pronunciation-word';
+        }
+      }
+
+      var fbEl = step10.querySelector('.pronunciation-feedback[data-phrase-index="' + currentPhraseIdx + '"]');
+      if (fbEl) {
+        fbEl.textContent = '';
+        fbEl.className = 'pronunciation-feedback';
+      }
+
+      // Update retry display
+      var state = phraseStates[currentPhraseIdx];
+      var retryEl = step10.querySelector('.pronunciation-retry-count[data-phrase-index="' + currentPhraseIdx + '"]');
+      if (retryEl) {
+        retryEl.textContent = state.retries > 0 ? 'Intento ' + (state.retries + 1) + ' de 3' : '';
+      }
+
+      // Hide text fallback
+      var fallbackEl = step10.querySelector('.pronunciation-text-fallback');
+      if (fallbackEl) fallbackEl.style.display = 'none';
+    }
+
+    showCurrentPhrase();
+
+    /* --- Play button wiring --- */
+    var playBtns = step10.querySelectorAll('.pronunciation-play-btn');
+    for (var pbi = 0; pbi < playBtns.length; pbi++) {
+      playBtns[pbi].addEventListener('click', function(e) {
+        var btn = e.currentTarget;
+        var phraseIdx = parseInt(btn.getAttribute('data-phrase-index'), 10);
+        var text = btn.getAttribute('data-phrase-text');
+        var card = step10.querySelector('.pronunciation-phrase-card[data-phrase-index="' + phraseIdx + '"]');
+        if (!card) return;
+        var wordEls = card.querySelectorAll('.pronunciation-word');
+        var activeWord = -1;
+
+        function onWordBoundary(wordIndex) {
+          // Remove highlight from previous word
+          if (activeWord >= 0 && wordEls[activeWord]) {
+            wordEls[activeWord].classList.remove('pronunciation-word--speaking');
+          }
+          // Highlight current word
+          activeWord = wordIndex;
+          if (wordEls[wordIndex]) {
+            wordEls[wordIndex].classList.add('pronunciation-word--speaking');
+          }
+        }
+
+        App.SpeechManager.speakWithHighlight(text, onWordBoundary).then(function() {
+          // Clear all highlights on completion
+          if (activeWord >= 0 && wordEls[activeWord]) {
+            wordEls[activeWord].classList.remove('pronunciation-word--speaking');
+          }
+          activeWord = -1;
+        });
+      });
+    }
+
+    /* --- Record button wiring --- */
+    var recordBtns = step10.querySelectorAll('.pronunciation-record-btn');
+    for (var rbi = 0; rbi < recordBtns.length; rbi++) {
+      recordBtns[rbi].addEventListener('click', function(e) {
+        var btn = e.currentTarget;
+        var phraseIdx = parseInt(btn.getAttribute('data-phrase-index'), 10);
+        var phrase = phrases[phraseIdx];
+        if (!phrase) return;
+
+        // Show text fallback if speech recognition is not supported
+        if (!App.SpeechManager.isSupported()) {
+          showTextFallback(phraseIdx);
+          return;
+        }
+
+        // Start speech recognition
+        btn.disabled = true;
+        btn.textContent = '🎤 Escuchando...';
+
+        var timeoutId = setTimeout(function() {
+          window.removeEventListener('speech:result', onResultHandler);
+          btn.disabled = false;
+          btn.textContent = '🎤 Grabar';
+          var fb = step10.querySelector('.pronunciation-feedback[data-phrase-index="' + phraseIdx + '"]');
+          if (fb) {
+            fb.textContent = 'No se detectó voz. Intenta de nuevo o escribe.';
+            fb.className = 'pronunciation-feedback pronunciation-feedback--incorrect';
+          }
+        }, 8000);
+
+        function onResultHandler(event) {
+          var detail = event.detail;
+          if (!detail.isFinal) return;
+          window.removeEventListener('speech:result', onResultHandler);
+          clearTimeout(timeoutId);
+
+          btn.disabled = false;
+          btn.textContent = '🎤 Grabar';
+
+          var transcript = detail.transcript || '';
+          processRecognition(phraseIdx, transcript.trim());
+        }
+
+        window.addEventListener('speech:result', onResultHandler);
+        App.SpeechManager.start();
+      });
+    }
+
+    /**
+     * Show text input fallback for a phrase (when SpeechRecognition unavailable).
+     * @param {number} phraseIdx
+     */
+    function showTextFallback(phraseIdx) {
+      var fallbackEl = step10.querySelector('.pronunciation-text-fallback');
+      if (!fallbackEl) return;
+      fallbackEl.style.display = 'block';
+
+      var input = fallbackEl.querySelector('.pronunciation-text-input');
+      var checkBtn = fallbackEl.querySelector('.pronunciation-check-btn');
+      if (!input || !checkBtn) return;
+
+      input.value = '';
+      input.focus();
+
+      // Replace button to avoid duplicate listeners
+      var newBtn = checkBtn.cloneNode(true);
+      checkBtn.parentNode.replaceChild(newBtn, checkBtn);
+
+      newBtn.addEventListener('click', function() {
+        var text = input.value.trim();
+        if (!text) return;
+        processRecognition(phraseIdx, text);
+        fallbackEl.style.display = 'none';
+      });
+    }
+
+    /**
+     * Process a recognition result (speech or typed text).
+     * Compares word by word, shows color-coded feedback, handles retries.
+     * @param {number} phraseIdx
+     * @param {string} transcript
+     */
+    function processRecognition(phraseIdx, transcript) {
+      var phrase = phrases[phraseIdx];
+      var state = phraseStates[phraseIdx];
+      var expectedWords = phrase.words || [];
+      var recognizedWords = transcript ? transcript.split(/\s+/) : [];
+
+      var card = step10.querySelector('.pronunciation-phrase-card[data-phrase-index="' + phraseIdx + '"]');
+      var wordEls = card ? card.querySelectorAll('.pronunciation-word') : [];
+      var totalScore = 0;
+
+      // Compare each expected word
+      for (var wi = 0; wi < expectedWords.length; wi++) {
+        var expected = expectedWords[wi];
+        var recognized = wi < recognizedWords.length ? recognizedWords[wi] : '';
+        var result = compareWord(expected, recognized);
+        totalScore += result.score;
+
+        if (wordEls[wi]) {
+          wordEls[wi].className = 'pronunciation-word';
+          if (result.status === 'correct') {
+            wordEls[wi].classList.add('pronunciation-word--correct');
+          } else if (result.status === 'partial') {
+            wordEls[wi].classList.add('pronunciation-word--partial');
+          } else {
+            wordEls[wi].classList.add('pronunciation-word--incorrect');
+          }
+        }
+      }
+
+      // Mark any extra recognized words as incorrect (they exceed expected count)
+      for (var xi = expectedWords.length; xi < recognizedWords.length; xi++) {
+        totalScore += 0; // extra words = 0
+        // No word element for extra words, but they drag the score down
+      }
+
+      var avgScore = Math.round(totalScore / expectedWords.length);
+      var feedbackEl = step10.querySelector('.pronunciation-feedback[data-phrase-index="' + phraseIdx + '"]');
+
+      if (avgScore >= 80) {
+        state.passed = true;
+        if (feedbackEl) {
+          feedbackEl.textContent = '✓ ¡Excelente! (' + avgScore + '%)';
+          feedbackEl.className = 'pronunciation-feedback pronunciation-feedback--correct';
+        }
+        moveToNextPhrase(phraseIdx);
+      } else {
+        state.retries++;
+
+        if (state.retries >= 3) {
+          // Record to missed items in profile
+          var profile = App.Progress.get('default');
+          if (profile) {
+            if (!profile.missedItems) profile.missedItems = [];
+            profile.missedItems.push({
+              unitId: _state.unitId,
+              phrase: phrase.text,
+              type: 'pronunciation',
+              timestamp: Date.now()
+            });
+            App.Progress.save('default', profile);
+          }
+
+          if (feedbackEl) {
+            feedbackEl.textContent = 'Puedes continuar, pero practica más tarde (' + avgScore + '%)';
+            feedbackEl.className = 'pronunciation-feedback pronunciation-feedback--warning';
+          }
+          moveToNextPhrase(phraseIdx);
+        } else {
+          if (feedbackEl) {
+            feedbackEl.textContent = 'Intenta de nuevo (' + avgScore + '%). Necesitas 80% o más.';
+            feedbackEl.className = 'pronunciation-feedback pronunciation-feedback--incorrect';
+          }
+          var retryEl = step10.querySelector('.pronunciation-retry-count[data-phrase-index="' + phraseIdx + '"]');
+          if (retryEl) {
+            retryEl.textContent = 'Intento ' + (state.retries + 1) + ' de 3';
+          }
+
+          // Re-enable record button for retry
+          var recordBtn = step10.querySelector('.pronunciation-record-btn[data-phrase-index="' + phraseIdx + '"]');
+          if (recordBtn) {
+            recordBtn.disabled = false;
+            recordBtn.textContent = '🎤 Grabar';
+          }
+        }
+      }
+    }
+
+    /**
+     * Advance to the next phrase, or enable Next when all are done.
+     * @param {number} currentIdx
+     */
+    function moveToNextPhrase(currentIdx) {
+      if (currentIdx + 1 < totalPhrases) {
+        currentPhraseIdx = currentIdx + 1;
+        showCurrentPhrase();
+      } else {
+        // All phrases completed — enable Next button
+        var progEl = step10.querySelector('.pronunciation-progress');
+        if (progEl) {
+          progEl.textContent = '✓ Todas las frases completadas';
+        }
+        enableNextBtn();
+      }
+    }
   }
 
   /* ==========================================

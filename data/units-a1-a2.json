@@ -582,9 +582,35 @@
       },
       {
         "step": 10,
-        "type": "coming-soon",
+        "type": "pronunciacion",
         "title": "Pronunciación",
-        "message": "🔜 Próximamente: escucha y repite frases en voz alta con corrección por palabra."
+        "phrases": [
+          {
+            "text": "Io sono Marco",
+            "translation": "Yo soy Marco",
+            "words": ["Io", "sono", "Marco"]
+          },
+          {
+            "text": "Ciao, come stai?",
+            "translation": "Hola, ¿cómo estás?",
+            "words": ["Ciao", "come", "stai"]
+          },
+          {
+            "text": "Lei è di Roma",
+            "translation": "Ella es de Roma",
+            "words": ["Lei", "è", "di", "Roma"]
+          },
+          {
+            "text": "Io ho un libro",
+            "translation": "Yo tengo un libro",
+            "words": ["Io", "ho", "un", "libro"]
+          },
+          {
+            "text": "Piacere di conoscerti",
+            "translation": "Mucho gusto de conocerte",
+            "words": ["Piacere", "di", "conoscerti"]
+          }
+        ]
       },
       {
         "step": 11,
