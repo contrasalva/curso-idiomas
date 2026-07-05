@@ -1,0 +1,140 @@
+/* ============================================
+   Italiano B1 — difficulty.css
+   N-Level difficulty tabs and progress indicators
+   ============================================ */
+
+/* --- Difficulty Tabs Row --- */
+.difficulty-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.difficulty-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Individual Tab --- */
+.difficulty-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 40px;
+  border-radius: 100px;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 200ms ease;
+  flex-shrink: 0;
+  min-height: 40px;
+}
+
+.difficulty-tab:hover {
+  border-color: var(--accent);
+  background: rgba(59,130,246,0.04);
+}
+
+/* --- States --- */
+.difficulty-tab--locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.difficulty-tab--locked::before {
+  content: '\01F512'; /* 🔒 */
+  font-size: 0.8rem;
+}
+
+.difficulty-tab--passed {
+  border-color: #16a34a;
+  color: #16a34a;
+  background: rgba(22,163,74,0.08);
+}
+
+.difficulty-tab--passed::before {
+  content: '\2713'; /* ✓ */
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.difficulty-tab--active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+}
+
+.difficulty-tab--active:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* --- Progress Bar --- */
+.difficulty-progress {
+  height: 5px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.difficulty-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 400ms ease;
+}
+
+/* --- Level Badge --- */
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+  min-width: 24px;
+  height: 20px;
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+/* --- Phase Colors N1-N7 --- */
+[data-difficulty-nivel="1"] .difficulty-progress-fill { background: #3b82f6; }
+[data-difficulty-nivel="2"] .difficulty-progress-fill { background: #2563eb; }
+[data-difficulty-nivel="3"] .difficulty-progress-fill { background: #1d4ed8; }
+[data-difficulty-nivel="4"] .difficulty-progress-fill { background: #7c3aed; }
+[data-difficulty-nivel="5"] .difficulty-progress-fill { background: #9333ea; }
+[data-difficulty-nivel="6"] .difficulty-progress-fill { background: #c026d3; }
+[data-difficulty-nivel="7"] .difficulty-progress-fill { background: #db2777; }
+
+.difficulty-tab--nivel-1 { --tab-color: #3b82f6; }
+.difficulty-tab--nivel-2 { --tab-color: #2563eb; }
+.difficulty-tab--nivel-3 { --tab-color: #1d4ed8; }
+.difficulty-tab--nivel-4 { --tab-color: #7c3aed; }
+.difficulty-tab--nivel-5 { --tab-color: #9333ea; }
+.difficulty-tab--nivel-6 { --tab-color: #c026d3; }
+.difficulty-tab--nivel-7 { --tab-color: #db2777; }
+
+/* Dark theme adjustments */
+[data-theme="dark"] .difficulty-tab {
+  background: rgba(255,255,255,0.04);
+}
+
+[data-theme="dark"] .difficulty-tab--active {
+  background: var(--accent);
+  color: #fff;
+}
+
+[data-theme="dark"] .difficulty-tab--passed {
+  background: rgba(22,163,74,0.15);
+}

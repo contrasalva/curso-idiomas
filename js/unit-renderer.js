@@ -42,7 +42,7 @@ App.UnitRenderer = (function() {
     'descubrimiento':         renderStep2,
     'comprension':            renderComprehension,
     'gramatica-del-dia':      renderGrammar,
-    'construccion':           renderComingSoon,
+    'construccion':           renderStep5,
     'regla':                  renderRule,
     'tabla-referencia':       renderReference,
     'ejercicios-escalonados': renderComingSoon,
@@ -477,7 +477,10 @@ App.UnitRenderer = (function() {
       if (profile) {
         if (!profile.unitProgress) profile.unitProgress = {};
         if (!profile.unitProgress[_state.unitId]) {
-          profile.unitProgress[_state.unitId] = {};
+          profile.unitProgress[_state.unitId] = { levelScores: {} };
+        }
+        if (!profile.unitProgress[_state.unitId].levelScores) {
+          profile.unitProgress[_state.unitId].levelScores = {};
         }
         profile.unitProgress[_state.unitId].completed = true;
         App.Progress.save(learner, profile);
@@ -497,7 +500,10 @@ App.UnitRenderer = (function() {
     if (!profile) return;
     if (!profile.unitProgress) profile.unitProgress = {};
     if (!profile.unitProgress[_state.unitId]) {
-      profile.unitProgress[_state.unitId] = {};
+      profile.unitProgress[_state.unitId] = { levelScores: {} };
+    }
+    if (!profile.unitProgress[_state.unitId].levelScores) {
+      profile.unitProgress[_state.unitId].levelScores = {};
     }
     profile.unitProgress[_state.unitId].currentStep = _state.currentStep;
     App.Progress.save(learner, profile);
@@ -555,6 +561,9 @@ App.UnitRenderer = (function() {
 
     // Comprehension quiz wiring (step 3)
     wireComprehension(container);
+
+    // Token builder wiring (step 5)
+    wireStep5(container);
   }
 
   /**
@@ -1239,6 +1248,279 @@ App.UnitRenderer = (function() {
 
     html += '</div>';
     return html;
+  }
+
+  /* ==========================================
+     STEP 5: Construcción — Token Builder
+     ========================================== */
+
+  /**
+   * Color mapping for token roles.
+   */
+  var TOKEN_COLORS = {
+    subject: '#2563eb',
+    verb: '#16a34a',
+    complement: '#ea580c'
+  };
+
+  /**
+   * Background (20% opacity) for token roles.
+   */
+  function getTokenBg(role) {
+    switch (role) {
+      case 'subject': return '#2563eb20';
+      case 'verb': return '#16a34a20';
+      case 'complement': return '#ea580c20';
+      default: return '#6b728020';
+    }
+  }
+
+  /**
+   * Fisher-Yates shuffle (returns new array, does not mutate original).
+   * @param {Array} arr
+   * @returns {Array}
+   */
+  function shuffleArray(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  /**
+   * Render step 5 — construccion: color-coded token builder.
+   * Renders static containers; wiring is done in wireStep5.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderStep5(stepData) {
+    var sentences = stepData.sentences || [];
+    if (!sentences || sentences.length === 0) {
+      return renderComingSoon(stepData);
+    }
+
+    // Build empty scaffold — wireStep5 will populate dynamically
+    var html = '<div class="construccion-container" data-step5-init="true">' +
+      '<p class="builder-hint"></p>' +
+      '<div class="builder-slots"></div>' +
+      '<div class="word-tokens"></div>' +
+      '<div class="builder-feedback"></div>' +
+      '<div class="builder-progress"></div>' +
+    '</div>';
+
+    return html;
+  }
+
+  /**
+   * Wire step 5 interactions: token placement, validation, progression.
+   * @param {HTMLElement} container
+   */
+  function wireStep5(container) {
+    var construccion = container.querySelector('.construccion-container');
+    if (!construccion) return;
+
+    var stepData = _state.data.steps[_state.currentStep];
+    var sentences = stepData.sentences || [];
+    if (!sentences || sentences.length === 0) return;
+
+    var currentIdx = 0;
+    var slots = [];     // Array of {text,role}|null — one per position
+    var pool = [];      // Array of {text,role} — available tokens
+    var isTransitioning = false;
+
+    /** Disable Next until all sentences are done */
+    disableNextBtn();
+
+    /** Setup a sentence at the given index */
+    function setupSentence(idx) {
+      var sentence = sentences[idx];
+      if (!sentence) return;
+
+      slots = sentence.tokens.map(function() { return null; });
+      pool = shuffleArray(sentence.tokens.map(function(t) {
+        return { text: t.text, role: t.role };
+      }));
+      isTransitioning = false;
+      renderSentence(sentence, idx);
+    }
+
+    /** Re-render the slots and token pool for current state */
+    function renderSentence(sentence, idx) {
+      if (!construccion) return;
+
+      // Hint
+      var hintEl = construccion.querySelector('.builder-hint');
+      if (hintEl) hintEl.textContent = sentence.translation;
+
+      // Slots
+      var slotsEl = construccion.querySelector('.builder-slots');
+      slotsEl.innerHTML = '';
+      for (var s = 0; s < slots.length; s++) {
+        var slotDiv = document.createElement('div');
+        slotDiv.className = 'builder-slot';
+        slotDiv.setAttribute('data-slot-index', s);
+        if (slots[s]) {
+          slotDiv.classList.add('builder-slot--filled');
+          slotDiv.textContent = slots[s].text;
+          slotDiv.style.borderColor = TOKEN_COLORS[slots[s].role] || '#94a3b8';
+          slotDiv.style.color = TOKEN_COLORS[slots[s].role] || '#94a3b8';
+        }
+        slotsEl.appendChild(slotDiv);
+      }
+
+      // Wire slot clicks — tap filled slot returns token to pool
+      var slotDivs = slotsEl.querySelectorAll('.builder-slot');
+      for (var si = 0; si < slotDivs.length; si++) {
+        (function(slotIdx) {
+          slotDivs[slotIdx].addEventListener('click', function() {
+            if (isTransitioning) return;
+            if (slots[slotIdx]) {
+              pool.push(slots[slotIdx]);
+              slots[slotIdx] = null;
+              renderSentence(sentence, idx);
+            }
+          });
+        })(si);
+      }
+
+      // Token pool
+      var poolEl = construccion.querySelector('.word-tokens');
+      poolEl.innerHTML = '';
+      for (var t = 0; t < pool.length; t++) {
+        var token = pool[t];
+        var color = TOKEN_COLORS[token.role] || '#6b7280';
+        var btn = document.createElement('button');
+        btn.className = 'word-token';
+        btn.textContent = token.text;
+        btn.setAttribute('data-text', token.text);
+        btn.setAttribute('data-role', token.role);
+        btn.style.backgroundColor = getTokenBg(token.role);
+        btn.style.color = color;
+        btn.style.borderColor = color;
+        poolEl.appendChild(btn);
+      }
+
+      // Wire token clicks — tap to place in next empty slot
+      var tokenBtns = poolEl.querySelectorAll('.word-token');
+      for (var tb = 0; tb < tokenBtns.length; tb++) {
+        (function(btn) {
+          btn.addEventListener('click', function() {
+            if (isTransitioning) return;
+            var text = btn.getAttribute('data-text');
+            var role = btn.getAttribute('data-role');
+
+            // Find first empty slot
+            var emptyIdx = -1;
+            for (var e = 0; e < slots.length; e++) {
+              if (!slots[e]) {
+                emptyIdx = e;
+                break;
+              }
+            }
+            if (emptyIdx === -1) return;
+
+            // Find matching token in pool
+            var poolIdx = -1;
+            for (var p = 0; p < pool.length; p++) {
+              if (pool[p].text === text && pool[p].role === role) {
+                poolIdx = p;
+                break;
+              }
+            }
+            if (poolIdx === -1) return;
+
+            // Move token from pool to slot
+            var tok = pool.splice(poolIdx, 1)[0];
+            slots[emptyIdx] = tok;
+            renderSentence(sentence, idx);
+
+            // Check if all slots are now filled
+            var allFilled = true;
+            for (var f = 0; f < slots.length; f++) {
+              if (!slots[f]) { allFilled = false; break; }
+            }
+            if (allFilled) {
+              validateSentence(sentence);
+            }
+          });
+        })(tokenBtns[tb]);
+      }
+
+      // Progress
+      var progressEl = construccion.querySelector('.builder-progress');
+      if (progressEl) {
+        progressEl.textContent = 'Frase ' + (idx + 1) + ' de ' + sentences.length;
+      }
+
+      // Clear feedback
+      var feedbackEl = construccion.querySelector('.builder-feedback');
+      if (feedbackEl) {
+        feedbackEl.textContent = '';
+        feedbackEl.className = 'builder-feedback';
+      }
+    }
+
+    /** Validate the current sentence after all slots are filled */
+    function validateSentence(sentence) {
+      isTransitioning = true;
+
+      var allCorrect = true;
+      var slotEls = construccion.querySelectorAll('.builder-slot');
+
+      for (var v = 0; v < slots.length; v++) {
+        if (slots[v] && slots[v].text === sentence.tokens[v].text) {
+          slotEls[v].classList.add('builder-slot--correct');
+        } else {
+          slotEls[v].classList.add('builder-slot--incorrect');
+          allCorrect = false;
+        }
+      }
+
+      var feedbackEl = construccion.querySelector('.builder-feedback');
+
+      if (allCorrect) {
+        feedbackEl.textContent = '✓ ¡Correcto!';
+        feedbackEl.className = 'builder-feedback builder-feedback--correct';
+
+        setTimeout(function() {
+          if (currentIdx + 1 < sentences.length) {
+            currentIdx++;
+            setupSentence(currentIdx);
+          } else {
+            // All sentences completed — enable Next
+            feedbackEl.textContent = '✓ ¡Todas las frases completadas!';
+            feedbackEl.className = 'builder-feedback builder-feedback--correct';
+            enableNextBtn();
+          }
+        }, 1500);
+      } else {
+        feedbackEl.textContent = '✗ Intenta de nuevo';
+        feedbackEl.className = 'builder-feedback builder-feedback--incorrect';
+
+        // Return wrong tokens to pool; keep correct ones in place
+        var newSlots = slots.slice();
+        for (var w = 0; w < slots.length; w++) {
+          if (slots[w] && slots[w].text !== sentence.tokens[w].text) {
+            pool.push(slots[w]);
+            newSlots[w] = null;
+          }
+        }
+        slots = newSlots;
+
+        // Re-render after brief delay (removes red/green classes)
+        setTimeout(function() {
+          isTransitioning = false;
+          renderSentence(sentence, currentIdx);
+        }, 1200);
+      }
+    }
+
+    // Bootstrap with first sentence
+    setupSentence(0);
   }
 
   /* ==========================================

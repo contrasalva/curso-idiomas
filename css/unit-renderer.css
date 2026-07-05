@@ -1149,3 +1149,179 @@
   font-size: 0.8rem;
   margin: 0;
 }
+
+/* ============================================
+   STEP 5: Token Builder (Construcción)
+   ============================================ */
+
+.construccion-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.builder-hint {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 24px;
+  line-height: 1.5;
+  padding: 8px 16px;
+  background: rgba(59,130,246,0.04);
+  border-radius: 8px;
+}
+
+/* --- Slots row --- */
+.builder-slots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+  min-height: 52px;
+}
+
+.builder-slot {
+  min-width: 80px;
+  height: 48px;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 200ms ease;
+  cursor: default;
+  padding: 0 12px;
+  background: var(--bg);
+  color: var(--text-secondary);
+}
+
+.builder-slot--filled {
+  border-style: solid;
+  cursor: pointer;
+  background: var(--bg-card);
+  animation: slotFillIn 250ms ease;
+}
+
+@keyframes slotFillIn {
+  from { transform: scale(0.85); opacity: 0.5; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.builder-slot--correct {
+  background: rgba(22,163,74,0.12) !important;
+  border-color: #16a34a !important;
+  color: #16a34a !important;
+  animation: pulseCorrect 400ms ease;
+}
+
+@keyframes pulseCorrect {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.builder-slot--incorrect {
+  background: rgba(220,38,38,0.12) !important;
+  border-color: #dc2626 !important;
+  color: #dc2626 !important;
+  animation: shakeIncorrect 400ms ease;
+}
+
+@keyframes shakeIncorrect {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+/* --- Token pool --- */
+.word-tokens {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  min-height: 44px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.word-token {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid;
+  background: transparent;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 40px;
+}
+
+.word-token:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.word-token:active {
+  transform: translateY(0);
+}
+
+.word-token--used {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* --- Feedback --- */
+.builder-feedback {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  min-height: 28px;
+  line-height: 1.4;
+}
+
+.builder-feedback--correct {
+  color: #16a34a;
+}
+
+.builder-feedback--incorrect {
+  color: #dc2626;
+}
+
+/* --- Progress --- */
+.builder-progress {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .builder-hint {
+  background: rgba(96,165,250,0.06);
+}
+
+[data-theme="dark"] .builder-slot {
+  background: rgba(255,255,255,0.03);
+}
+
+[data-theme="dark"] .builder-slot--filled {
+  background: rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .word-token:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}

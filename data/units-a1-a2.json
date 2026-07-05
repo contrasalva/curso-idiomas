@@ -108,9 +108,55 @@
       },
       {
         "step": 5,
-        "type": "coming-soon",
-        "title": "Construcción",
-        "message": "🔜 Próximamente: construye frases arrastrando palabras coloreadas (azul=sujeto, verde=verbo, naranja=complemento)."
+        "type": "construccion",
+        "title": "Construye la frase",
+        "sentences": [
+          {
+            "text": "Io sono Marco",
+            "translation": "Yo soy Marco",
+            "tokens": [
+              { "text": "Io", "role": "subject" },
+              { "text": "sono", "role": "verb" },
+              { "text": "Marco", "role": "complement" }
+            ]
+          },
+          {
+            "text": "Tu sei Lucia",
+            "translation": "Tú eres Lucia",
+            "tokens": [
+              { "text": "Tu", "role": "subject" },
+              { "text": "sei", "role": "verb" },
+              { "text": "Lucia", "role": "complement" }
+            ]
+          },
+          {
+            "text": "Lei è di Roma",
+            "translation": "Ella es de Roma",
+            "tokens": [
+              { "text": "Lei", "role": "subject" },
+              { "text": "è", "role": "verb" },
+              { "text": "di Roma", "role": "complement" }
+            ]
+          },
+          {
+            "text": "Noi siamo amici",
+            "translation": "Nosotros somos amigos",
+            "tokens": [
+              { "text": "Noi", "role": "subject" },
+              { "text": "siamo", "role": "verb" },
+              { "text": "amici", "role": "complement" }
+            ]
+          },
+          {
+            "text": "Io ho un libro",
+            "translation": "Yo tengo un libro",
+            "tokens": [
+              { "text": "Io", "role": "subject" },
+              { "text": "ho", "role": "verb" },
+              { "text": "un libro", "role": "complement" }
+            ]
+          }
+        ]
       },
       {
         "step": 6,
