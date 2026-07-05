@@ -853,5 +853,93 @@
         "title": "Repaso inteligente"
       }
     ]
+  },
+  {
+    "id": 1,
+    "title": "Números, edad y artículos",
+    "level": "A1",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 2,
+    "title": "La familia y los posesivos",
+    "level": "A1",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 3,
+    "title": "Descripciones y adjetivos",
+    "level": "A1",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 4,
+    "title": "Gustos y preferencias",
+    "level": "A1",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 5,
+    "title": "La rutina diaria",
+    "level": "A1",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 6,
+    "title": "El tiempo y las estaciones",
+    "level": "A2",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 7,
+    "title": "De compras",
+    "level": "A2",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 8,
+    "title": "En el restaurante",
+    "level": "A2",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 9,
+    "title": "Planes y proyectos",
+    "level": "A2",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 10,
+    "title": "Experiencias pasadas",
+    "level": "A2",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
+  },
+  {
+    "id": 11,
+    "title": "Cultura italiana",
+    "level": "A2",
+    "track": "a1-a2",
+    "objectives": [],
+    "steps": []
   }
 ]

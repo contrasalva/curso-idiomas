@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/exercises.css">
   <link rel="stylesheet" href="css/difficulty.css">
   <link rel="stylesheet" href="css/unit-renderer.css">
+  <link rel="stylesheet" href="css/curriculum.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido</a>
@@ -32,9 +33,18 @@
       <!-- Sidebar rendered by App.renderSidebar() -->
     </aside>
 
-    <!-- Home: Module Grid -->
-    <section id="section-home" class="active" aria-label="Selección de módulo">
-      <h1>Selecciona un módulo</h1>
+    <!-- Home: Unit Grid (new pedagogical structure) -->
+    <section id="section-home" class="active" aria-label="Selección de unidad">
+      <!-- Legacy module grid -->
+      <!--
+      <div id="module-grid" class="module-grid"></div>
+      -->
+      <div class="home-header">
+        <h1 class="app-title">Curso de Italiano</h1>
+        <p class="app-subtitle">Aprende italiano paso a paso</p>
+      </div>
+      <div id="track-selector" class="track-selector"></div>
+      <div id="unit-grid" class="unit-grid"></div>
       <div id="progress-summary" class="progress-summary" role="region" aria-label="Resumen de progreso">
         <div class="progress-summary-header">
           <span class="progress-summary-icon">📊</span>
@@ -50,16 +60,11 @@
           <span id="overall-pct-text" class="progress-pct-text">0%</span>
         </div>
       </div>
-      <div id="module-grid" class="module-grid"></div>
       <div class="exam-start-card">
         <h3>🎯 Simulación Examen CILS/CELI B1</h3>
         <p>Pon a prueba tus conocimientos con un examen completo nivel B1.</p>
         <button id="start-exam-btn" class="primary-btn">Iniciar examen</button>
         <button id="start-practice-btn" class="secondary-btn">Modo práctica</button>
-      </div>
-      <div class="unit-test-card" style="margin-top:16px;padding:16px 20px;background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(99,102,241,0.06));border:1px solid var(--border);border-radius:16px;text-align:center">
-        <p style="font-size:0.85rem;color:var(--text-secondary);margin:0 0 8px">🧪 Nueva estructura pedagógica</p>
-        <button id="test-unit-btn" class="primary-btn" style="font-size:0.95rem">Probar Unidad 1 — Saludos</button>
       </div>
       <div id="competition-card" class="competition-card">
         <div class="competition-header">

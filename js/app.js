@@ -18,7 +18,8 @@ App.state = {
   examTimer: null,
   darkMode: false,
   activeUnit: null,
-  currentStep: 0
+  currentStep: 0,
+  activeTrack: 'a1-a2'
 };
 
 /* --- Navigation --- */
@@ -74,8 +75,9 @@ App.nav = (function() {
   /* ---- Internal Render Dispatch ---- */
 
   function renderHome() {
-    var gridContainer = document.getElementById('module-grid');
-    if (!gridContainer) return;
+    var gridContainer = document.getElementById('unit-grid');
+    var trackContainer = document.getElementById('track-selector');
+    var legacyContainer = document.getElementById('module-grid');
 
     var learner = App.state.currentLearner;
     var progress = learner ? App.Progress.get(learner) : null;
@@ -83,7 +85,29 @@ App.nav = (function() {
       progress = App.Progress.createDefault(learner);
       App.Progress.save(learner, progress);
     }
-    App.Curriculum.renderModuleGrid(gridContainer, progress);
+
+    // Render track selector
+    if (trackContainer) {
+      App.Curriculum.renderTrackSelector(trackContainer, App.state.activeTrack, function(track) {
+        App.state.activeTrack = track;
+        if (progress) {
+          progress.track = track;
+          App.Progress.save(learner, progress);
+        }
+        renderHome();
+      });
+    }
+
+    // Render unit grid (replaces old module grid)
+    if (gridContainer) {
+      App.Curriculum.renderUnitGrid(gridContainer, App.state.activeTrack, progress);
+    }
+
+    // Preserve legacy module grid rendering for backward compat
+    if (legacyContainer) {
+      App.Curriculum.renderModuleGrid(legacyContainer, progress);
+    }
+
     renderProgressSummary(progress);
     renderCompetition();
   }
@@ -627,14 +651,6 @@ function getProgressDots(total, done) {
         updateLearnerUI(nextProfile);
         App.nav.show(App.state.activeSection);
       }
-    }
-
-    // --- Test Unit button (temporary) ---
-    var testUnitBtn = document.getElementById('test-unit-btn');
-    if (testUnitBtn) {
-      testUnitBtn.addEventListener('click', function() {
-        App.nav.show('unit', { unit: 0 });
-      });
     }
 
     // --- Exam start buttons ---

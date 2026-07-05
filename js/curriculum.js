@@ -804,6 +804,367 @@ App.Curriculum = (function() {
     }
   }
 
+  /* ============================================
+     UNIT GRID — replaces old module grid
+     ============================================ */
+
+  /**
+   * Render the track selector (A1-A2 / B1) into a container.
+   * @param {HTMLElement} container
+   * @param {string} activeTrack - 'a1-a2' or 'b1'
+   * @param {function} onSwitch - callback(track)
+   */
+  function renderTrackSelector(container, activeTrack, onSwitch) {
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    var tracks = [
+      { id: 'a1-a2', label: 'A1-A2', disabled: false },
+      { id: 'b1',     label: 'B1',    disabled: true }
+    ];
+
+    for (var i = 0; i < tracks.length; i++) {
+      var t = tracks[i];
+      var btn = document.createElement('button');
+      btn.className = 'track-btn';
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', activeTrack === t.id ? 'true' : 'false');
+
+      if (t.disabled) {
+        btn.className += ' track-btn--disabled';
+        btn.disabled = true;
+      }
+
+      if (activeTrack === t.id) {
+        btn.className += ' track-btn--active';
+      }
+
+      btn.textContent = t.label;
+
+      if (t.disabled) {
+        var badge = document.createElement('span');
+        badge.className = 'track-btn-badge';
+        badge.textContent = 'Próximamente';
+        btn.appendChild(badge);
+      } else {
+        (function(trackId) {
+          btn.addEventListener('click', function() {
+            if (typeof onSwitch === 'function') {
+              onSwitch(trackId);
+            }
+          });
+        })(t.id);
+      }
+
+      container.appendChild(btn);
+    }
+  }
+
+  /**
+   * Determine the state of a unit card.
+   * @param {number} unitId
+   * @param {object} profile - Progress profile
+   * @returns {string} 'locked' | 'unlocked' | 'in-progress' | 'completed'
+   */
+  function getUnitCardState(unitId, profile) {
+    // Unit 0 is always unlocked
+    if (unitId === 0) {
+      if (!profile || !profile.unitProgress || !profile.unitProgress[0]) {
+        return 'unlocked';
+      }
+      if (profile.unitProgress[0].completed) {
+        return 'completed';
+      }
+      if (profile.unitProgress[0].currentStep !== undefined && profile.unitProgress[0].currentStep > 0) {
+        return 'in-progress';
+      }
+      return 'unlocked';
+    }
+
+    // No profile at all — everything beyond unit 0 is locked
+    if (!profile || !profile.unitProgress) {
+      return 'locked';
+    }
+
+    // Check if previous unit is completed
+    var prevUnit = profile.unitProgress[unitId - 1];
+    var prevCompleted = prevUnit && prevUnit.completed === true;
+
+    if (!prevCompleted) {
+      return 'locked';
+    }
+
+    // Current unit state
+    var thisUnit = profile.unitProgress[unitId];
+    if (thisUnit) {
+      if (thisUnit.completed) {
+        return 'completed';
+      }
+      if (thisUnit.currentStep !== undefined && thisUnit.currentStep > 0) {
+        return 'in-progress';
+      }
+    }
+
+    return 'unlocked';
+  }
+
+  /**
+   * Compute the progress percentage for a unit.
+   * @param {number} unitId
+   * @param {object} profile
+   * @returns {number} 0-100
+   */
+  function getUnitProgressPct(unitId, profile) {
+    if (!profile || !profile.unitProgress || !profile.unitProgress[unitId]) return 0;
+
+    var up = profile.unitProgress[unitId];
+    if (up.completed) return 100;
+
+    var step = up.currentStep;
+    if (step === undefined || step === null || step <= 0) return 0;
+
+    return Math.min(Math.round((step / 15) * 100), 99);
+  }
+
+  /**
+   * Build a progress ring SVG as a string.
+   * @param {number} pct - 0-100
+   * @returns {string} SVG markup
+   */
+  function buildProgressRingSvg(pct) {
+    var circumference = 2 * Math.PI * 15.915;
+    var offset = circumference - (pct / 100) * circumference;
+    var dashArray = Math.round(circumference - offset) + ', ' + Math.round(circumference);
+
+    return '<svg viewBox="0 0 36 36" aria-hidden="true">' +
+      '<path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />' +
+      '<path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" ' +
+      'stroke-dasharray="' + dashArray + '" />' +
+      '<text class="ring-text" x="18" y="18">' + pct + '%</text>' +
+      '</svg>';
+  }
+
+  /**
+   * Get the localized level badge class.
+   * @param {string} level - 'A1', 'A2', or 'B1'
+   * @returns {string} CSS class
+   */
+  function getLevelClass(level) {
+    var map = { 'A1': 'unit-card-level--a1', 'A2': 'unit-card-level--a2', 'B1': 'unit-card-level--b1' };
+    return map[level] || 'unit-card-level--a1';
+  }
+
+  /**
+   * Get the step count for a unit (max 15, or 0 for stubs).
+   * @param {object} unit
+   * @returns {number}
+   */
+  function getUnitStepCount(unit) {
+    if (!unit || !unit.steps) return 0;
+    return unit.steps.length || 0;
+  }
+
+  /**
+   * Build a unit card element.
+   * @param {object} unit - Unit data object
+   * @param {object} profile - Progress profile
+   * @param {function} onClick - callback(unitId)
+   * @returns {HTMLElement}
+   */
+  function buildUnitCard(unit, profile, onClick) {
+    var unitId = parseInt(unit.id, 10);
+    var state = getUnitCardState(unitId, profile);
+    var pct = getUnitProgressPct(unitId, profile);
+    var stepCount = getUnitStepCount(unit);
+    var stepLabel = stepCount > 0 ? stepCount + ' pasos' : 'Próximamente';
+
+    var card = document.createElement('div');
+    card.className = 'unit-card';
+    card.setAttribute('data-unit-id', unitId);
+
+    if (state === 'locked') {
+      card.className += ' unit-card--locked';
+    } else if (state === 'completed') {
+      card.className += ' unit-card--completed';
+    }
+
+    // --- Header: level badge + progress ring ---
+    var header = document.createElement('div');
+    header.className = 'unit-card-header';
+
+    var levelBadge = document.createElement('span');
+    levelBadge.className = 'unit-card-level ' + getLevelClass(unit.level);
+    levelBadge.textContent = unit.level;
+
+    var ring = document.createElement('div');
+    ring.className = 'unit-card-progress-ring';
+    if (pct > 0 || state === 'completed') {
+      ring.innerHTML = buildProgressRingSvg(pct);
+    }
+
+    header.appendChild(levelBadge);
+    if (pct > 0 || state === 'completed') {
+      header.appendChild(ring);
+    }
+
+    // --- Title ---
+    var title = document.createElement('h3');
+    title.className = 'unit-card-title';
+    title.textContent = unit.title;
+
+    // --- Meta ---
+    var meta = document.createElement('p');
+    meta.className = 'unit-card-meta';
+    meta.textContent = stepLabel;
+
+    // --- Footer ---
+    var footer = document.createElement('div');
+    footer.className = 'unit-card-footer';
+
+    if (state === 'locked') {
+      var lockLabel = document.createElement('span');
+      lockLabel.className = 'unit-card-state-label';
+      lockLabel.innerHTML = '🔒 Bloqueada';
+      footer.appendChild(lockLabel);
+    } else if (state === 'completed') {
+      var badge = document.createElement('span');
+      badge.className = 'unit-card-badge unit-card-badge--completed';
+      badge.innerHTML = '✅ ¡Completada!';
+      footer.appendChild(badge);
+    } else if (state === 'in-progress') {
+      var continueBtn = document.createElement('button');
+      continueBtn.className = 'unit-card-btn unit-card-btn--primary';
+      continueBtn.textContent = '▶ Continuar';
+      (function(id) {
+        continueBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (typeof onClick === 'function') onClick(id);
+        });
+      })(unitId);
+      footer.appendChild(continueBtn);
+    } else {
+      var startBtn = document.createElement('button');
+      startBtn.className = 'unit-card-btn unit-card-btn--primary';
+      startBtn.textContent = '▶ Empezar';
+      (function(id) {
+        startBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (typeof onClick === 'function') onClick(id);
+        });
+      })(unitId);
+      footer.appendChild(startBtn);
+    }
+
+    // Assemble card
+    card.appendChild(header);
+    card.appendChild(title);
+    card.appendChild(meta);
+    card.appendChild(footer);
+
+    // Wire click on the whole card (for unlocked cards)
+    if (state !== 'locked') {
+      (function(id) {
+        card.addEventListener('click', function() {
+          if (typeof onClick === 'function') onClick(id);
+        });
+      })(unitId);
+    }
+
+    return card;
+  }
+
+  /**
+   * Load unit data for a given track.
+   * Tries inline script tag first, falls back to fetch.
+   * @param {string} track - 'a1-a2' or 'b1'
+   * @returns {Array|null|Promise}
+   */
+  function loadTrackData(track) {
+    var data = null;
+    var el = document.getElementById('data-units-a1a2');
+    if (el) {
+      try {
+        data = JSON.parse(el.textContent);
+      } catch (e) {
+        console.warn('[Curriculum] Failed to parse inline unit data:', e);
+      }
+    }
+
+    if (data && data.length > 0) {
+      return data;
+    }
+
+    // Fallback: fetch from file
+    var filePath = track === 'b1' ? 'data/units-b1.json' : 'data/units-a1-a2.json';
+    return fetch(filePath)
+      .then(function(res) {
+        if (!res.ok) throw new Error('Failed to load ' + filePath);
+        return res.json();
+      })
+      .then(function(json) {
+        return json;
+      })
+      .catch(function(err) {
+        console.error('[Curriculum] Error loading track data:', err);
+        return null;
+      });
+  }
+
+  /**
+   * Render the unit grid for a given track.
+   * @param {HTMLElement} container - The #unit-grid container
+   * @param {string} track - 'a1-a2' or 'b1'
+   * @param {object} profile - User progress profile object
+   */
+  function renderUnitGrid(container, track, profile) {
+    if (!container) return;
+
+    var data = loadTrackData(track);
+
+    if (data && typeof data === 'object' && typeof data.then === 'function') {
+      // Async path
+      container.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:32px">Cargando unidades...</p>';
+      data.then(function(units) {
+        if (!units || units.length === 0) {
+          container.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:32px">No hay unidades disponibles para este nivel.</p>';
+          return;
+        }
+        renderUnits(container, units, profile);
+      });
+    } else if (data) {
+      // Sync path
+      renderUnits(container, data, profile);
+    } else {
+      container.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:32px">No se pudieron cargar las unidades.</p>';
+    }
+  }
+
+  /**
+   * Render unit card elements into the container.
+   * @param {HTMLElement} container
+   * @param {Array} units
+   * @param {object} profile
+   */
+  function renderUnits(container, units, profile) {
+    container.innerHTML = '';
+
+    for (var i = 0; i < units.length; i++) {
+      (function(u) {
+        var card = buildUnitCard(u, profile, function(unitId) {
+          // Wire unit click: set active unit, persist, and navigate
+          App.state.activeUnit = unitId;
+          if (profile) {
+            profile.currentUnit = unitId;
+            App.Progress.save(App.state.currentLearner, profile);
+          }
+          App.nav.show('unit', { unit: unitId });
+        });
+        container.appendChild(card);
+      })(units[i]);
+    }
+  }
+
   return {
     isUnlocked: isUnlocked,
     completionPct: completionPct,
@@ -811,6 +1172,11 @@ App.Curriculum = (function() {
     renderModuleGrid: renderModuleGrid,
     renderExerciseList: renderExerciseList,
     renderSidebar: renderSidebar,
-    renderModuleLesson: renderModuleLesson
+    renderModuleLesson: renderModuleLesson,
+    // New API
+    renderTrackSelector: renderTrackSelector,
+    renderUnitGrid: renderUnitGrid,
+    getUnitCardState: getUnitCardState,
+    getUnitProgressPct: getUnitProgressPct
   };
 })();
