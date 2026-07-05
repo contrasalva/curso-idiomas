@@ -49,8 +49,8 @@ App.UnitRenderer = (function() {
     'vocabulario':            renderStep9,
     'pronunciacion':          renderStep10,
     'cultura':                renderCulture,
-    'conversacion-guiada':    renderComingSoon,
-    'conversacion-libre':     renderComingSoon,
+    'conversacion-guiada':    renderStep12,
+    'conversacion-libre':     renderStep13,
     'resumen-visual':         renderSummary,
     'repaso-inteligente':     renderComingSoon,
     'coming-soon':            renderComingSoon
@@ -573,6 +573,9 @@ App.UnitRenderer = (function() {
 
     // Step 10 — pronunciacion wiring
     wireStep10(container);
+
+    // Step 12 & 13 — conversation wiring
+    wireConversation(container);
   }
 
   /**
@@ -2386,6 +2389,292 @@ App.UnitRenderer = (function() {
         }
         enableNextBtn();
       }
+    }
+  }
+
+  /* ==========================================
+     STEP 12: Conversación Guiada (Guided)
+     STEP 13: Conversación Libre (Free)
+     ========================================== */
+
+  /**
+   * Render step 12 — conversacion-guiada: guided conversation with hints and feedback.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderStep12(stepData) {
+    return renderConversationCard(stepData);
+  }
+
+  /**
+   * Render step 13 — conversacion-libre: free conversation without hints/feedback.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderStep13(stepData) {
+    return renderConversationCard(stepData);
+  }
+
+  /**
+   * Render the conversation card HTML (shared by guided and free).
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderConversationCard(stepData) {
+    var tree = stepData.dialogTree;
+    if (!tree || !tree.nodes || !tree.startNodeId) {
+      return renderComingSoon(stepData);
+    }
+
+    var startNode = tree.nodes[tree.startNodeId];
+    var initialPrompt = startNode ? startNode.prompt : '';
+    var initialTranslation = startNode ? (startNode.promptTranslation || '') : '';
+
+    var html = '<div class="conv-card">';
+
+    // IA bubble with TTS
+    html += '<div class="conv-bubble">' +
+      '<div class="conv-bubble-text">' + escapeHtml(initialPrompt) + '</div>' +
+      '<div class="conv-bubble-translation">' + escapeHtml(initialTranslation) + '</div>' +
+      '<button class="dialogue-tts-btn conv-tts-btn" data-text="' + escapeAttr(initialPrompt) + '" title="Escuchar" aria-label="Escuchar">🔊</button>' +
+    '</div>';
+
+    // Hints area (hidden in free mode via CSS, populated by JS in guided)
+    html += '<div class="conv-hints"></div>';
+
+    // Input area
+    html += '<div class="conv-input-area">' +
+      '<input type="text" class="conv-input" placeholder="Escribe tu respuesta en italiano..." autocomplete="off">' +
+      '<button class="conv-send-btn" title="Enviar">Enviar</button>' +
+      '<button class="conv-mic-btn" title="Usar micrófono">🎤</button>' +
+    '</div>';
+
+    // Feedback area
+    html += '<div class="conv-feedback"></div>';
+
+    html += '</div>'; // .conv-card
+
+    return html;
+  }
+
+  /**
+   * Wire conversation interactions for both guided and free modes.
+   * Called from wireTtsButtons after the DOM is rendered.
+   * @param {HTMLElement} container
+   */
+  function wireConversation(container) {
+    var convCard = container.querySelector('.conv-card');
+    if (!convCard) return;
+
+    var stepData = _state.data.steps[_state.currentStep];
+    if (!stepData || !stepData.dialogTree) return;
+
+    var stepType = stepData.type;
+    var mode = stepType === 'conversacion-libre' ? 'free' : 'guided';
+
+    // Disable Next until conversation completes
+    disableNextBtn();
+
+    // DOM references
+    var bubbleTextEl = convCard.querySelector('.conv-bubble-text');
+    var bubbleTransEl = convCard.querySelector('.conv-bubble-translation');
+    var ttsBtn = convCard.querySelector('.conv-tts-btn');
+    var hintsEl = convCard.querySelector('.conv-hints');
+    var inputEl = convCard.querySelector('.conv-input');
+    var sendBtn = convCard.querySelector('.conv-send-btn');
+    var micBtn = convCard.querySelector('.conv-mic-btn');
+    var feedbackEl = convCard.querySelector('.conv-feedback');
+
+    // Track consecutive misses per node (for free mode)
+    var _consecutiveMisses = 0;
+
+    // Register TTS click for this specific step's bubble
+    if (ttsBtn) {
+      // Remove old listener by cloning (safety against re-wiring)
+      // Note: handleTtsClick already wires .dialogue-tts-btn globally via wireTtsButtons.
+      // The data-text attribute is updated in onPrompt, so the global handler works.
+    }
+
+    // Start the ConversationEngine
+    App.ConversationEngine.startDialog(stepData.dialogTree, mode, {
+      onPrompt: function(node) {
+        // Determine prompt text (use variation in free mode)
+        var promptText = node._currentPrompt || node.prompt || '';
+        var promptTrans = node.promptTranslation || '';
+
+        bubbleTextEl.textContent = promptText;
+        if (bubbleTransEl) {
+          bubbleTransEl.textContent = promptTrans;
+        }
+
+        // Update TTS data attribute
+        if (ttsBtn) {
+          ttsBtn.setAttribute('data-text', promptText);
+        }
+
+        // Update hints (guided mode only)
+        updateHints();
+
+        // Clear input and feedback for next turn
+        inputEl.value = '';
+        feedbackEl.textContent = '';
+        feedbackEl.className = 'conv-feedback';
+
+        // Reset consecutive miss counter on node change
+        _consecutiveMisses = 0;
+      },
+
+      onFeedback: function(feedback, isCorrect) {
+        if (mode === 'guided') {
+          // Show feedback in guided mode
+          feedbackEl.textContent = feedback;
+          feedbackEl.className = 'conv-feedback '
+            + (isCorrect ? 'conv-feedback--correct' : 'conv-feedback--incorrect');
+        } else {
+          // Free mode: track misses silently, do not show feedback
+          if (!isCorrect) {
+            _consecutiveMisses++;
+            // After 3 consecutive misses, save to missedItems in profile
+            if (_consecutiveMisses >= 3) {
+              saveMissedKeywords();
+              _consecutiveMisses = 0;
+            }
+          } else {
+            _consecutiveMisses = 0;
+          }
+        }
+      },
+
+      onComplete: function() {
+        // Save any remaining missed items
+        if (mode === 'free') {
+          saveMissedKeywords();
+        }
+
+        feedbackEl.textContent = '✓ Conversazione completata!';
+        feedbackEl.className = 'conv-feedback conv-feedback--correct';
+        enableNextBtn();
+      }
+    });
+
+    /**
+     * Update hint chips in guided mode.
+     */
+    function updateHints() {
+      if (mode === 'free') {
+        hintsEl.innerHTML = '';
+        hintsEl.style.display = 'none';
+        return;
+      }
+
+      var hints = App.ConversationEngine.getHints();
+      hintsEl.innerHTML = '';
+
+      if (hints.length === 0) {
+        hintsEl.style.display = 'none';
+        return;
+      }
+
+      hintsEl.style.display = 'flex';
+      for (var hi = 0; hi < hints.length; hi++) {
+        (function(hintText) {
+          var chip = document.createElement('button');
+          chip.className = 'conv-hint-chip';
+          chip.textContent = hintText;
+          chip.addEventListener('click', function() {
+            inputEl.value = hintText;
+            inputEl.focus();
+          });
+          hintsEl.appendChild(chip);
+        })(hints[hi]);
+      }
+    }
+
+    /**
+     * Save missed keywords from the engine to the learner profile.
+     */
+    function saveMissedKeywords() {
+      var missedItems = App.ConversationEngine.getMissedItems();
+      if (!missedItems || missedItems.length === 0) return;
+
+      var learner = App.state && App.state.currentLearner;
+      if (!learner) return;
+      var profile = App.Progress.get(learner);
+      if (!profile) return;
+      if (!profile.missedItems) profile.missedItems = [];
+
+      for (var mi = 0; mi < missedItems.length; mi++) {
+        profile.missedItems.push({
+          unitId: _state.unitId,
+          stepIndex: _state.currentStep,
+          prompt: missedItems[mi].prompt,
+          userInput: missedItems[mi].userInput,
+          expectedKeywords: missedItems[mi].expectedKeywords,
+          type: 'conversation',
+          timestamp: missedItems[mi].timestamp
+        });
+      }
+      App.Progress.save(learner, profile);
+    }
+
+    /**
+     * Send the current input to the conversation engine.
+     */
+    function sendResponse() {
+      var text = inputEl.value.trim();
+      if (!text) return;
+      App.ConversationEngine.processResponse(text);
+    }
+
+    // Wire send button
+    sendBtn.addEventListener('click', sendResponse);
+
+    // Wire Enter key in input
+    inputEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendResponse();
+      }
+    });
+
+    // Wire mic button (voice input)
+    if (micBtn) {
+      micBtn.addEventListener('click', function() {
+        if (!App.SpeechManager.isSupported()) {
+          feedbackEl.textContent = 'Reconocimiento de voz no soportado. Escribe tu respuesta.';
+          feedbackEl.className = 'conv-feedback conv-feedback--incorrect';
+          return;
+        }
+
+        micBtn.disabled = true;
+        micBtn.textContent = '🎤 Ascoltando...';
+
+        var timeoutId = setTimeout(function() {
+          window.removeEventListener('speech:result', onResultHandler);
+          micBtn.disabled = false;
+          micBtn.textContent = '🎤';
+          feedbackEl.textContent = 'No se detectó voz. Intenta de nuevo o escribe.';
+          feedbackEl.className = 'conv-feedback conv-feedback--incorrect';
+        }, 10000);
+
+        function onResultHandler(event) {
+          var detail = event.detail;
+          if (!detail.isFinal) return;
+          window.removeEventListener('speech:result', onResultHandler);
+          clearTimeout(timeoutId);
+          micBtn.disabled = false;
+          micBtn.textContent = '🎤';
+
+          var transcript = detail.transcript || '';
+          if (transcript) {
+            inputEl.value = transcript;
+            sendResponse();
+          }
+        }
+
+        window.addEventListener('speech:result', onResultHandler);
+        App.SpeechManager.start();
+      });
     }
   }
 

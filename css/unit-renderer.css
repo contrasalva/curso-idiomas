@@ -1437,3 +1437,225 @@
   border-color: #f59e0b;
   color: #fbbf24;
 }
+
+/* ============================================
+   STEP 12-13: Conversation Card (Guided & Free)
+   ============================================ */
+
+.conv-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* --- IA Prompt Bubble --- */
+.conv-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(99,102,241,0.06));
+  border: 1px solid rgba(59,130,246,0.15);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  position: relative;
+  max-width: 85%;
+}
+
+.conv-bubble-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.conv-bubble-translation {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.conv-tts-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+/* --- Hints Area --- */
+.conv-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+  min-height: 0;
+}
+
+.conv-hint-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+  cursor: pointer;
+  transition: all 200ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.conv-hint-chip:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.conv-hint-chip:active {
+  transform: translateY(0);
+}
+
+[data-theme="dark"] .conv-hint-chip {
+  background: rgba(96,165,250,0.12);
+  border-color: rgba(96,165,250,0.25);
+}
+
+[data-theme="dark"] .conv-hint-chip:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* --- Input Area --- */
+.conv-input-area {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.conv-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 200ms ease;
+  font-family: inherit;
+}
+
+.conv-input:focus {
+  border-color: var(--accent);
+}
+
+.conv-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.conv-send-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 200ms ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.conv-send-btn:hover {
+  background: var(--accent-hover, #2563eb);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59,130,246,0.25);
+}
+
+.conv-send-btn:active {
+  transform: translateY(0);
+}
+
+.conv-mic-btn {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.conv-mic-btn:hover {
+  border-color: var(--accent);
+  background: rgba(59,130,246,0.06);
+}
+
+.conv-mic-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--border);
+  background: var(--bg);
+}
+
+/* --- Feedback Area --- */
+.conv-feedback {
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-height: 24px;
+  padding: 4px 0;
+  line-height: 1.4;
+  animation: convFadeIn 300ms ease;
+}
+
+@keyframes convFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.conv-feedback--correct {
+  color: #16a34a;
+}
+
+.conv-feedback--incorrect {
+  color: #f59e0b;
+}
+
+/* Conversation specific: hide hints in free mode via JS (style.display = 'none'),
+   but also ensure proper visibility in guided mode. */
+.conv-hints:empty {
+  display: none;
+}
+
+/* Dark theme refinements */
+[data-theme="dark"] .conv-bubble {
+  background: linear-gradient(135deg, rgba(96,165,250,0.1), rgba(129,140,248,0.08));
+  border-color: rgba(96,165,250,0.2);
+}
+
+[data-theme="dark"] .conv-input {
+  background: rgba(255,255,255,0.04);
+}
+
+[data-theme="dark"] .conv-mic-btn {
+  background: rgba(255,255,255,0.04);
+}
+
+[data-theme="dark"] .conv-mic-btn:hover {
+  background: rgba(96,165,250,0.1);
+}

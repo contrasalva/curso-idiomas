@@ -626,15 +626,212 @@
       },
       {
         "step": 12,
-        "type": "coming-soon",
+        "type": "conversacion-guiada",
         "title": "Conversación guiada",
-        "message": "🔜 Próximamente: conversa con la IA con ayuda y sugerencias."
+        "dialogTree": {
+          "startNodeId": "node_1",
+          "nodes": {
+            "node_1": {
+              "id": "node_1",
+              "prompt": "Ciao! Come ti chiami?",
+              "promptTranslation": "¡Hola! ¿Cómo te llamas?",
+              "branches": [
+                { "keyword": "mi chiamo", "nextNodeId": "node_2", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "sono", "nextNodeId": "node_2", "feedback": "Molto bene!", "feedbackTranslation": "¡Muy bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_1_retry", "feedback": "Prova a dire: Mi chiamo...", "feedbackTranslation": "Intenta decir: Me llamo...", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_1_retry": {
+              "id": "node_1_retry",
+              "prompt": "Riproviamo! Presentati dicendo: 'Mi chiamo...'",
+              "promptTranslation": "¡Intentemos de nuevo! Preséntate diciendo: 'Me llamo...'",
+              "branches": [
+                { "keyword": "mi chiamo", "nextNodeId": "node_2", "feedback": "Bravo!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "sono", "nextNodeId": "node_2", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_1", "feedback": "Ascolta: 'Mi chiamo Marco'. Riprova.", "feedbackTranslation": "Escucha: 'Mi chiamo Marco'. Intenta de nuevo.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_2": {
+              "id": "node_2",
+              "prompt": "Piacere di conoscerti! Come stai?",
+              "promptTranslation": "¡Mucho gusto! ¿Cómo estás?",
+              "branches": [
+                { "keyword": "bene", "nextNodeId": "node_3", "feedback": "Ottimo!", "feedbackTranslation": "¡Óptimo!", "isDefault": false },
+                { "keyword": "tutto bene", "nextNodeId": "node_3", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "non male", "nextNodeId": "node_3", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_2_retry", "feedback": "Prova a rispondere: 'Bene, grazie!'", "feedbackTranslation": "Intenta responder: 'Bien, gracias'", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_2_retry": {
+              "id": "node_2_retry",
+              "prompt": "Proviamo di nuovo! Come stai?",
+              "promptTranslation": "¡Intentemos de nuevo! ¿Cómo estás?",
+              "branches": [
+                { "keyword": "bene", "nextNodeId": "node_3", "feedback": "Bravo!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_2", "feedback": "Ascolta: 'Bene, grazie! E tu?' Riprova.", "feedbackTranslation": "Escucha: 'Bien, gracias. ¿Y tú?' Intenta de nuevo.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_3": {
+              "id": "node_3",
+              "prompt": "Bene! Di dove sei?",
+              "promptTranslation": "¡Bien! ¿De dónde eres?",
+              "branches": [
+                { "keyword": "di roma", "nextNodeId": "node_4", "feedback": "Che bello, Roma!", "feedbackTranslation": "¡Qué bonito, Roma!", "isDefault": false },
+                { "keyword": "di milano", "nextNodeId": "node_4", "feedback": "Fantastico, Milano!", "feedbackTranslation": "¡Fantástico, Milán!", "isDefault": false },
+                { "keyword": "sono di", "nextNodeId": "node_4", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "di", "nextNodeId": "node_4", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_3_retry", "feedback": "Prova a dire: 'Sono di...'", "feedbackTranslation": "Intenta decir: 'Soy de...'", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_3_retry": {
+              "id": "node_3_retry",
+              "prompt": "Riproviamo! Di dove sei?",
+              "promptTranslation": "¡Intentemos de nuevo! ¿De dónde eres?",
+              "branches": [
+                { "keyword": "sono di", "nextNodeId": "node_4", "feedback": "Bravo!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "di", "nextNodeId": "node_4", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_3", "feedback": "Ascolta: 'Sono di Roma'. Riprova.", "feedbackTranslation": "Escucha: 'Soy de Roma'. Intenta de nuevo.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_4": {
+              "id": "node_4",
+              "prompt": "Dove abiti?",
+              "promptTranslation": "¿Dónde vives?",
+              "branches": [
+                { "keyword": "abito a", "nextNodeId": "node_5", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "vivo a", "nextNodeId": "node_5", "feedback": "Molto bene!", "feedbackTranslation": "¡Muy bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_4_retry", "feedback": "Prova a dire: 'Abito a...'", "feedbackTranslation": "Intenta decir: 'Vivo en...'", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_4_retry": {
+              "id": "node_4_retry",
+              "prompt": "Riproviamo! Dove abiti?",
+              "promptTranslation": "¡Intentemos de nuevo! ¿Dónde vives?",
+              "branches": [
+                { "keyword": "abito a", "nextNodeId": "node_5", "feedback": "Bravo!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "vivo a", "nextNodeId": "node_5", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_4", "feedback": "Ascolta: 'Abito a Milano'. Riprova.", "feedbackTranslation": "Escucha: 'Vivo en Milán'. Intenta de nuevo.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_5": {
+              "id": "node_5",
+              "prompt": "Quanti anni hai?",
+              "promptTranslation": "¿Cuántos años tienes?",
+              "branches": [
+                { "keyword": "ho", "nextNodeId": "node_6_end", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "anni", "nextNodeId": "node_6_end", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_5_retry", "feedback": "Prova a dire: 'Ho 25 anni'", "feedbackTranslation": "Intenta decir: 'Tengo 25 años'", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_5_retry": {
+              "id": "node_5_retry",
+              "prompt": "Riproviamo! Quanti anni hai?",
+              "promptTranslation": "¡Intentemos de nuevo! ¿Cuántos años tienes?",
+              "branches": [
+                { "keyword": "ho", "nextNodeId": "node_6_end", "feedback": "Bravo!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_5", "feedback": "Ascolta: 'Ho 30 anni'. Riprova.", "feedbackTranslation": "Escucha: 'Tengo 30 años'. Intenta de nuevo.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_6_end": {
+              "id": "node_6_end",
+              "prompt": "Perfetto! È stato un piacere parlare con te. Arrivederci e buona giornata!",
+              "promptTranslation": "¡Perfecto! Fue un placer hablar contigo. ¡Hasta luego y buen día!",
+              "branches": [],
+              "isEnd": true
+            }
+          }
+        }
       },
       {
         "step": 13,
-        "type": "coming-soon",
+        "type": "conversacion-libre",
         "title": "Conversación libre",
-        "message": "🔜 Próximamente: conversa sin ayuda. La IA cambiará las preguntas para que no memorices respuestas."
+        "dialogTree": {
+          "startNodeId": "node_1",
+          "nodes": {
+            "node_1": {
+              "id": "node_1",
+              "prompt": "Ciao! Come ti chiami?",
+              "promptTranslation": "¡Hola! ¿Cómo te llamas?",
+              "promptVariations": ["Buongiorno! Come ti chiami?", "Ciao! Io sono Marco, e tu?"],
+              "branches": [
+                { "keyword": "mi chiamo", "nextNodeId": "node_2", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "sono", "nextNodeId": "node_2", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "chiamo", "nextNodeId": "node_2", "feedback": "Ok!", "feedbackTranslation": "¡Ok!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_2", "feedback": "Va bene, continuiamo.", "feedbackTranslation": "Está bien, continuemos.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_2": {
+              "id": "node_2",
+              "prompt": "Piacere! Come stai?",
+              "promptTranslation": "¡Mucho gusto! ¿Cómo estás?",
+              "promptVariations": ["Piacere mio! Come va?", "Che piacere! Come stai?"],
+              "branches": [
+                { "keyword": "bene", "nextNodeId": "node_3", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "tutto bene", "nextNodeId": "node_3", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "non male", "nextNodeId": "node_3", "feedback": "Ok!", "feedbackTranslation": "¡Ok!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_3", "feedback": "Continuiamo.", "feedbackTranslation": "Continuemos.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_3": {
+              "id": "node_3",
+              "prompt": "Di dove sei?",
+              "promptTranslation": "¿De dónde eres?",
+              "promptVariations": ["Da dove vieni?", "Di dove sei?"],
+              "branches": [
+                { "keyword": "sono di", "nextNodeId": "node_4", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "di", "nextNodeId": "node_4", "feedback": "Ok!", "feedbackTranslation": "¡Ok!", "isDefault": false },
+                { "keyword": "vengo da", "nextNodeId": "node_4", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_4", "feedback": "Va bene.", "feedbackTranslation": "Está bien.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_4": {
+              "id": "node_4",
+              "prompt": "Dove abiti?",
+              "promptTranslation": "¿Dónde vives?",
+              "promptVariations": ["Dove vivi?", "In che città abiti?"],
+              "branches": [
+                { "keyword": "abito a", "nextNodeId": "node_5", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "vivo a", "nextNodeId": "node_5", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_5", "feedback": "Ok, continuiamo.", "feedbackTranslation": "Ok, continuemos.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_5": {
+              "id": "node_5",
+              "prompt": "Quanti anni hai?",
+              "promptTranslation": "¿Cuántos años tienes?",
+              "promptVariations": ["Che età hai?", "Quanti anni hai?"],
+              "branches": [
+                { "keyword": "ho", "nextNodeId": "node_6_end", "feedback": "Perfetto!", "feedbackTranslation": "¡Perfecto!", "isDefault": false },
+                { "keyword": "anni", "nextNodeId": "node_6_end", "feedback": "Bene!", "feedbackTranslation": "¡Bien!", "isDefault": false },
+                { "keyword": "", "nextNodeId": "node_6_end", "feedback": "Va bene.", "feedbackTranslation": "Está bien.", "isDefault": true }
+              ],
+              "isEnd": false
+            },
+            "node_6_end": {
+              "id": "node_6_end",
+              "prompt": "Grazie! È stato un piacere. Arrivederci!",
+              "promptTranslation": "¡Gracias! Fue un placer. ¡Hasta luego!",
+              "promptVariations": ["Grazie per la conversazione! Arrivederci!", "Perfetto! È stato bello parlare con te. Ciao!"],
+              "branches": [],
+              "isEnd": true
+            }
+          }
+        }
       },
       {
         "step": 14,
