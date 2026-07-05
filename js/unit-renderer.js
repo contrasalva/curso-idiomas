@@ -140,7 +140,7 @@ App.UnitRenderer = (function() {
   }
 
   /**
-   * Initialize the unit renderer state and render the first step.
+   * Initialize the unit renderer state and show the welcome screen.
    * @param {number} unitId
    * @param {object} unit
    */
@@ -150,14 +150,15 @@ App.UnitRenderer = (function() {
     _state.currentStep = 0;
     _state.totalSteps = 15;
 
-    // Resume from saved progress if available
+    // Check for saved progress
     var learner = App.state && App.state.currentLearner;
+    var savedStep = null;
     if (learner) {
       var profile = App.Progress.get(learner);
       if (profile && profile.unitProgress && profile.unitProgress[unitId]) {
-        var savedStep = profile.unitProgress[unitId].currentStep;
-        if (savedStep !== undefined && savedStep !== null && savedStep < _state.totalSteps) {
-          _state.currentStep = savedStep;
+        var st = profile.unitProgress[unitId].currentStep;
+        if (st !== undefined && st !== null && st < _state.totalSteps) {
+          savedStep = st;
         }
       }
     }
@@ -168,8 +169,8 @@ App.UnitRenderer = (function() {
       navName.textContent = unit.title || 'Unidad ' + (unitId + 1);
     }
 
-    // Render the current step
-    renderCurrentStep();
+    // Show welcome screen (always — entry gate to the unit)
+    renderWelcome(unit, savedStep);
   }
 
   /**
@@ -181,6 +182,97 @@ App.UnitRenderer = (function() {
     if (!container) return;
     container.innerHTML = '<div class="error-card" style="text-align:center;padding:48px 24px">' +
       '<p style="font-size:1.1rem;color:var(--text)">' + escapeHtml(message) + '</p></div>';
+  }
+
+  /* ==========================================
+     WELCOME SCREEN
+     ========================================== */
+
+  /**
+   * Render the unit welcome screen (step 0, pre-step entry gate).
+   * Shows objectives as achievements, unit info, and start/resume buttons.
+   * Hides step indicator + nav until the user clicks start.
+   * @param {object} unit - Full unit data object
+   * @param {number|null} savedStep - Saved progress step index, or null
+   */
+  function renderWelcome(unit, savedStep) {
+    var objectivesHtml = '';
+    if (unit.objectives && unit.objectives.length) {
+      objectivesHtml = '<ul class="welcome-objectives-list">' +
+        unit.objectives.map(function(obj) {
+          return '<li class="welcome-objective-item"><span class="welcome-objective-check">&#10003;</span> ' +
+            escapeHtml(obj) + '</li>';
+        }).join('') +
+        '</ul>';
+    }
+
+    var resumeBtnHtml = '';
+    if (savedStep !== null && savedStep >= 0) {
+      resumeBtnHtml = '<button class="primary-btn welcome-btn welcome-btn-secondary" id="welcome-resume">' +
+        '&#9654; Continuar desde paso ' + (savedStep + 1) + '</button>';
+    }
+
+    var html =
+      '<div class="welcome-screen">' +
+        '<div class="welcome-card">' +
+          '<div class="welcome-header">' +
+            '<span class="welcome-level-badge">Nivel ' + escapeHtml(unit.level) + '</span>' +
+            '<h1 class="welcome-title">' + escapeHtml(unit.title) + '</h1>' +
+            '<p class="welcome-meta">15 pasos · ~45 minutos</p>' +
+          '</div>' +
+          '<div class="welcome-objectives">' +
+            '<h2 class="welcome-section-title">&#127919; Al completar esta unidad podr&aacute;s...</h2>' +
+            objectivesHtml +
+          '</div>' +
+          '<div class="welcome-actions">' +
+            resumeBtnHtml +
+            '<button class="primary-btn welcome-btn welcome-btn-primary" id="welcome-start">' +
+              '&#9654; Empezar' +
+            '</button>' +
+          '</div>' +
+          '<p class="welcome-footer-text">Tu progreso se guarda autom&aacute;ticamente al avanzar.</p>' +
+        '</div>' +
+      '</div>';
+
+    var container = document.getElementById('step-container');
+    if (!container) return;
+    container.innerHTML = html;
+
+    // Hide step indicator, progress bar, and nav during welcome
+    var indicator = document.querySelector('.step-indicator');
+    var progress = document.querySelector('.step-progress');
+    var stepNav = document.querySelector('.step-nav');
+    var unitHeader = document.querySelector('.unit-header');
+    if (indicator) indicator.style.display = 'none';
+    if (progress) progress.style.display = 'none';
+    if (stepNav) stepNav.style.display = 'none';
+    if (unitHeader) unitHeader.style.display = 'none';
+
+    // Show indicators again when user starts
+    function showIndicators() {
+      if (indicator) indicator.style.display = '';
+      if (progress) progress.style.display = '';
+      if (stepNav) stepNav.style.display = '';
+      if (unitHeader) unitHeader.style.display = '';
+    }
+
+    // Wire "Empezar" button — first-visit start
+    var startBtn = document.getElementById('welcome-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', function() {
+        showIndicators();
+        goToStep(0);
+      });
+    }
+
+    // Wire "Continuar" button — resume from saved step
+    var resumeBtn = document.getElementById('welcome-resume');
+    if (resumeBtn) {
+      resumeBtn.addEventListener('click', function() {
+        showIndicators();
+        goToStep(savedStep);
+      });
+    }
   }
 
   /* ==========================================

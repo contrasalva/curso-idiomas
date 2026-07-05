@@ -983,3 +983,169 @@
   cursor: not-allowed;
   pointer-events: none;
 }
+
+/* ============================================
+   Welcome Screen (Step 0 — Entry Gate)
+   ============================================ */
+
+.welcome-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 24px 16px;
+}
+
+.welcome-card {
+  max-width: 560px;
+  width: 100%;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 16px;
+  padding: 40px 32px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+
+[data-theme="dark"] .welcome-card {
+  background: var(--card-bg, #1e293b);
+  border-color: var(--border, #334155);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+
+.welcome-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.welcome-level-badge {
+  display: inline-block;
+  background: var(--accent, #3b82f6);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.welcome-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--heading, #0f172a);
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+[data-theme="dark"] .welcome-title {
+  color: var(--heading, #f1f5f9);
+}
+
+.welcome-meta {
+  color: var(--text-secondary, #64748b);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.welcome-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--heading, #0f172a);
+  margin: 0 0 16px;
+}
+
+[data-theme="dark"] .welcome-section-title {
+  color: var(--heading, #f1f5f9);
+}
+
+.welcome-objectives {
+  margin-bottom: 32px;
+}
+
+.welcome-objectives-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.welcome-objective-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(59,130,246,0.05);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: var(--text, #1e293b);
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .welcome-objective-item {
+  background: rgba(59,130,246,0.08);
+  color: var(--text, #e2e8f0);
+}
+
+.welcome-objective-check {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  background: var(--accent, #3b82f6);
+  color: #fff;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.welcome-btn {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  transition: all 200ms ease;
+}
+
+.welcome-btn-primary {
+  background: var(--accent, #3b82f6);
+  color: #fff;
+}
+
+.welcome-btn-primary:hover {
+  background: var(--accent-hover, #2563eb);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+}
+
+.welcome-btn-secondary {
+  background: transparent;
+  color: var(--accent, #3b82f6);
+  border: 2px solid var(--accent, #3b82f6);
+}
+
+.welcome-btn-secondary:hover {
+  background: rgba(59,130,246,0.06);
+  transform: translateY(-1px);
+}
+
+.welcome-footer-text {
+  text-align: center;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.8rem;
+  margin: 0;
+}
