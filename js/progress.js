@@ -127,7 +127,7 @@ App.Progress = (function() {
   }
 
   /**
-   * Create a default profile object.
+   * Create a default profile object (v2 schema).
    * @param {string} name
    * @returns {object}
    */
@@ -137,7 +137,13 @@ App.Progress = (function() {
       createdAt: Date.now(),
       lastActive: Date.now(),
       streak: 0,
-      modules: {}
+      modules: {},
+      track: 'a1-a2',
+      currentUnit: 0,
+      currentStep: 0,
+      unitProgress: {},
+      missedItems: [],
+      vocabularySeen: []
     };
   }
 
@@ -180,6 +186,264 @@ App.Progress = (function() {
     return standings;
   }
 
+  /* ==========================================
+     V2: DEBOUNCED SAVE & QUOTA HANDLING
+     ========================================== */
+
+  /**
+   * Debounce timer for save.
+   */
+  var _saveTimer = null;
+
+  /**
+   * Save a profile with debouncing (300ms).
+   * Handles QuotaExceededError with partial save fallback.
+   * @param {string} name
+   * @param {object} data
+   */
+  function saveSafe(name, data) {
+    if (_saveTimer) {
+      clearTimeout(_saveTimer);
+    }
+    _saveTimer = setTimeout(function() {
+      _saveTimer = null;
+      try {
+        var serialized = JSON.stringify(data);
+        localStorage.setItem(profileKey(name), serialized);
+      } catch (e) {
+        if (e.name === 'QuotaExceededError' || e.code === 22) {
+          console.warn('[Progress] localStorage quota exceeded. Performing partial save.');
+          // Fallback: save only essential data
+          var minimal = {
+            name: data.name,
+            createdAt: data.createdAt,
+            lastActive: Date.now(),
+            streak: data.streak || 0,
+            modules: data.modules || {},
+            track: data.track || 'a1-a2',
+            currentUnit: data.currentUnit || 0,
+            currentStep: data.currentStep || 0,
+            unitProgress: data.unitProgress || {},
+            missedItems: data.missedItems || [],
+            vocabularySeen: data.vocabularySeen || []
+          };
+          try {
+            localStorage.setItem(profileKey(name), JSON.stringify(minimal));
+          } catch (e2) {
+            // Evacuation: keep only unitProgress
+            try {
+              var evacuation = {
+                name: data.name,
+                lastActive: Date.now(),
+                unitProgress: data.unitProgress || {}
+              };
+              localStorage.setItem(profileKey(name), JSON.stringify(evacuation));
+            } catch (e3) {
+              console.error('[Progress] Unable to save profile. Storage is full.');
+            }
+          }
+        } else {
+          console.error('[Progress] Save error:', e);
+        }
+      }
+    }, 300);
+  }
+
+  /* ==========================================
+     V2: MIGRATION
+     ========================================== */
+
+  /**
+   * Migrate a legacy profile (with moduleProgress but no unitProgress)
+   * to the v2 schema. Idempotent — skips if unitProgress already exists.
+   * @param {object} oldProfile - The old profile object (mutated in place)
+   */
+  function migrateLegacyProfile(oldProfile) {
+    if (!oldProfile) return;
+    // Skip if already migrated
+    if (oldProfile.unitProgress) return;
+
+    // Add new fields
+    oldProfile.track = oldProfile.track || 'a1-a2';
+    oldProfile.currentUnit = oldProfile.currentUnit || 0;
+    oldProfile.currentStep = oldProfile.currentStep || 0;
+    oldProfile.unitProgress = {};
+    oldProfile.missedItems = oldProfile.missedItems || [];
+    oldProfile.vocabularySeen = oldProfile.vocabularySeen || [];
+
+    // Map old moduleProgress → unitProgress if it exists
+    if (oldProfile.moduleProgress) {
+      for (var modId in oldProfile.moduleProgress) {
+        if (oldProfile.moduleProgress.hasOwnProperty(modId)) {
+          var oldMod = oldProfile.moduleProgress[modId];
+          oldProfile.unitProgress[modId] = {
+            currentStep: oldMod.currentStep !== undefined ? oldMod.currentStep : 0,
+            completed: oldMod.completed === true,
+            score: oldMod.score || 0,
+            levelScores: oldMod.levelScores || {}
+          };
+        }
+      }
+    }
+
+    // Keep old modules data as is
+  }
+
+  /* ==========================================
+     V2: PROGRESS TRACKING METHODS
+     ========================================== */
+
+  /**
+   * Save progress for a specific unit: step and optional score.
+   * Debounced.
+   * @param {number} unitId
+   * @param {number} step - Current step index (0-based)
+   * @param {number|undefined} score - Optional unit score
+   */
+  function saveUnitProgress(unitId, step, score) {
+    var learner = App.state && App.state.currentLearner;
+    if (!learner) return;
+    var profile = get(learner);
+    if (!profile) return;
+
+    if (!profile.unitProgress) profile.unitProgress = {};
+    if (!profile.unitProgress[unitId]) {
+      profile.unitProgress[unitId] = {
+        currentStep: 0,
+        completed: false,
+        score: 0,
+        levelScores: {}
+      };
+    }
+
+    profile.unitProgress[unitId].currentStep = step;
+    profile.currentUnit = unitId;
+    profile.currentStep = step;
+
+    if (score !== undefined && score !== null) {
+      profile.unitProgress[unitId].score = score;
+    }
+
+    saveSafe(learner, profile);
+  }
+
+  /**
+   * Update the score for a specific difficulty level within a unit.
+   * Saves immediately (no debounce since it's called on level completion).
+   * @param {number} unitId
+   * @param {number|string} nivel - Level number (1-7)
+   * @param {number} score - 0-100
+   */
+  function updateLevelScore(unitId, nivel, score) {
+    var learner = App.state && App.state.currentLearner;
+    if (!learner) return;
+    var profile = get(learner);
+    if (!profile) return;
+
+    if (!profile.unitProgress) profile.unitProgress = {};
+    if (!profile.unitProgress[unitId]) {
+      profile.unitProgress[unitId] = {
+        currentStep: 0,
+        completed: false,
+        score: 0,
+        levelScores: {}
+      };
+    }
+    if (!profile.unitProgress[unitId].levelScores) {
+      profile.unitProgress[unitId].levelScores = {};
+    }
+
+    // Keep best score
+    var prev = profile.unitProgress[unitId].levelScores[nivel];
+    if (prev === undefined || score > prev) {
+      profile.unitProgress[unitId].levelScores[nivel] = score;
+    }
+
+    save(learner, profile);
+  }
+
+  /**
+   * Record a missed item by delegating to App.SmartReview.recordMissedItem.
+   * Saves via debounced save.
+   * @param {object} item - Missed item data object
+   */
+  function recordMissedItem(item) {
+    var learner = App.state && App.state.currentLearner;
+    if (!learner) return;
+    var profile = get(learner);
+    if (!profile) return;
+
+    if (App.SmartReview && App.SmartReview.recordMissedItem) {
+      App.SmartReview.recordMissedItem(item, profile);
+      saveSafe(learner, profile);
+    }
+  }
+
+  /**
+   * Update vocabulary seen for a word. If not seen yet, adds it.
+   * If already seen, updates the mastered flag.
+   * @param {string} word - The Italian word
+   * @param {boolean} mastered - Whether the user has mastered it
+   */
+  function updateVocabularySeen(word, mastered) {
+    var learner = App.state && App.state.currentLearner;
+    if (!learner) return;
+    var profile = get(learner);
+    if (!profile) return;
+
+    if (!profile.vocabularySeen) {
+      profile.vocabularySeen = [];
+    }
+
+    var found = false;
+    for (var i = 0; i < profile.vocabularySeen.length; i++) {
+      if (profile.vocabularySeen[i].word === word) {
+        profile.vocabularySeen[i].seen = (profile.vocabularySeen[i].seen || 0) + 1;
+        if (mastered !== undefined) {
+          profile.vocabularySeen[i].mastered = mastered;
+        }
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      profile.vocabularySeen.push({
+        word: word,
+        seen: 1,
+        mastered: mastered === true
+      });
+    }
+
+    saveSafe(learner, profile);
+  }
+
+  /* ==========================================
+     BOOT-TIME MIGRATION CHECK
+     ========================================== */
+
+  /**
+   * Run migration on all existing profiles on boot.
+   * Called automatically when this module loads.
+   */
+  function runBootMigration() {
+    var names = listProfiles();
+    for (var i = 0; i < names.length; i++) {
+      var profile = get(names[i]);
+      if (profile) {
+        // Check if old schema (no unitProgress)
+        if (!profile.unitProgress) {
+          migrateLegacyProfile(profile);
+          save(names[i], profile);
+          console.log('[Progress] Migrated profile "' + names[i] + '" to v2 schema.');
+        }
+      }
+    }
+  }
+
+  // Run boot migration immediately
+  runBootMigration();
+
   return {
     get: get,
     save: save,
@@ -190,6 +454,13 @@ App.Progress = (function() {
     resume: resume,
     createDefault: createDefault,
     getTotalPoints: getTotalPoints,
-    getStandings: getStandings
+    getStandings: getStandings,
+    // V2 API
+    saveSafe: saveSafe,
+    migrateLegacyProfile: migrateLegacyProfile,
+    saveUnitProgress: saveUnitProgress,
+    updateLevelScore: updateLevelScore,
+    recordMissedItem: recordMissedItem,
+    updateVocabularySeen: updateVocabularySeen
   };
 })();

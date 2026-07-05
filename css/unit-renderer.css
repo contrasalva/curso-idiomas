@@ -1659,3 +1659,193 @@
 [data-theme="dark"] .conv-mic-btn:hover {
   background: rgba(96,165,250,0.1);
 }
+
+/* ============================================
+   STEP 15: Smart Review (Repaso Inteligente)
+   ============================================ */
+
+.smart-review-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+/* Progress indicator */
+.review-progress {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.review-progress-text {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  padding: 8px 16px;
+  background: rgba(59,130,246,0.06);
+  border-radius: 8px;
+  display: inline-block;
+}
+
+/* Review card */
+.review-card {
+  animation: fadeInCard 300ms ease;
+}
+
+.review-phrase-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.review-phrase {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: rgba(59,130,246,0.04);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.review-wrong-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.review-wrong-answer {
+  font-size: 1rem;
+  color: #dc2626;
+  font-weight: 500;
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  background: rgba(220,38,38,0.06);
+  border: 1px solid rgba(220,38,38,0.2);
+  border-radius: 10px;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+[data-theme="dark"] .review-wrong-answer {
+  background: rgba(239,68,68,0.1);
+  border-color: rgba(239,68,68,0.25);
+  color: #fca5a5;
+}
+
+.review-reattempt-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.review-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 200ms ease;
+}
+
+.review-input:focus {
+  border-color: var(--accent);
+}
+
+.review-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.review-check-btn {
+  width: 100%;
+}
+
+.review-later-msg {
+  font-style: italic;
+}
+
+/* Congratulations card */
+.review-congratulations {
+  text-align: center;
+  padding: 32px 16px;
+  animation: fadeInCard 400ms ease;
+}
+
+.review-congrats-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.review-congrats-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.review-congrats-text {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.review-congrats-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.review-congrats-stat {
+  text-align: center;
+  padding: 16px 24px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-width: 100px;
+}
+
+.review-congrats-stat-value {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1.2;
+}
+
+.review-congrats-stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.review-complete-btn {
+  font-size: 1.1rem;
+  padding: 14px 32px;
+}
+
+/* Feedback colors */
+.review-feedback {
+  min-height: 28px;
+  margin-top: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}

@@ -52,7 +52,7 @@ App.UnitRenderer = (function() {
     'conversacion-guiada':    renderStep12,
     'conversacion-libre':     renderStep13,
     'resumen-visual':         renderSummary,
-    'repaso-inteligente':     renderComingSoon,
+    'repaso-inteligente':     renderStep15,
     'coming-soon':            renderComingSoon
   };
 
@@ -336,7 +336,7 @@ App.UnitRenderer = (function() {
     // 5. Navigation buttons
     var isFirst = idx === 0;
     var isLast = idx === 14;
-    var nextLabel = isLast ? '▶ ¡Empezar ejercicios!' : 'Siguiente →';
+    var nextLabel = isLast ? '🏠 Ir al inicio' : 'Siguiente →';
     html += '<div class="step-nav">' +
       '<button class="secondary-btn step-prev"' + (isFirst ? ' disabled' : '') + '>← Anterior</button>' +
       '<span class="step-nav-spacer"></span>' +
@@ -576,6 +576,9 @@ App.UnitRenderer = (function() {
 
     // Step 12 & 13 — conversation wiring
     wireConversation(container);
+
+    // Step 15 — smart review wiring
+    wireStep15(container);
   }
 
   /**
@@ -2704,6 +2707,218 @@ App.UnitRenderer = (function() {
       '<div class="coming-soon-title">' + escapeHtml(title) + '</div>' +
       '<p class="coming-soon-message">' + escapeHtml(message) + '</p>' +
     '</div>';
+  }
+
+  /* ==========================================
+     STEP 15: Repaso Inteligente (Smart Review)
+     ========================================== */
+
+  /**
+   * Render step 15 — repaso-inteligente: smart review of missed items.
+   * Returns a container; wiring is done in wireStep15.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderStep15(stepData) {
+    return '<div class="smart-review-container" data-step15-init="true">' +
+      '<div class="review-progress" id="review-progress"></div>' +
+      '<div class="review-content" id="review-content"></div>' +
+      '<div class="review-actions" id="review-actions"></div>' +
+    '</div>';
+  }
+
+  /**
+   * Wire step 15 interactions: query SmartReview, show review cards,
+   * handle scoring, and show congratulations when done.
+   * Called from wireTtsButtons after the DOM is rendered.
+   * @param {HTMLElement} container
+   */
+  function wireStep15(container) {
+    var step15 = container.querySelector('.smart-review-container');
+    if (!step15) return;
+
+    var learner = App.state && App.state.currentLearner;
+    if (!learner) return;
+    var profile = App.Progress.get(learner);
+    if (!profile) return;
+
+    var unitId = _state.unitId;
+    var missedItems = App.SmartReview.getMissedItems(profile, unitId);
+    var currentReviewIdx = 0;
+    var reviewTotal = missedItems.length;
+    var reviewPassed = 0;
+
+    var contentEl = document.getElementById('review-content');
+    var progressEl = document.getElementById('review-progress');
+    var actionsEl = document.getElementById('review-actions');
+
+    // Disable Next until review is complete
+    disableNextBtn();
+
+    /**
+     * Show the congratulations card and wire the completion button.
+     */
+    function showCongratulations() {
+      var reviewScore = App.SmartReview.getReviewScore(profile, unitId);
+      var opts = {
+        reviewedCount: reviewScore.reviewed,
+        totalCount: reviewScore.total,
+        score: reviewScore.percentage
+      };
+      App.SmartReview.renderCongratulations(contentEl, opts);
+
+      if (progressEl) progressEl.innerHTML = '';
+
+      // Wire "Completar unidad" button
+      var completeBtn = document.getElementById('review-complete-unit');
+      if (completeBtn) {
+        completeBtn.addEventListener('click', function() {
+          completeUnitWithScore();
+        });
+      }
+    }
+
+    /**
+     * Complete the unit with score calculation and save.
+     */
+    function completeUnitWithScore() {
+      // Calculate overall unit score
+      var levelScores = profile.unitProgress &&
+        profile.unitProgress[unitId] &&
+        profile.unitProgress[unitId].levelScores;
+
+      var levelScoreSum = 0;
+      var levelScoreCount = 0;
+      if (levelScores) {
+        for (var key in levelScores) {
+          if (levelScores.hasOwnProperty(key)) {
+            levelScoreSum += levelScores[key];
+            levelScoreCount++;
+          }
+        }
+      }
+
+      var avgLevelScore = levelScoreCount > 0 ? Math.round(levelScoreSum / levelScoreCount) : 100;
+      var reviewScoreData = App.SmartReview.getReviewScore(profile, unitId);
+      var overallScore = Math.round((avgLevelScore + reviewScoreData.percentage) / 2);
+
+      // Save unit completion
+      if (!profile.unitProgress) profile.unitProgress = {};
+      if (!profile.unitProgress[unitId]) {
+        profile.unitProgress[unitId] = { levelScores: {} };
+      }
+      profile.unitProgress[unitId].completed = true;
+      profile.unitProgress[unitId].score = overallScore;
+      profile.unitProgress[unitId].currentStep = 14; // final step
+      profile.currentUnit = unitId;
+      profile.currentStep = 14;
+      App.Progress.save(learner, profile);
+
+      // Show completion message
+      if (contentEl) {
+        contentEl.innerHTML =
+          '<div class="review-congratulations">' +
+            '<div class="review-congrats-icon" style="font-size:3rem">🎉</div>' +
+            '<h3 class="review-congrats-title">¡Unidad completada!</h3>' +
+            '<div class="review-congrats-stats">' +
+              '<div class="review-congrats-stat">' +
+                '<span class="review-congrats-stat-value">' + overallScore + '%</span>' +
+                '<span class="review-congrats-stat-label">puntuación total</span>' +
+              '</div>' +
+            '</div>' +
+            '<p style="color:var(--text-secondary);margin-top:12px;font-size:0.95rem">' +
+              'Nivel: ' + (avgLevelScore) + '% · Repaso: ' + reviewScoreData.percentage + '%' +
+            '</p>' +
+          '</div>';
+      }
+
+      if (progressEl) progressEl.innerHTML = '';
+
+      // Enable the Next button (shows "🏠 Ir al inicio")
+      enableNextBtn();
+    }
+
+    /**
+     * Show the next missed item for review, or show congratulations if all done.
+     */
+    function showNextReviewItem() {
+      if (currentReviewIdx >= reviewTotal) {
+        // All items reviewed — show congratulations
+        showCongratulations();
+        return;
+      }
+
+      var item = missedItems[currentReviewIdx];
+
+      // Update progress
+      if (progressEl) {
+        progressEl.innerHTML = '<div class="review-progress-text">Repaso: ' +
+          (currentReviewIdx + 1) + ' de ' + reviewTotal + '</div>';
+      }
+
+      // Render the review card
+      App.SmartReview.renderReviewItem(item, contentEl);
+
+      // Wire the "Comprobar" button
+      var card = contentEl.querySelector('.review-card');
+      if (!card) return;
+
+      var checkBtn = card._checkBtn;
+      var input = card._input;
+      var fb = card._feedback;
+
+      if (checkBtn) {
+        checkBtn.addEventListener('click', function() {
+          var answer = input ? input.value.trim() : '';
+          if (!answer) {
+            fb.textContent = 'Escribe tu respuesta primero.';
+            fb.style.color = '#f59e0b';
+            return;
+          }
+
+          // Score the re-attempt
+          var result = App.SmartReview.scoreReviewItem(item, answer);
+
+          if (result.passed) {
+            fb.textContent = '✓ ' + result.feedback + ' (' + result.score + '%)';
+            fb.style.color = '#16a34a';
+            reviewPassed++;
+            // Auto-advance after a brief pause
+            setTimeout(function() {
+              currentReviewIdx++;
+              showNextReviewItem();
+            }, 1200);
+          } else {
+            fb.textContent = '✗ ' + result.feedback;
+            fb.style.color = '#ef4444';
+            // Show message that they'll see it later
+            var laterMsg = document.createElement('div');
+            laterMsg.className = 'review-later-msg';
+            laterMsg.textContent = 'Volverás a ver esto más tarde.';
+            laterMsg.style.cssText = 'color:var(--text-secondary);font-size:0.85rem;margin-top:8px';
+            card.appendChild(laterMsg);
+            // Auto-advance after a brief pause
+            setTimeout(function() {
+              currentReviewIdx++;
+              showNextReviewItem();
+            }, 2000);
+          }
+        });
+      }
+
+      // Focus the input
+      if (input) {
+        setTimeout(function() { input.focus(); }, 100);
+      }
+    }
+
+    // Start the review flow
+    if (reviewTotal === 0) {
+      // No missed items — show congratulations directly
+      showCongratulations();
+    } else {
+      showNextReviewItem();
+    }
   }
 
   /* ==========================================

@@ -849,9 +849,8 @@
       },
       {
         "step": 15,
-        "type": "coming-soon",
-        "title": "Repaso inteligente",
-        "message": "🔜 Próximamente: repaso automático solo de los ejercicios que fallaste."
+        "type": "repaso-inteligente",
+        "title": "Repaso inteligente"
       }
     ]
   }
