@@ -240,15 +240,345 @@
       },
       {
         "step": 8,
-        "type": "coming-soon",
+        "type": "ejercicios-escalonados",
         "title": "Ejercicios escalonados",
-        "message": "🔜 Próximamente: ejercicios desde nivel 1 (reconocer) hasta nivel 7 (hablar) con desbloqueo progresivo."
+        "levels": {
+          "1": {
+            "name": "Reconocer",
+            "questions": [
+              {
+                "type": "mc",
+                "question": "¿Cómo saludas informalmente en italiano?",
+                "options": ["Buongiorno", "Ciao", "Arrivederci", "Grazie"],
+                "correctIndex": 1
+              },
+              {
+                "type": "mc",
+                "question": "¿Qué significa \"Io sono Marco\"?",
+                "options": ["Tú eres Marco", "Él es Marco", "Yo soy Marco", "Marco es mío"],
+                "correctIndex": 2
+              },
+              {
+                "type": "mc",
+                "question": "¿Cuál de estos verbos significa 'tener' en italiano?",
+                "options": ["ESSERE", "AVERE", "PARLARE", "DORMIRE"],
+                "correctIndex": 1
+              }
+            ]
+          },
+          "2": {
+            "name": "Completar",
+            "questions": [
+              {
+                "type": "fill",
+                "question": "Completa: Io ___ Marco. (ESSERE)",
+                "blanks": ["___"],
+                "answers": ["sono"]
+              },
+              {
+                "type": "fill",
+                "question": "Completa: Tu 20 anni. (AVERE)",
+                "blanks": ["___"],
+                "answers": ["hai"]
+              },
+              {
+                "type": "fill",
+                "question": "Completa: Lei ___ di Roma. (ESSERE)",
+                "blanks": ["___"],
+                "answers": ["è", "e"]
+              }
+            ]
+          },
+          "3": {
+            "name": "Escribir",
+            "questions": [
+              {
+                "type": "write",
+                "question": "Escribe en italiano: 'Yo soy Marco.'",
+                "expected": "Io sono Marco"
+              },
+              {
+                "type": "write",
+                "question": "Escribe en italiano: '¿Cómo estás?'",
+                "expected": "Come stai"
+              },
+              {
+                "type": "write",
+                "question": "Escribe en italiano: 'Ella tiene un libro.'",
+                "expected": "Lei ha un libro"
+              }
+            ]
+          },
+          "4": {
+            "name": "Ordenar",
+            "questions": [
+              {
+                "type": "reorder",
+                "question": "Ordena las palabras para formar una frase:",
+                "words": ["Io", "sono", "Marco"],
+                "correctOrder": ["Io", "sono", "Marco"]
+              },
+              {
+                "type": "reorder",
+                "question": "Ordena las palabras para formar una pregunta:",
+                "words": ["Come", "stai", "?"],
+                "correctOrder": ["Come", "stai", "?"]
+              },
+              {
+                "type": "reorder",
+                "question": "Ordena las palabras para formar una frase:",
+                "words": ["Noi", "siamo", "amici"],
+                "correctOrder": ["Noi", "siamo", "amici"]
+              }
+            ]
+          },
+          "5": {
+            "name": "Corregir",
+            "questions": [
+              {
+                "type": "correct",
+                "question": "Corrige el error: 'Io ha un libro.'",
+                "wrongSentence": "Io ha un libro.",
+                "correctSentence": "Io ho un libro."
+              },
+              {
+                "type": "correct",
+                "question": "Corrige el error: 'Lui sono Marco.'",
+                "wrongSentence": "Lui sono Marco.",
+                "correctSentence": "Lui è Marco."
+              },
+              {
+                "type": "correct",
+                "question": "Corrige el error: 'Noi è amici.'",
+                "wrongSentence": "Noi è amici.",
+                "correctSentence": "Noi siamo amici."
+              }
+            ]
+          },
+          "6": {
+            "name": "Conversar",
+            "questions": [
+              {
+                "type": "free-text",
+                "question": "Preséntate en italiano: di' il tuo nome e da dove vieni.",
+                "expectedKeywords": ["mi chiamo", "sono di", "vengo"]
+              },
+              {
+                "type": "free-text",
+                "question": "¿Cómo saludarías por la mañana en italiano? Escribe un saludo formal.",
+                "expectedKeywords": ["buongiorno"]
+              },
+              {
+                "type": "free-text",
+                "question": "Pregunta a alguien cómo está en italiano.",
+                "expectedKeywords": ["come stai", "come sta"]
+              }
+            ]
+          },
+          "7": {
+            "name": "Hablar",
+            "questions": [
+              {
+                "type": "free-text",
+                "question": "Di' 'Hola, yo soy [tu nombre]' in italiano.",
+                "expectedKeywords": ["ciao", "sono", "mi chiamo"]
+              },
+              {
+                "type": "free-text",
+                "question": "Di' 'Adiós, hasta luego' in italiano.",
+                "expectedKeywords": ["arrivederci", "ciao"]
+              },
+              {
+                "type": "free-text",
+                "question": "Di' 'Tengo dos hermanos' in italiano.",
+                "expectedKeywords": ["ho", "fratelli", "due"]
+              }
+            ]
+          }
+        }
       },
       {
         "step": 9,
-        "type": "coming-soon",
+        "type": "vocabulario",
         "title": "Vocabulario",
-        "message": "🔜 Próximamente: palabras nuevas con imagen, audio, pronunciación y ejemplos."
+        "words": [
+          {
+            "text": "ciao",
+            "translation": "hola / adiós",
+            "pronunciation": "cháo",
+            "example": "Ciao, come stai?",
+            "exampleTranslation": "Hola, ¿cómo estás?",
+            "image": ""
+          },
+          {
+            "text": "buongiorno",
+            "translation": "buenos días",
+            "pronunciation": "buón dyórno",
+            "example": "Buongiorno, signora Rossi.",
+            "exampleTranslation": "Buenos días, señora Rossi.",
+            "image": ""
+          },
+          {
+            "text": "arrivederci",
+            "translation": "hasta luego",
+            "pronunciation": "arive dérchi",
+            "example": "Arrivederci e grazie!",
+            "exampleTranslation": "¡Hasta luego y gracias!",
+            "image": ""
+          },
+          {
+            "text": "piacere",
+            "translation": "mucho gusto",
+            "pronunciation": "pia chére",
+            "example": "Piacere di conoscerti!",
+            "exampleTranslation": "¡Mucho gusto de conocerte!",
+            "image": ""
+          },
+          {
+            "text": "come",
+            "translation": "cómo",
+            "pronunciation": "kóme",
+            "example": "Come ti chiami?",
+            "exampleTranslation": "¿Cómo te llamas?",
+            "image": ""
+          },
+          {
+            "text": "stare",
+            "translation": "estar",
+            "pronunciation": "stáre",
+            "example": "Come stai?",
+            "exampleTranslation": "¿Cómo estás?",
+            "image": ""
+          },
+          {
+            "text": "bene",
+            "translation": "bien",
+            "pronunciation": "béne",
+            "example": "Sto bene, grazie.",
+            "exampleTranslation": "Estoy bien, gracias.",
+            "image": ""
+          },
+          {
+            "text": "grazie",
+            "translation": "gracias",
+            "pronunciation": "grátsie",
+            "example": "Grazie mille!",
+            "exampleTranslation": "¡Muchas gracias!",
+            "image": ""
+          },
+          {
+            "text": "di dove sei",
+            "translation": "¿de dónde eres?",
+            "pronunciation": "di dóve séi",
+            "example": "Di dove sei?",
+            "exampleTranslation": "¿De dónde eres?",
+            "image": ""
+          },
+          {
+            "text": "io",
+            "translation": "yo",
+            "pronunciation": "ío",
+            "example": "Io sono Marco.",
+            "exampleTranslation": "Yo soy Marco.",
+            "image": ""
+          },
+          {
+            "text": "tu",
+            "translation": "tú",
+            "pronunciation": "tú",
+            "example": "Tu sei Lucia.",
+            "exampleTranslation": "Tú eres Lucia.",
+            "image": ""
+          },
+          {
+            "text": "lui",
+            "translation": "él",
+            "pronunciation": "lúi",
+            "example": "Lui è Marco.",
+            "exampleTranslation": "Él es Marco.",
+            "image": ""
+          },
+          {
+            "text": "lei",
+            "translation": "ella",
+            "pronunciation": "léi",
+            "example": "Lei è Lucia.",
+            "exampleTranslation": "Ella es Lucia.",
+            "image": ""
+          },
+          {
+            "text": "noi",
+            "translation": "nosotros",
+            "pronunciation": "nói",
+            "example": "Noi siamo amici.",
+            "exampleTranslation": "Nosotros somos amigos.",
+            "image": ""
+          },
+          {
+            "text": "voi",
+            "translation": "vosotros",
+            "pronunciation": "vói",
+            "example": "Voi siete studenti.",
+            "exampleTranslation": "Vosotros sois estudiantes.",
+            "image": ""
+          },
+          {
+            "text": "loro",
+            "translation": "ellos / ellas",
+            "pronunciation": "lóro",
+            "example": "Loro sono simpatici.",
+            "exampleTranslation": "Ellos son simpáticos.",
+            "image": ""
+          },
+          {
+            "text": "essere",
+            "translation": "ser / estar",
+            "pronunciation": "ésere",
+            "example": "Essere o non essere.",
+            "exampleTranslation": "Ser o no ser.",
+            "image": ""
+          },
+          {
+            "text": "avere",
+            "translation": "tener",
+            "pronunciation": "avére",
+            "example": "Io ho un libro.",
+            "exampleTranslation": "Yo tengo un libro.",
+            "image": ""
+          },
+          {
+            "text": "sono",
+            "translation": "soy / son",
+            "pronunciation": "sóno",
+            "example": "Io sono Marco. Loro sono italiani.",
+            "exampleTranslation": "Yo soy Marco. Ellos son italianos.",
+            "image": ""
+          },
+          {
+            "text": "sei",
+            "translation": "eres (tú)",
+            "pronunciation": "séi",
+            "example": "Tu sei Lucia.",
+            "exampleTranslation": "Tú eres Lucia.",
+            "image": ""
+          },
+          {
+            "text": "amico",
+            "translation": "amigo",
+            "pronunciation": "amíko",
+            "example": "Lui è il mio amico Marco.",
+            "exampleTranslation": "Él es mi amigo Marco.",
+            "image": ""
+          },
+          {
+            "text": "italiano",
+            "translation": "italiano",
+            "pronunciation": "italyáno",
+            "example": "Parlo italiano.",
+            "exampleTranslation": "Hablo italiano.",
+            "image": ""
+          }
+        ]
       },
       {
         "step": 10,

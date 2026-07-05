@@ -1543,6 +1543,482 @@ App.ExerciseEngine = (function() {
     container.appendChild(backBtn);
   }
 
+  /* ============================================
+     N-LEVEL EXERCISE SUPPORT (for step 8)
+     ============================================ */
+
+  /**
+   * Render a question for a given difficulty level into a container.
+   * @param {object} q - Question data object (type-specific)
+   * @param {number} nivel - 1-7
+   * @param {HTMLElement} container - Target DOM element
+   */
+  function renderQuestion(q, nivel, container) {
+    if (!container) return;
+    container.innerHTML = '';
+
+    switch (nivel) {
+      case 1:
+        renderQuestionN1(q, container);
+        break;
+      case 2:
+        renderQuestionN2(q, container);
+        break;
+      case 3:
+        renderQuestionN3(q, container);
+        break;
+      case 4:
+        renderQuestionN4(q, container);
+        break;
+      case 5:
+        renderQuestionN5(q, container);
+        break;
+      case 6:
+        renderQuestionN6(q, container);
+        break;
+      case 7:
+        renderQuestionN7(q, container);
+        break;
+      default:
+        container.textContent = 'Nivel no soportado: ' + nivel;
+    }
+  }
+
+  /**
+   * N1 — Multiple choice with radio buttons.
+   */
+  function renderQuestionN1(q, container) {
+    var questionEl = document.createElement('div');
+    questionEl.className = 'nlevel-mc';
+    questionEl.setAttribute('data-nivel', '1');
+    questionEl.setAttribute('data-correctindex', q.correctIndex);
+
+    var questionText = document.createElement('p');
+    questionText.className = 'nlevel-question';
+    questionText.textContent = q.question;
+    questionEl.appendChild(questionText);
+
+    var optionsDiv = document.createElement('div');
+    optionsDiv.className = 'nlevel-options';
+    optionsDiv.style.display = 'flex';
+    optionsDiv.style.flexDirection = 'column';
+    optionsDiv.style.gap = '8px';
+
+    (q.options || []).forEach(function(opt, i) {
+      var label = document.createElement('label');
+      label.className = 'nlevel-option';
+      label.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:0.95rem;color:var(--text);transition:all 200ms ease';
+
+      var radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'nlevel-mc-' + Date.now();
+      radio.value = i;
+      radio.className = 'nlevel-radio';
+      radio.style.accentColor = 'var(--accent)';
+
+      var span = document.createElement('span');
+      span.textContent = opt;
+
+      label.appendChild(radio);
+      label.appendChild(span);
+      optionsDiv.appendChild(label);
+    });
+
+    questionEl.appendChild(optionsDiv);
+
+    // Feedback area
+    var feedback = document.createElement('div');
+    feedback.className = 'nlevel-feedback';
+    feedback.style.cssText = 'margin-top:12px;font-size:0.9rem;font-weight:600;min-height:24px';
+    questionEl.appendChild(feedback);
+
+    container.appendChild(questionEl);
+
+    // Wire immediate feedback on radio change and auto-submit
+    var radios = questionEl.querySelectorAll('.nlevel-radio');
+    for (var r = 0; r < radios.length; r++) {
+      radios[r].addEventListener('change', function(e) {
+        var selectedIdx = parseInt(e.target.value, 10);
+        var correctIdx = parseInt(questionEl.getAttribute('data-correctindex'), 10);
+        var isCorrect = selectedIdx === correctIdx;
+
+        // Highlight options
+        var labels = questionEl.querySelectorAll('.nlevel-option');
+        for (var l = 0; l < labels.length; l++) {
+          labels[l].style.borderColor = 'var(--border)';
+          labels[l].style.background = 'var(--bg)';
+        }
+        e.target.parentElement.style.borderColor = isCorrect ? '#16a34a' : '#ef4444';
+        e.target.parentElement.style.background = isCorrect ? 'rgba(22,163,74,0.08)' : 'rgba(239,68,68,0.08)';
+
+        // Show feedback
+        feedback.textContent = isCorrect ? '✓ ¡Correcto!' : '✗ Incorrecto';
+        feedback.style.color = isCorrect ? '#16a34a' : '#ef4444';
+        questionEl.setAttribute('data-answered', 'true');
+
+        // Auto-trigger the global submit to advance level progress
+        var submitBtn = document.getElementById('step8-submit');
+        if (submitBtn && !submitBtn.disabled) {
+          submitBtn.click();
+        }
+      });
+    }
+  }
+
+  /**
+   * N2 — Fill in the blank with text input.
+   * Uses wireStep8's global submit flow (no inline check button).
+   */
+  function renderQuestionN2(q, container) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'nlevel-fill';
+    wrapper.setAttribute('data-nivel', '2');
+    wrapper.setAttribute('data-question-id', q.id || 'q-' + Date.now());
+
+    var questionText = document.createElement('p');
+    questionText.className = 'nlevel-question';
+    questionText.textContent = q.question;
+    wrapper.appendChild(questionText);
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'nlevel-input';
+    input.name = 'nlevel-answer';
+    input.style.cssText = 'width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box';
+    input.placeholder = 'Escribe aquí...';
+    input.autocomplete = 'off';
+    wrapper.appendChild(input);
+
+    container.appendChild(wrapper);
+
+    setTimeout(function() { input.focus(); }, 50);
+
+    // Wire Enter key to trigger the global submit button
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var submitBtn = document.getElementById('step8-submit');
+        if (submitBtn && !submitBtn.disabled) {
+          submitBtn.click();
+        }
+      }
+    });
+  }
+
+  /**
+   * N3 — Write full answer with textarea.
+   * Uses wireStep8's global submit flow (no inline check button).
+   */
+  function renderQuestionN3(q, container) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'nlevel-write';
+    wrapper.setAttribute('data-nivel', '3');
+    wrapper.setAttribute('data-question-id', q.id || 'q-' + Date.now());
+
+    var questionText = document.createElement('p');
+    questionText.className = 'nlevel-question';
+    questionText.textContent = q.question;
+    wrapper.appendChild(questionText);
+
+    var textarea = document.createElement('textarea');
+    textarea.className = 'nlevel-textarea';
+    textarea.name = 'nlevel-answer';
+    textarea.style.cssText = 'width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:inherit;background:var(--bg);color:var(--text);resize:vertical;min-height:80px;box-sizing:border-box';
+    textarea.placeholder = 'Escribe la respuesta completa...';
+    wrapper.appendChild(textarea);
+
+    container.appendChild(wrapper);
+
+    setTimeout(function() { textarea.focus(); }, 50);
+  }
+
+  /**
+   * N4 — Reorder words (click to select position in sequence).
+   */
+  function renderQuestionN4(q, container) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'nlevel-reorder';
+    wrapper.setAttribute('data-nivel', '4');
+
+    var questionText = document.createElement('p');
+    questionText.className = 'nlevel-question';
+    questionText.textContent = q.question;
+    wrapper.appendChild(questionText);
+
+    // Shuffle words
+    var shuffleArr = (q.words || []).slice();
+    for (var si = shuffleArr.length - 1; si > 0; si--) {
+      var sj = Math.floor(Math.random() * (si + 1));
+      var tmp = shuffleArr[si]; shuffleArr[si] = shuffleArr[sj]; shuffleArr[sj] = tmp;
+    }
+
+    var selected = [];
+    var remaining = shuffleArr.slice();
+
+    var selectedRow = document.createElement('div');
+    selectedRow.className = 'nlevel-reorder-selected';
+    selectedRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;padding:16px;min-height:52px;border:2px dashed var(--border);border-radius:10px;margin-bottom:12px';
+
+    var poolRow = document.createElement('div');
+    poolRow.className = 'nlevel-reorder-pool';
+    poolRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;padding:16px;min-height:52px;background:var(--bg);border-radius:10px;border:1px solid var(--border)';
+
+    container.appendChild(wrapper);
+
+    function renderReorderChips() {
+      selectedRow.innerHTML = '';
+      poolRow.innerHTML = '';
+
+      if (selected.length === 0) {
+        var ph = document.createElement('span');
+        ph.textContent = 'Toca las palabras para ordenarlas...';
+        ph.style.color = 'var(--text-secondary)';
+        ph.style.fontStyle = 'italic';
+        selectedRow.appendChild(ph);
+      } else {
+        selected.forEach(function(w, idx) {
+          var chip = document.createElement('span');
+          chip.textContent = w;
+          chip.style.cssText = 'padding:8px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:opacity 200ms ease';
+          chip.setAttribute('data-word', w);
+          chip.addEventListener('click', function() {
+            var wordIdx = selected.indexOf(w);
+            if (wordIdx >= 0) selected.splice(wordIdx, 1);
+            remaining.push(w);
+            renderReorderChips();
+          });
+          selectedRow.appendChild(chip);
+        });
+      }
+
+      remaining.forEach(function(w) {
+        var chip = document.createElement('span');
+        chip.textContent = w;
+        chip.style.cssText = 'padding:8px 16px;background:var(--bg-card);border:2px solid var(--border);border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 200ms ease';
+        chip.setAttribute('data-word', w);
+        chip.addEventListener('click', function() {
+          var wordIdx = remaining.indexOf(w);
+          if (wordIdx >= 0) remaining.splice(wordIdx, 1);
+          selected.push(w);
+          renderReorderChips();
+        });
+        poolRow.appendChild(chip);
+      });
+    }
+
+    // Insert rows
+    wrapper.insertBefore(selectedRow, wrapper.firstChild.nextSibling);
+    wrapper.insertBefore(poolRow, wrapper.children[wrapper.children.length - 1]);
+
+    renderReorderChips();
+
+    // Expose selected array so gatherAnswer can read it
+    wrapper._reorderSelected = selected;
+    wrapper._reorderCorrectLength = q.correctOrder ? q.correctOrder.length : 0;
+  }
+
+  /**
+   * N5 — Correct the sentence (show wrong, user writes correction).
+   * Uses wireStep8's global submit flow (no inline check button).
+   */
+  function renderQuestionN5(q, container) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'nlevel-correct';
+    wrapper.setAttribute('data-nivel', '5');
+    wrapper.setAttribute('data-question-id', q.id || 'q-' + Date.now());
+
+    var questionText = document.createElement('p');
+    questionText.className = 'nlevel-question';
+    questionText.textContent = q.question;
+    wrapper.appendChild(questionText);
+
+    var wrongSentence = document.createElement('div');
+    wrongSentence.textContent = q.wrongSentence;
+    wrongSentence.style.cssText = 'padding:14px 18px;background:rgba(239,68,68,0.08);border:2px solid #ef4444;border-radius:10px;font-size:1.1rem;font-weight:600;color:#ef4444;margin-bottom:12px;text-align:center';
+    wrapper.appendChild(wrongSentence);
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'nlevel-input';
+    input.name = 'nlevel-answer';
+    input.style.cssText = 'width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:inherit;background:var(--bg);color:var(--text);box-sizing:border-box';
+    input.placeholder = 'Escribe la frase corregida...';
+    input.autocomplete = 'off';
+    wrapper.appendChild(input);
+
+    container.appendChild(wrapper);
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var submitBtn = document.getElementById('step8-submit');
+        if (submitBtn && !submitBtn.disabled) {
+          submitBtn.click();
+        }
+      }
+    });
+    setTimeout(function() { input.focus(); }, 50);
+  }
+
+  /**
+   * N6 — Free text conversation (textarea).
+   * Uses wireStep8's global submit flow.
+   */
+  function renderQuestionN6(q, container) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'nlevel-free';
+    wrapper.setAttribute('data-nivel', '6');
+    wrapper.setAttribute('data-question-id', q.id || 'q-' + Date.now());
+
+    var questionText = document.createElement('p');
+    questionText.className = 'nlevel-question';
+    questionText.textContent = q.question;
+    wrapper.appendChild(questionText);
+
+    var textarea = document.createElement('textarea');
+    textarea.className = 'nlevel-textarea';
+    textarea.name = 'nlevel-answer';
+    textarea.style.cssText = 'width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:inherit;background:var(--bg);color:var(--text);resize:vertical;min-height:80px;box-sizing:border-box';
+    textarea.placeholder = 'Escribe tu respuesta en italiano...';
+    wrapper.appendChild(textarea);
+
+    container.appendChild(wrapper);
+
+    setTimeout(function() { textarea.focus(); }, 50);
+  }
+
+  /**
+   * N7 — Same as N6 but with mic icon placeholder.
+   * Uses wireStep8's global submit flow.
+   */
+  function renderQuestionN7(q, container) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'nlevel-free';
+    wrapper.setAttribute('data-nivel', '7');
+    wrapper.setAttribute('data-question-id', q.id || 'q-' + Date.now());
+
+    var questionText = document.createElement('p');
+    questionText.className = 'nlevel-question';
+    questionText.textContent = q.question;
+    wrapper.appendChild(questionText);
+
+    // Mic icon indicator
+    var micRow = document.createElement('div');
+    micRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;background:rgba(139,92,246,0.08);border-radius:8px;color:var(--text-secondary);font-size:0.85rem';
+    micRow.innerHTML = '🎤 <span>Reconocimiento de voz (próximamente). Escribe tu respuesta.</span>';
+    wrapper.appendChild(micRow);
+
+    var textarea = document.createElement('textarea');
+    textarea.className = 'nlevel-textarea';
+    textarea.name = 'nlevel-answer';
+    textarea.style.cssText = 'width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:inherit;background:var(--bg);color:var(--text);resize:vertical;min-height:80px;box-sizing:border-box';
+    textarea.placeholder = 'Escribe tu respuesta en italiano...';
+    wrapper.appendChild(textarea);
+
+    container.appendChild(wrapper);
+
+    setTimeout(function() { textarea.focus(); }, 50);
+  }
+
+  /**
+   * Validate an answer for a given difficulty level.
+   * Uses App.DifficultyEngine scoring models.
+   * @param {string|string[]} userAnswer
+   * @param {object} q - Question data
+   * @param {number} nivel - 1-7
+   * @returns {{ score: number, isCorrect: boolean, feedback: string }}
+   */
+  function validateLevelAnswer(userAnswer, q, nivel) {
+    if (!q) return { score: 0, isCorrect: false, feedback: 'Error: datos de pregunta no válidos.' };
+
+    var score = 0;
+    var feedback = '';
+    var de = App.DifficultyEngine;
+
+    switch (nivel) {
+      case 1: {
+        // Multiple choice: exact match
+        var correctIdx = typeof q.correctIndex === 'number' ? q.correctIndex : parseInt(q.correctIndex, 10);
+        var userIdx = parseInt(String(userAnswer), 10);
+        score = de.scoreExact(userIdx, correctIdx);
+        feedback = score >= 80 ? '¡Correcto!' : 'Incorrecto.';
+        break;
+      }
+      case 2: {
+        // Fill blank: proportional scoring against answers[]
+        var ua = String(userAnswer).trim();
+        var bestScore = 0;
+        var bestAnswer = '';
+        (q.answers || []).forEach(function(ans) {
+          var s = de.scoreProportional(ua, ans);
+          if (s > bestScore) { bestScore = s; bestAnswer = ans; }
+        });
+        score = bestScore;
+        feedback = score >= 80 ? '¡Correcto!' : 'Respuesta esperada: ' + (bestAnswer || q.answers[0]);
+        break;
+      }
+      case 3: {
+        // Write: exact with typo tolerance
+        score = de.scoreExactTypo(String(userAnswer), q.expected);
+        feedback = score >= 80 ? '¡Correcto!' : 'Esperado: "' + q.expected + '"';
+        break;
+      }
+      case 4: {
+        // Reorder: exact sequence match
+        var userArr = Array.isArray(userAnswer) ? userAnswer : [];
+        var expectedOrder = q.correctOrder || [];
+        score = de.scoreExactSequence(userArr, expectedOrder);
+        feedback = score >= 80 ? '¡Orden correcto!' : 'Orden incorrecto.';
+        break;
+      }
+      case 5: {
+        // Correct: exact match (or typo-tolerant) against correctSentence
+        score = de.scoreExactTypo(String(userAnswer), q.correctSentence);
+        feedback = score >= 80 ? '¡Corrección correcta!' : 'Esperado: "' + q.correctSentence + '"';
+        break;
+      }
+      case 6:
+      case 7: {
+        // Free text: keyword proportion
+        var keywords = q.expectedKeywords || [];
+        score = de.scoreKeywordProportion(String(userAnswer), keywords);
+        feedback = score >= 80
+          ? '¡Bien! Has incluido las palabras clave.'
+          : 'Intenta incluir palabras como: ' + keywords.join(', ');
+        break;
+      }
+    }
+
+    return {
+      score: score,
+      isCorrect: score >= 80,
+      feedback: feedback
+    };
+  }
+
+  /**
+   * Score a set of answers and return aggregate.
+   * @param {Array} answers - Array of user answer strings
+   * @param {Array} questions - Array of question data objects
+   * @param {number} nivel - 1-7
+   * @returns {{ totalScore: number, passed: boolean }}
+   */
+  function scoreQuestionSet(answers, questions, nivel) {
+    if (!answers || !questions || answers.length === 0 || questions.length === 0) {
+      return { totalScore: 0, passed: false };
+    }
+
+    var total = 0;
+    for (var i = 0; i < Math.min(answers.length, questions.length); i++) {
+      var result = validateLevelAnswer(answers[i], questions[i], nivel);
+      total += result.score;
+    }
+
+    var avg = Math.round(total / Math.min(answers.length, questions.length));
+    return {
+      totalScore: avg,
+      passed: avg >= 80
+    };
+  }
+
   /* ---- Public API ---- */
 
   return {
@@ -1554,6 +2030,10 @@ App.ExerciseEngine = (function() {
     submitAnswer: submitAnswer,
     goTo: goTo,
     compareTranscripts: compareTranscripts,
+    // N-Level exercise API (for step 8)
+    renderQuestion: renderQuestion,
+    validateAnswer: validateLevelAnswer,
+    scoreQuestionSet: scoreQuestionSet,
     // Exam API
     loadExam: loadExam,
     startExam: startExam,

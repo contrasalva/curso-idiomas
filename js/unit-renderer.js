@@ -45,8 +45,8 @@ App.UnitRenderer = (function() {
     'construccion':           renderStep5,
     'regla':                  renderRule,
     'tabla-referencia':       renderReference,
-    'ejercicios-escalonados': renderComingSoon,
-    'vocabulario':            renderComingSoon,
+    'ejercicios-escalonados': renderStep8,
+    'vocabulario':            renderStep9,
     'pronunciacion':          renderComingSoon,
     'cultura':                renderCulture,
     'conversacion-guiada':    renderComingSoon,
@@ -564,6 +564,12 @@ App.UnitRenderer = (function() {
 
     // Token builder wiring (step 5)
     wireStep5(container);
+
+    // Step 8 — ejercicios-escalonados wiring
+    wireStep8(container);
+
+    // Step 9 — vocabulario wiring
+    wireStep9(container);
   }
 
   /**
@@ -1521,6 +1527,448 @@ App.UnitRenderer = (function() {
 
     // Bootstrap with first sentence
     setupSentence(0);
+  }
+
+  /* ==========================================
+     STEP 8: Ejercicios Escalonados
+     ========================================== */
+
+  /**
+   * Render step 8 — difficulty-tiered exercises (N1-N7).
+   * Displays difficulty tabs, current question, submit/validate flow.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderStep8(stepData) {
+    var questions = stepData.questions || [];
+    if (questions.length === 0) return renderComingSoon(stepData);
+
+    // Group questions by nivel
+    var byNivel = {};
+    for (var qi = 0; qi < questions.length; qi++) {
+      var q = questions[qi];
+      var n = q.nivel || 1;
+      if (!byNivel[n]) byNivel[n] = [];
+      byNivel[n].push(q);
+    }
+
+    // Ensure levels 1-7 all exist
+    for (var li = 1; li <= 7; li++) {
+      if (!byNivel[li]) byNivel[li] = [];
+    }
+
+    // Difficulty profile from Progress
+    var profile = null;
+    try {
+      profile = App.Progress.get('default');
+    } catch (e) { /* ignore */ }
+
+    var html = '<div class="step8-container" data-step8="true">';
+
+    // Difficulty tabs
+    html += '<div class="difficulty-tabs" role="tablist">';
+    for (var ni = 1; ni <= 7; ni++) {
+      var levelQuestions = byNivel[ni] || [];
+      var isUnlocked = App.DifficultyEngine.isLevelUnlocked(ni, profile);
+      var lockedLevels = App.DifficultyEngine.getLockedLevels(profile);
+      var isLocked = lockedLevels.indexOf(ni) >= 0;
+      var scores = App.DifficultyEngine.getLevelScores(profile);
+      var levelScore = scores ? scores[ni] : null;
+      var isPassed = levelScore && levelScore >= 80;
+
+      var tabClass = 'difficulty-tab';
+      if (isLocked) tabClass += ' difficulty-tab--locked';
+      else if (isPassed) tabClass += ' difficulty-tab--passed';
+      if (ni === 1 || isUnlocked) tabClass += ' difficulty-tab--active';
+
+      html += '<button class="' + tabClass + '" data-nivel="' + ni + '" role="tab" ' +
+        (isLocked ? 'disabled' : '') + '>' +
+        '<span class="level-badge">N' + ni + '</span>' +
+        '<span class="difficulty-progress">' + (levelQuestions.length) + ' ejercicios</span>' +
+        (levelScore !== null ? '<span class="difficulty-score">' + levelScore + '%</span>' : '') +
+        (isPassed ? '<span class="difficulty-check">✓</span>' : '') +
+      '</button>';
+    }
+    html += '</div>';
+
+    // Content area for questions — rendered dynamically
+    html += '<div class="step8-content" id="step8-content"></div>';
+
+    // Submit button row
+    html += '<div class="step8-actions" style="margin-top:16px;display:flex;gap:8px">' +
+      '<button class="primary-btn step8-submit-btn" id="step8-submit" style="display:none">Comprobar</button>' +
+    '</div>';
+
+    // Level feedback area
+    html += '<div class="step8-feedback" id="step8-feedback" style="margin-top:12px;font-size:0.95rem;font-weight:600;min-height:28px"></div>';
+
+    html += '</div>';
+
+    return html;
+  }
+
+  /**
+   * Wire step 8 interactions once the DOM is rendered.
+   * Called from wireTtsButtons (or independently after renderCurrentStep builds the DOM).
+   * @param {HTMLElement} container
+   */
+  function wireStep8(container) {
+    var step8 = container.querySelector('.step8-container');
+    if (!step8) return;
+
+    var stepData = _state.data.steps[_state.currentStep];
+    if (!stepData) return;
+
+    var questions = stepData.questions || [];
+    if (questions.length === 0) return;
+
+    // Group & sort questions by nivel
+    var byNivel = {};
+    for (var qi = 0; qi < questions.length; qi++) {
+      var q = questions[qi];
+      var n = q.nivel || 1;
+      if (!byNivel[n]) byNivel[n] = [];
+      byNivel[n].push(q);
+    }
+    for (var li = 1; li <= 7; li++) {
+      if (!byNivel[li]) byNivel[li] = [];
+    }
+
+    // State
+    var currentNivel = 1;
+    var levelProgress = {};   // { nivel: { currentQ: 0, answers: [], scores: [] } }
+    for (var li2 = 1; li2 <= 7; li2++) {
+      levelProgress[li2] = { currentQ: 0, answers: [], scores: [] };
+    }
+
+    var profile = null;
+    try {
+      profile = App.Progress.get('default');
+    } catch (e) { /* ignore */ }
+
+    var submitBtn = document.getElementById('step8-submit');
+    var feedbackEl = document.getElementById('step8-feedback');
+    var contentEl = document.getElementById('step8-content');
+
+    /** Render current question for the active nivel */
+    function renderCurrentQuestion() {
+      if (!contentEl) return;
+      var prog = levelProgress[currentNivel];
+      var levelQs = byNivel[currentNivel] || [];
+
+      if (prog.currentQ >= levelQs.length) {
+        // All questions for this level answered — show completion
+        contentEl.innerHTML = '<div style="text-align:center;padding:32px">' +
+          '<div style="font-size:2rem;margin-bottom:12px">✅</div>' +
+          '<p style="font-size:1.1rem;font-weight:600">Nivel ' + currentNivel + ' completado</p>' +
+          '</div>';
+        if (submitBtn) submitBtn.style.display = 'none';
+        return;
+      }
+
+      var questionData = levelQs[prog.currentQ];
+      contentEl.innerHTML = '';
+      App.ExerciseEngine.renderQuestion(questionData, currentNivel, contentEl);
+
+      if (submitBtn) {
+        // Hide submit for N1 (auto-submits on radio change); show for others
+        submitBtn.style.display = currentNivel === 1 ? 'none' : '';
+        submitBtn.disabled = false;
+      }
+      if (feedbackEl) feedbackEl.textContent = '';
+    }
+
+    /** Gather user answer from the DOM based on nivel type */
+    function gatherAnswer(nivel, questionData) {
+      var contentEl = document.getElementById('step8-content');
+      if (!contentEl) return null;
+
+      switch (nivel) {
+        case 1: {
+          // Read selected radio
+          var selectedRadio = contentEl.querySelector('.nlevel-radio:checked');
+          return selectedRadio ? parseInt(selectedRadio.value, 10) : null;
+        }
+        case 2:
+        case 5: {
+          // Read input value
+          var input = contentEl.querySelector('input.nlevel-input[name="nlevel-answer"]');
+          return input ? input.value.trim() : null;
+        }
+        case 3:
+        case 6:
+        case 7: {
+          // Read textarea value
+          var ta = contentEl.querySelector('textarea.nlevel-textarea[name="nlevel-answer"]');
+          return ta ? ta.value.trim() : null;
+        }
+        case 4: {
+          // Read reorder selected words from wrapper._reorderSelected
+          var wrapper = contentEl.querySelector('.nlevel-reorder');
+          if (wrapper && wrapper._reorderSelected) {
+            if (wrapper._reorderSelected.length === wrapper._reorderCorrectLength) {
+              return wrapper._reorderSelected.slice();
+            }
+            return null; // Not all words placed yet
+          }
+          return null;
+        }
+        default:
+          return null;
+      }
+    }
+
+    /** Submit the current question for validation */
+    function submitCurrentQuestion() {
+      var prog = levelProgress[currentNivel];
+      var levelQs = byNivel[currentNivel] || [];
+      if (prog.currentQ >= levelQs.length) return;
+
+      var questionData = levelQs[prog.currentQ];
+
+      // Gather user answer based on nivel type
+      var userAnswer = gatherAnswer(currentNivel, questionData);
+      if (userAnswer === null || userAnswer === undefined || userAnswer === '') {
+        if (feedbackEl) feedbackEl.textContent = 'Responde la pregunta primero.';
+        return;
+      }
+
+      var result = App.ExerciseEngine.validateAnswer(userAnswer, questionData, currentNivel);
+      prog.answers.push(userAnswer);
+      prog.scores.push(result.score);
+
+      if (feedbackEl) {
+        feedbackEl.textContent = result.feedback;
+        feedbackEl.style.color = result.isCorrect ? '#16a34a' : '#ef4444';
+      }
+
+      // Disable submit for this question
+      if (submitBtn) submitBtn.disabled = true;
+
+      // Emit exercise:submitted event
+      var evt = new CustomEvent('exercise:submitted', {
+        detail: {
+          stepIndex: _state.currentStep,
+          nivel: currentNivel,
+          questionIndex: prog.currentQ,
+          answer: userAnswer,
+          score: result.score,
+          isCorrect: result.isCorrect
+        }
+      });
+      document.dispatchEvent(evt);
+
+      // Auto-advance to next question after a brief delay
+      setTimeout(function () {
+        prog.currentQ++;
+
+        if (prog.currentQ >= levelQs.length) {
+          // Level complete — calculate score and unlock next
+          var avgScore = 0;
+          for (var si = 0; si < prog.scores.length; si++) {
+            avgScore += prog.scores[si];
+          }
+          avgScore = Math.round(avgScore / prog.scores.length);
+
+          // Save level score via DifficultyEngine
+          App.DifficultyEngine.submitLevelScore(currentNivel, avgScore, profile);
+          if (profile) {
+            App.Progress.save('default', profile);
+          }
+
+          // Unlock next level if passed
+          if (avgScore >= 80 && currentNivel < 7) {
+            currentNivel++;
+            // Update tab active state
+            updateTabs();
+            renderCurrentQuestion();
+            if (feedbackEl) {
+              feedbackEl.textContent = '✓ ¡Nivel superado! Avanzando a N' + currentNivel + '...';
+              feedbackEl.style.color = '#16a34a';
+            }
+          } else if (avgScore < 80 && currentNivel < 7) {
+            // Failed — enable Next button if step wants to let them through
+            // (allow continuing even if failed — pedagogical choice)
+            renderCurrentQuestion();
+            if (feedbackEl) {
+              feedbackEl.textContent = 'Intenta de nuevo o continúa. Puedes repetir este nivel más tarde.';
+              feedbackEl.style.color = '#f59e0b';
+            }
+          } else {
+            // Last level (N7) completed
+            renderCurrentQuestion();
+            enableNextBtn();
+          }
+        } else {
+          renderCurrentQuestion();
+        }
+      }, 800);
+    }
+
+    /** Update tab active/locked/passed styles */
+    function updateTabs() {
+      var tabs = step8.querySelectorAll('.difficulty-tab');
+      for (var ti = 0; ti < tabs.length; ti++) {
+        var tab = tabs[ti];
+        var nivel = parseInt(tab.getAttribute('data-nivel'), 10);
+        var isLocked = App.DifficultyEngine.getLockedLevels(profile).indexOf(nivel) >= 0;
+        var scores = App.DifficultyEngine.getLevelScores(profile);
+        var scoreVal = scores ? scores[nivel] : null;
+        var isPassed = scoreVal && scoreVal >= 80;
+
+        tab.classList.remove('difficulty-tab--active', 'difficulty-tab--passed', 'difficulty-tab--locked');
+        if (isLocked) tab.classList.add('difficulty-tab--locked');
+        else if (isPassed) tab.classList.add('difficulty-tab--passed');
+        if (nivel === currentNivel) tab.classList.add('difficulty-tab--active');
+      }
+    }
+
+    // Wire tab clicks
+    var tabs = step8.querySelectorAll('.difficulty-tab:not([disabled])');
+    for (var ti2 = 0; ti2 < tabs.length; ti2++) {
+      tabs[ti2].addEventListener('click', function () {
+        var nivel = parseInt(this.getAttribute('data-nivel'), 10);
+        if (App.DifficultyEngine.isLevelUnlocked(nivel, profile)) {
+          currentNivel = nivel;
+          updateTabs();
+          renderCurrentQuestion();
+          if (submitBtn) submitBtn.style.display = '';
+          if (feedbackEl) feedbackEl.textContent = '';
+        }
+      });
+    }
+
+    // Wire submit button
+    if (submitBtn) {
+      submitBtn.addEventListener('click', submitCurrentQuestion);
+    }
+
+    // Render first question
+    renderCurrentQuestion();
+
+    // Disable Next by default until level work progresses
+    disableNextBtn();
+  }
+
+  /* ==========================================
+     STEP 9: Vocabulario
+     ========================================== */
+
+  /**
+   * Render step 9 — vocabulary word cards with TTS, flip, and mastered toggle.
+   * @param {object} stepData
+   * @returns {string} HTML
+   */
+  function renderStep9(stepData) {
+    var words = stepData.words || [];
+    if (words.length === 0) return renderComingSoon(stepData);
+
+    var html = '<div class="step9-container" data-step9="true">';
+
+    // Word count + search/filter header
+    html += '<div class="vocab-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">' +
+      '<p class="vocab-count" style="font-size:0.9rem;color:var(--text-secondary)">' + words.length + ' palabras en esta unidad</p>' +
+      '<button class="secondary-btn vocab-flip-all-btn" id="vocab-flip-all"> Voltear todas</button>' +
+    '</div>';
+
+    // VocabularyViewer container — will be populated dynamically
+    html += '<div class="vocab-viewer-container" id="vocab-viewer-container"></div>';
+
+    html += '</div>';
+
+    return html;
+  }
+
+  /**
+   * Wire step 9 interactions — renders vocabulary viewer into the container.
+   * @param {HTMLElement} container
+   */
+  function wireStep9(container) {
+    var step9 = container.querySelector('.step9-container');
+    if (!step9) return;
+
+    var stepData = _state.data.steps[_state.currentStep];
+    if (!stepData) return;
+
+    var words = stepData.words || [];
+    if (words.length === 0) return;
+
+    var viewerContainer = document.getElementById('vocab-viewer-container');
+    if (!viewerContainer) return;
+
+    // Use VocabularyManager to render the paginated viewer
+    if (App.VocabularyManager && typeof App.VocabularyManager.renderVocabularyViewer === 'function') {
+      var viewer = App.VocabularyManager.renderVocabularyViewer(words, 12);
+      viewerContainer.appendChild(viewer);
+    } else {
+      // Fallback: render basic cards
+      fallbackRenderVocabulary(words, viewerContainer);
+    }
+
+    // Wire "Flip all" button
+    var flipAllBtn = document.getElementById('vocab-flip-all');
+    if (flipAllBtn) {
+      var isFlipped = false;
+      flipAllBtn.addEventListener('click', function () {
+        isFlipped = !isFlipped;
+        var cards = container.querySelectorAll('.vocab-card');
+        for (var ci = 0; ci < cards.length; ci++) {
+          if (isFlipped) {
+            cards[ci].classList.add('vocab-card--flipped');
+          } else {
+            cards[ci].classList.remove('vocab-card--flipped');
+          }
+        }
+        flipAllBtn.textContent = isFlipped ? ' Voltear todas' : ' Voltear todas';
+      });
+    }
+  }
+
+  /**
+   * Fallback vocabulary renderer if VocabularyManager is not available.
+   * @param {Array} words
+   * @param {HTMLElement} container
+   */
+  function fallbackRenderVocabulary(words, container) {
+    var perPage = 12;
+    var totalPages = Math.max(1, Math.ceil(words.length / perPage));
+    var currentPage = 0;
+
+    var grid = document.createElement('div');
+    grid.className = 'vocab-grid';
+
+    var pagination = document.createElement('div');
+    pagination.className = 'vocab-pagination';
+
+    function renderPage(pageIdx) {
+      grid.innerHTML = '';
+      var start = pageIdx * perPage;
+      var pageWords = words.slice(start, start + perPage);
+
+      pageWords.forEach(function (w) {
+        var card = document.createElement('div');
+        card.className = 'vocab-card';
+
+        var front = document.createElement('div');
+        front.className = 'vocab-card__front';
+        front.textContent = w.word;
+        card.appendChild(front);
+
+        var back = document.createElement('div');
+        back.className = 'vocab-card__back';
+        back.textContent = w.translation;
+        card.appendChild(back);
+
+        card.addEventListener('click', function () {
+          card.classList.toggle('vocab-card--flipped');
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    container.appendChild(grid);
+    renderPage(0);
   }
 
   /* ==========================================
