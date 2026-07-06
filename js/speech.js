@@ -217,7 +217,7 @@ App.SpeechManager = (function() {
 
     var utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'it-IT';
-    utterance.rate = (options && options.rate) || 0.9;
+    utterance.rate = (options && options.rate) || 0.82;
     utterance.pitch = (options && options.pitch) || 1;
     utterance.volume = 1;
 
@@ -255,7 +255,7 @@ App.SpeechManager = (function() {
 
     var utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'it-IT';
-    utterance.rate = 0.9;
+    utterance.rate = 0.82;
     utterance.pitch = 1;
     utterance.volume = 1;
 
