@@ -191,43 +191,7 @@ header::after {
 
 /* ─── PROFILE SETUP (first visit) ─── */
 
-.profile-setup {
-  position: relative;
-  padding-top: 32px;
-}
-
-.profile-setup::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 4px;
-  background: linear-gradient(90deg,
-    var(--italia-green) 0%,
-    var(--italia-green) 33.33%,
-    var(--italia-white) 33.33%,
-    var(--italia-white) 66.66%,
-    var(--italia-red) 66.66%,
-    var(--italia-red) 100%
-  );
-  border-radius: 2px;
-  opacity: 0.6;
-}
-
-.profile-setup h1 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  margin: 0 0 8px;
-  color: var(--heading, #0f172a);
-  position: relative;
-  display: inline-block;
-}
-
-[data-theme="dark"] .profile-setup h1 {
-  color: var(--heading, #f1f5f9);
-}
+/* Tricolor accent is now on .profile-body::before in main.css */
 
 /* ─── UNIT CARDS ─── */
 

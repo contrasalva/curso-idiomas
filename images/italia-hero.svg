@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" width="800" height="280">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fce4b8"/>
+      <stop offset="40%" stop-color="#f5cba7"/>
+      <stop offset="70%" stop-color="#e8b4a0"/>
+      <stop offset="100%" stop-color="#d4a0b8"/>
+    </linearGradient>
+    <linearGradient id="hill1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c9a6e"/>
+      <stop offset="100%" stop-color="#5a7d4a"/>
+    </linearGradient>
+    <linearGradient id="hill2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8aa87a"/>
+      <stop offset="100%" stop-color="#6b8f5a"/>
+    </linearGradient>
+    <linearGradient id="hill3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6e8f5e"/>
+      <stop offset="100%" stop-color="#4d7040"/>
+    </linearGradient>
+    <linearGradient id="sun" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#fff4d6"/>
+      <stop offset="100%" stop-color="#f5c542"/>
+    </linearGradient>
+    <linearGradient id="houseWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4a88a"/>
+      <stop offset="100%" stop-color="#c49474"/>
+    </linearGradient>
+    <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c0392b"/>
+      <stop offset="100%" stop-color="#a93226"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="280" fill="url(#sky)"/>
+
+  <!-- Sun -->
+  <circle cx="620" cy="60" r="35" fill="url(#sun)" opacity="0.9"/>
+  <circle cx="620" cy="60" r="45" fill="#f5c542" opacity="0.12"/>
+  <circle cx="620" cy="60" r="60" fill="#f5c542" opacity="0.06"/>
+
+  <!-- Distant hills (background) -->
+  <path d="M0 180 Q80 120 180 150 Q250 130 320 155 Q380 135 440 150 Q520 120 600 145 Q680 125 750 150 Q790 140 800 155 L800 280 L0 280 Z" fill="#a8be8a" opacity="0.4"/>
+
+  <!-- Middle hills -->
+  <path d="M0 200 Q60 160 140 180 Q220 150 300 170 Q380 145 460 165 Q550 140 630 160 Q700 150 760 170 Q790 160 800 175 L800 280 L0 280 Z" fill="url(#hill2)" opacity="0.7"/>
+
+  <!-- Middle hills 2 -->
+  <path d="M0 220 Q100 180 200 200 Q300 170 400 190 Q480 175 560 195 Q640 175 720 190 Q770 180 800 195 L800 280 L0 280 Z" fill="#628050" opacity="0.6"/>
+
+  <!-- Foreground hills -->
+  <path d="M0 250 Q80 210 160 230 Q240 200 340 220 Q420 205 500 225 Q580 200 660 215 Q740 205 800 225 L800 280 L0 280 Z" fill="url(#hill1)"/>
+
+  <!-- Cypress trees -->
+  <!-- Cypress 1 -->
+  <path d="M140 195 L145 130 L150 195 Z" fill="#2d4a1e" opacity="0.85"/>
+  <path d="M142 195 L145 140 L148 195 Z" fill="#3a5e2a" opacity="0.7"/>
+
+  <!-- Cypress 2 -->
+  <path d="M170 190 L175 120 L180 190 Z" fill="#2d4a1e" opacity="0.85"/>
+  <path d="M172 190 L175 130 L178 190 Z" fill="#3a5e2a" opacity="0.7"/>
+
+  <!-- Cypress 3 -->
+  <path d="M280 205 L284 140 L288 205 Z" fill="#2d4a1e" opacity="0.85"/>
+  <path d="M282 205 L284 148 L286 205 Z" fill="#3a5e2a" opacity="0.7"/>
+
+  <!-- Cypress 4 -->
+  <path d="M310 200 L315 130 L320 200 Z" fill="#2d4a1e" opacity="0.8"/>
+  <path d="M312 200 L315 138 L318 200 Z" fill="#3a5e2a" opacity="0.65"/>
+
+  <!-- Cypress 5 (far) -->
+  <path d="M490 185 L493 135 L496 185 Z" fill="#2d4a1e" opacity="0.5"/>
+
+  <!-- Cypress 6 -->
+  <path d="M530 190 L534 125 L538 190 Z" fill="#2d4a1e" opacity="0.75"/>
+  <path d="M532 190 L534 133 L536 190 Z" fill="#3a5e2a" opacity="0.6"/>
+
+  <!-- Cypress 7 -->
+  <path d="M660 190 L664 135 L668 190 Z" fill="#2d4a1e" opacity="0.65"/>
+
+  <!-- Cypress 8 -->
+  <path d="M700 195 L704 140 L708 195 Z" fill="#2d4a1e" opacity="0.6"/>
+
+  <!-- Tuscan farmhouse -->
+  <g transform="translate(380, 170)">
+    <!-- House body -->
+    <rect x="0" y="20" width="50" height="35" fill="url(#houseWall)" rx="1"/>
+    <!-- Roof -->
+    <polygon points="-5,22 25,2 55,22" fill="url(#roof)" stroke="#8b1a1a" stroke-width="0.5"/>
+    <!-- Windows -->
+    <rect x="8" y="30" width="10" height="12" fill="#2c1810" opacity="0.6" rx="1"/>
+    <rect x="32" y="30" width="10" height="12" fill="#2c1810" opacity="0.6" rx="1"/>
+    <!-- Door -->
+    <rect x="18" y="38" width="14" height="17" fill="#5a3d2b" rx="1"/>
+    <!-- Window frames -->
+    <rect x="8" y="30" width="10" height="12" fill="none" stroke="#e8cbaa" stroke-width="0.8" rx="1"/>
+    <rect x="32" y="30" width="10" height="12" fill="none" stroke="#e8cbaa" stroke-width="0.8" rx="1"/>
+  </g>
+
+  <!-- Small tower/bell tower -->
+  <g transform="translate(410, 155)">
+    <rect x="0" y="15" width="14" height="40" fill="url(#houseWall)" rx="1"/>
+    <polygon points="-2,17 7,2 16,17" fill="url(#roof)" stroke="#8b1a1a" stroke-width="0.5"/>
+    <!-- Arch window -->
+    <rect x="3" y="28" width="8" height="10" fill="#2c1810" opacity="0.6" rx="4"/>
+    <!-- Cross -->
+    <rect x="6.5" y="0" width="1" height="6" fill="#8b1a1a"/>
+    <rect x="3.5" y="2" width="7" height="1" fill="#8b1a1a"/>
+  </g>
+
+  <!-- Vineyard rows (subtle) -->
+  <g opacity="0.25">
+    <line x1="20" y1="250" x2="20" y2="235" stroke="#3a5e2a" stroke-width="1.5"/>
+    <line x1="35" y1="252" x2="35" y2="237" stroke="#3a5e2a" stroke-width="1.5"/>
+    <line x1="50" y1="248" x2="50" y2="233" stroke="#3a5e2a" stroke-width="1.5"/>
+    <line x1="65" y1="250" x2="65" y2="235" stroke="#3a5e2a" stroke-width="1.5"/>
+    <line x1="80" y1="248" x2="80" y2="233" stroke="#3a5e2a" stroke-width="1.5"/>
+    <line x1="95" y1="250" x2="95" y2="235" stroke="#3a5e2a" stroke-width="1.5"/>
+  </g>
+
+  <!-- Distant vineyard rows -->
+  <g opacity="0.15">
+    <line x1="540" y1="235" x2="540" y2="222" stroke="#3a5e2a" stroke-width="1.2"/>
+    <line x1="555" y1="237" x2="555" y2="224" stroke="#3a5e2a" stroke-width="1.2"/>
+    <line x1="570" y1="234" x2="570" y2="221" stroke="#3a5e2a" stroke-width="1.2"/>
+    <line x1="585" y1="236" x2="585" y2="223" stroke="#3a5e2a" stroke-width="1.2"/>
+    <line x1="600" y1="234" x2="600" y2="221" stroke="#3a5e2a" stroke-width="1.2"/>
+  </g>
+
+  <!-- Birds (subtle detail) -->
+  <g stroke="#5a4a3a" stroke-width="1" fill="none" opacity="0.2">
+    <path d="M200 80 Q204 76 208 80"/>
+    <path d="M215 75 Q219 71 223 75"/>
+    <path d="M230 82 Q234 78 238 82"/>
+    <path d="M245 72 Q249 68 253 72"/>
+  </g>
+
+  <!-- Wildflowers (foreground detail) -->
+  <g opacity="0.3">
+    <circle cx="50" cy="268" r="2" fill="#e8b4a0"/>
+    <circle cx="52" cy="265" r="1.5" fill="#f5cba7"/>
+    <circle cx="100" cy="272" r="2" fill="#d4a0b8"/>
+    <circle cx="250" cy="265" r="1.5" fill="#e8b4a0"/>
+    <circle cx="450" cy="270" r="2" fill="#f5cba7"/>
+    <circle cx="700" cy="268" r="1.5" fill="#d4a0b8"/>
+    <circle cx="750" cy="272" r="2" fill="#e8b4a0"/>
+  </g>
+
+  <!-- Trasparent tricolor overlay (very subtle) -->
+  <rect x="0" y="0" width="800" height="4" fill="url(#sky)" opacity="0"/>
+</svg>

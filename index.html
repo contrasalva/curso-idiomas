@@ -198,15 +198,20 @@
     <!-- Profile (first visit) -->
     <section id="section-profile" aria-label="Crear perfiles">
       <div class="profile-setup">
-        <h1>🇮🇹 ¡Bienvenidos!</h1>
-        <p>Escribid vuestros nombres para empezar</p>
-        <input type="text" id="profile-name-1" class="text-input profile-input"
-          placeholder="Tu nombre..." maxlength="20" autocomplete="off">
-        <input type="text" id="profile-name-2" class="text-input profile-input"
-          placeholder="Nombre de tu compañera/o..." maxlength="20" autocomplete="off"
-          style="margin-top:8px">
-        <button id="profile-start" class="primary-btn">Empezar</button>
-        <p class="profile-hint">Se crearán ambos perfiles. Podéis alternar desde el menú.</p>
+        <div class="profile-hero">
+          <img src="images/italia-hero.svg" alt="Paisaje italiano" class="profile-hero-img" loading="lazy">
+          <img src="images/italia-lemon.svg" alt="" class="profile-hero-lemon" aria-hidden="true" loading="lazy">
+        </div>
+        <div class="profile-body">
+          <h1>🇮🇹 ¡Bienvenidos!</h1>
+          <p class="profile-subtitle">Escribid vuestros nombres para empezar</p>
+          <input type="text" id="profile-name-1" class="text-input profile-input"
+            placeholder="Tu nombre..." maxlength="20" autocomplete="off">
+          <input type="text" id="profile-name-2" class="text-input profile-input"
+            placeholder="Nombre de tu compañera/o..." maxlength="20" autocomplete="off">
+          <button id="profile-start" class="primary-btn">Empezar</button>
+          <p class="profile-hint">Se crearán ambos perfiles. Podéis alternar desde el menú.</p>
+        </div>
       </div>
     </section>
   </main>

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <radialGradient id="lemonGrad" cx="0.4" cy="0.35" r="0.6">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="60%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </radialGradient>
+    <radialGradient id="lemonGrad2" cx="0.4" cy="0.35" r="0.6">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="60%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </radialGradient>
+    <radialGradient id="leafGrad" cx="0.3" cy="0.3" r="0.7">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </radialGradient>
+    <linearGradient id="branchGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8b6914"/>
+      <stop offset="100%" stop-color="#6b5210"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Branch -->
+  <path d="M5 40 Q30 35 50 45 Q70 55 90 50 Q100 48 115 42" fill="none" stroke="url(#branchGrad)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M50 45 Q48 52 35 60" fill="none" stroke="url(#branchGrad)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Leaves along branch -->
+  <g opacity="0.9">
+    <ellipse cx="15" cy="32" rx="10" ry="5" fill="url(#leafGrad)" transform="rotate(-20 15 32)"/>
+    <path d="M15 32 L18 28" stroke="#15803d" stroke-width="0.5" fill="none"/>
+
+    <ellipse cx="35" cy="28" rx="9" ry="4.5" fill="url(#leafGrad)" transform="rotate(10 35 28)"/>
+    <path d="M35 28 L38 25" stroke="#15803d" stroke-width="0.5" fill="none"/>
+
+    <ellipse cx="75" cy="42" rx="10" ry="5" fill="url(#leafGrad)" transform="rotate(-15 75 42)"/>
+    <path d="M75 42 L78 38" stroke="#15803d" stroke-width="0.5" fill="none"/>
+  </g>
+
+  <!-- Lemon 1 -->
+  <g transform="translate(55, 48)">
+    <ellipse cx="0" cy="0" rx="16" ry="12" fill="url(#lemonGrad)" transform="rotate(25)"/>
+    <ellipse cx="-4" cy="-3" rx="6" ry="4" fill="white" opacity="0.15" transform="rotate(25)"/>
+    <!-- Lemon tip -->
+    <path d="M11 3 Q14 2 15 0" fill="none" stroke="#8b6914" stroke-width="1" stroke-linecap="round"/>
+  </g>
+
+  <!-- Lemon 2 -->
+  <g transform="translate(90, 44)">
+    <ellipse cx="0" cy="0" rx="14" ry="10" fill="url(#lemonGrad2)" transform="rotate(-10)"/>
+    <ellipse cx="-3" cy="-2" rx="5" ry="3" fill="white" opacity="0.12" transform="rotate(-10)"/>
+    <path d="M10 1 Q12 0 13 -1" fill="none" stroke="#8b6914" stroke-width="1" stroke-linecap="round"/>
+  </g>
+
+  <!-- Lemon 3 (smaller, behind) -->
+  <g transform="translate(30, 43)" opacity="0.7">
+    <ellipse cx="0" cy="0" rx="10" ry="7" fill="url(#lemonGrad)" transform="rotate(40)"/>
+    <path d="M7 1 Q9 0 10 -1" fill="none" stroke="#8b6914" stroke-width="0.8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Small flower -->
+  <g transform="translate(45, 22)" opacity="0.6">
+    <circle cx="0" cy="-2" r="2.5" fill="white"/>
+    <circle cx="2" cy="1" r="2.5" fill="white"/>
+    <circle cx="-2" cy="1" r="2.5" fill="white"/>
+    <circle cx="0" cy="0" r="1.5" fill="#facc15"/>
+  </g>
+</svg>
