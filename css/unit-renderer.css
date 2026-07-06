@@ -838,15 +838,22 @@
 /* Dialogue controls row (play-all + translation toggle) */
 .dialogue-controls {
   display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 8px 16px;
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
 
-.dialogue-translation-toggle {
-  margin-left: auto;
+.dialogue-controls .secondary-btn {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: center;
 }
+
+.dialogue-translation-toggle {
+  /* centered via flex parent, no margin-left:auto */
 
 /* Hint tooltip system (step 2) */
 .dialogue-hint-container {
