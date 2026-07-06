@@ -1377,6 +1377,142 @@ body:has(#section-profile.active) main > section.active {
   box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 
+/* --- Voice Settings Dialog --- */
+.voice-settings-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.voice-settings-overlay[hidden] {
+  display: none;
+}
+.voice-settings-panel {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 440px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.voice-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.voice-settings-header h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+.voice-settings-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.voice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.voice-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+.voice-item:hover {
+  background: var(--bg);
+}
+.voice-item.selected {
+  border-color: var(--accent);
+  background: rgba(37,99,235,0.06);
+}
+.voice-item-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--text-secondary);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.voice-item.selected .voice-item-radio {
+  border-color: var(--accent);
+}
+.voice-item.selected .voice-item-radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.voice-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.voice-item-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.voice-item-lang {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.voice-item-default {
+  font-size: 0.65rem;
+  background: var(--border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+.voice-play-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease;
+}
+.voice-play-btn:hover {
+  background: var(--bg);
+}
+.voice-install-help {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--bg);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.voice-settings-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 /* --- Module Lesson View --- */
 .module-lesson {
   margin: 0 auto;

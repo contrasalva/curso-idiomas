@@ -528,9 +528,10 @@ function getProgressDots(total, done) {
         var enabled = App.SpeechManager && App.SpeechManager.isEnabled();
         speechBtn.textContent = enabled ? '🔊' : '🔇';
         speechBtn.classList.toggle('speech-muted', !enabled);
-        speechBtn.title = enabled ? 'Silenciar audio' : 'Activar audio';
+        speechBtn.title = enabled ? 'Configurar voz (doble clic)' : 'Activar audio';
         speechBtn.setAttribute('aria-label', speechBtn.title);
       }
+      window.__updateSpeechBtn = updateSpeechBtn;
       speechBtn.addEventListener('click', function() {
         if (App.SpeechManager) {
           App.SpeechManager.toggle();
@@ -541,6 +542,155 @@ function getProgressDots(total, done) {
       window.addEventListener('speech:toggle', updateSpeechBtn);
       // Set initial state
       updateSpeechBtn();
+    }
+
+    // --- Voice Settings Dialog ---
+    var voiceOverlay = document.getElementById('voice-settings');
+    var voiceList = document.getElementById('voice-list');
+    var voiceClose = document.getElementById('voice-settings-close');
+    var voiceListClose = document.getElementById('voice-list-close');
+    var voiceMuteBtn = document.getElementById('voice-mute-btn');
+    var voiceInstallHelp = document.getElementById('voice-install-help');
+
+    function openVoiceSettings() {
+      if (!voiceOverlay || !voiceList) return;
+      voiceOverlay.removeAttribute('hidden');
+      populateVoiceList();
+    }
+
+    function closeVoiceSettings() {
+      if (voiceOverlay) voiceOverlay.setAttribute('hidden', '');
+    }
+
+    function populateVoiceList() {
+      if (!voiceList) return;
+      var synth = window.speechSynthesis;
+      if (!synth) return;
+
+      // Get all Italian voices
+      var voices = synth.getVoices() || [];
+      var itVoices = voices.filter(function(v) {
+        return v.lang && (v.lang === 'it-IT' || v.lang.indexOf('it') === 0);
+      });
+
+      // Read saved voice name
+      var savedName = '';
+      try { savedName = localStorage.getItem('italian_voice_name') || ''; } catch(e) {}
+
+      var html = '';
+      if (itVoices.length === 0) {
+        html = '<p class="voice-install-help">No se encontraron voces italianas. ' +
+          'Asegúrate de tener instalada la voz italiana en los ajustes de accesibilidad de tu dispositivo.</p>';
+        if (voiceInstallHelp) voiceInstallHelp.removeAttribute('hidden');
+      } else {
+        if (voiceInstallHelp) voiceInstallHelp.setAttribute('hidden', '');
+        itVoices.forEach(function(v, i) {
+          var isDefault = v.name && v.name.toLowerCase().indexOf('default') !== -1;
+          var isSelected = savedName ? v.name === savedName : (i === 0);
+          html += '<div class="voice-item' + (isSelected ? ' selected' : '') + '" data-voice="' +
+            escapeAttr(v.name) + '" data-lang="' + escapeAttr(v.lang) + '">' +
+            '<div class="voice-item-radio"></div>' +
+            '<div class="voice-item-info">' +
+              '<div class="voice-item-name">' + escapeHtml(v.name) + '</div>' +
+              '<div class="voice-item-lang">' + escapeHtml(v.lang) + '</div>' +
+            '</div>' +
+            (isDefault ? '<span class="voice-item-default">DEFAULT</span>' : '') +
+            '<button class="voice-play-btn" data-voice="' + escapeAttr(v.name) +
+              '" data-lang="' + escapeAttr(v.lang) + '" title="Probar voz">▶</button>' +
+          '</div>';
+        });
+        // Apply saved selection or default to first
+        if (!savedName) {
+          try { localStorage.setItem('italian_voice_name', itVoices[0].name); } catch(e) {}
+          if (App.SpeechManager && App.SpeechManager.setVoiceByName) {
+            App.SpeechManager.setVoiceByName(itVoices[0].name);
+          }
+        }
+      }
+      voiceList.innerHTML = html;
+
+      // Wire voice selection
+      voiceList.querySelectorAll('.voice-item').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+          // Don't select when clicking play button
+          if (e.target.closest('.voice-play-btn')) return;
+          selectVoice(item.dataset.voice, item.dataset.lang);
+        });
+      });
+
+      // Wire play buttons
+      voiceList.querySelectorAll('.voice-play-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          previewVoice(btn.dataset.voice, btn.dataset.lang);
+        });
+      });
+    }
+
+    function selectVoice(name, lang) {
+      // Update UI
+      voiceList.querySelectorAll('.voice-item').forEach(function(item) {
+        item.classList.toggle('selected', item.dataset.voice === name);
+      });
+      // Save
+      try { localStorage.setItem('italian_voice_name', name); } catch(e) {}
+      // Apply to SpeechManager
+      if (App.SpeechManager && App.SpeechManager.setVoiceByName) {
+        App.SpeechManager.setVoiceByName(name);
+      }
+      // Speak a quick test
+      previewVoice(name, lang);
+    }
+
+    function previewVoice(name, lang) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      var utter = new SpeechSynthesisUtterance('Ciao, come stai?');
+      utter.lang = 'it-IT';
+      utter.rate = 0.85;
+      // Find voice by name
+      var voices = window.speechSynthesis.getVoices() || [];
+      var found = voices.find(function(v) { return v.name === name; });
+      if (found) utter.voice = found;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+    function escapeAttr(str) {
+      return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Open voice settings from speech toggle (double-click or long-press alternative)
+    if (speechBtn && voiceOverlay) {
+      // Open on click when audio is already enabled
+      speechBtn.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        openVoiceSettings();
+      });
+    }
+
+    // Dialog close buttons
+    if (voiceClose) voiceClose.addEventListener('click', closeVoiceSettings);
+    if (voiceListClose) voiceListClose.addEventListener('click', closeVoiceSettings);
+
+    // Mute button in dialog
+    if (voiceMuteBtn && App.SpeechManager) {
+      voiceMuteBtn.addEventListener('click', function() {
+        App.SpeechManager.toggle();
+        closeVoiceSettings();
+        if (window.__updateSpeechBtn) window.__updateSpeechBtn();
+      });
+    }
+
+    // Close on overlay click (but not panel click)
+    if (voiceOverlay) {
+      voiceOverlay.addEventListener('click', function(e) {
+        if (e.target === voiceOverlay) closeVoiceSettings();
+      });
     }
 
     // --- Home button (logo) ---

@@ -54,9 +54,42 @@ App.SpeechManager = (function() {
    */
   function cacheItalianVoice() {
     if (!synth) return false;
+
+    // Check user's saved preference first
+    var savedName = '';
+    try { savedName = localStorage.getItem('italian_voice_name') || ''; } catch(e) {}
+    if (savedName) {
+      var voices = synth.getVoices();
+      if (voices) {
+        var saved = voices.find(function(v) { return v.name === savedName; });
+        if (saved) {
+          cachedItalianVoice = saved;
+          voicesLoaded = true;
+          return true;
+        }
+      }
+    }
+
+    // Fall back to automatic best-voice selection
     cachedItalianVoice = findBestItalianVoice();
     voicesLoaded = true;
     return !!cachedItalianVoice;
+  }
+
+  /**
+   * Set voice by exact name (used by the voice settings dialog in app.js).
+   */
+  function setVoiceByName(name) {
+    if (!synth) return false;
+    var voices = synth.getVoices();
+    if (!voices) return false;
+    var found = voices.find(function(v) { return v.name === name; });
+    if (found) {
+      cachedItalianVoice = found;
+      try { localStorage.setItem('italian_voice_name', name); } catch(e) {}
+      return true;
+    }
+    return false;
   }
 
   // Try immediate synchronous load (some browsers have them ready)
@@ -330,7 +363,8 @@ App.SpeechManager = (function() {
     isListening: function() { return isListening; },
     setEnabled: setEnabled,
     toggle: toggle,
-    isEnabled: isEnabled
+    isEnabled: isEnabled,
+    setVoiceByName: setVoiceByName
   };
 })();
 

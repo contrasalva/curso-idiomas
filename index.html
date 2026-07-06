@@ -2001,5 +2001,27 @@
   <script src="js/smart-review.js"></script>
   <script src="js/unit-renderer.js"></script>
   <script src="js/app.js"></script>
+
+  <!-- Voice Settings Dialog -->
+  <div id="voice-settings" class="voice-settings-overlay" role="dialog" aria-label="Configuración de voz" hidden>
+    <div class="voice-settings-panel">
+      <div class="voice-settings-header">
+        <h2>🔊 Voz Italiana</h2>
+        <button id="voice-settings-close" class="icon-btn" aria-label="Cerrar">✕</button>
+      </div>
+      <p class="voice-settings-desc">Elige la voz que prefieras para la pronunciación en italiano. Pulsa ▶ para probar cada una.</p>
+      <div id="voice-list" class="voice-list">
+        <!-- Populated by JS -->
+      </div>
+      <p id="voice-install-help" class="voice-install-help" hidden>
+        💡 En Android puedes descargar voces de alta calidad en:<br>
+        <em>Ajustes → Idioma y entrada → Síntesis de voz → Motor Google Text-to-Speech → Descargar voz italiana</em>
+      </p>
+      <div class="voice-settings-footer">
+        <button id="voice-mute-btn" class="secondary-btn">🔇 Silenciar audio</button>
+        <button id="voice-list-close" class="primary-btn">Cerrar</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
