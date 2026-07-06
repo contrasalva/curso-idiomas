@@ -1,0 +1,256 @@
+/* ============================================
+   Italia — Italian cultural visual identity
+   Subtle, elegant, minimal. Zero external images.
+   ============================================ */
+
+/* --- Italian tricolor palette --- */
+:root {
+  --italia-green: #009246;
+  --italia-white: #ffffff;
+  --italia-red:  #ce2b37;
+  --italia-gold: #e8c547;
+  --italia-sky:  #87ceeb;
+}
+
+/* --- Body: subtle warm Italian glow --- */
+body {
+  background:
+    radial-gradient(ellipse 120% 40% at 50% 0%, rgba(0,146,70,0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 40% at 20% 100%, rgba(206,43,55,0.025) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 40% at 80% 100%, rgba(0,146,70,0.02) 0%, transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+[data-theme="dark"] body {
+  background:
+    radial-gradient(ellipse 120% 40% at 50% 0%, rgba(0,146,70,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 40% at 20% 100%, rgba(206,43,55,0.035) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 40% at 80% 100%, rgba(0,146,70,0.03) 0%, transparent 60%),
+    #0f172a;
+  background-attachment: fixed;
+}
+
+/* --- Italian tricolor top bar --- */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    var(--italia-green) 0%,
+    var(--italia-green) 33.33%,
+    var(--italia-white) 33.33%,
+    var(--italia-white) 66.66%,
+    var(--italia-red) 66.66%,
+    var(--italia-red) 100%
+  );
+  z-index: 1000;
+}
+
+/* --- Header: subtle Italian flag in background --- */
+header {
+  position: relative;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--italia-green) 20%,
+    var(--italia-gold) 50%,
+    var(--italia-red) 80%,
+    transparent 100%
+  );
+  opacity: 0.4;
+}
+
+/* --- Home section: subtle decorative silhouette --- */
+#section-home.active .home-header::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  margin: 20px auto 0;
+  background: linear-gradient(90deg,
+    var(--italia-green),
+    var(--italia-white) 50%,
+    var(--italia-red)
+  );
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+/* --- App title: Italian flag underline --- */
+.app-title {
+  position: relative;
+  display: inline-block;
+}
+
+/* --- Welcome card: Italian tricolor top border --- */
+.welcome-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    var(--italia-green) 0%,
+    var(--italia-green) 33.33%,
+    var(--italia-white) 33.33%,
+    var(--italia-white) 66.66%,
+    var(--italia-red) 66.66%,
+    var(--italia-red) 100%
+  );
+  z-index: 1;
+}
+
+/* --- Profile setup: tricolor top border --- */
+.profile-setup {
+  position: relative;
+}
+
+.profile-setup::before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--italia-green),
+    var(--italia-white) 50%,
+    var(--italia-red)
+  );
+  border-radius: 2px;
+  opacity: 0.5;
+}
+
+/* --- Unit cards: subtle tricolor corner accent --- */
+.unit-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.unit-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background:
+    linear-gradient(135deg,
+      transparent 49.5%,
+      rgba(0,146,70,0.06) 49.5%,
+      rgba(0,146,70,0.06) 50.5%,
+      rgba(255,255,255,0.06) 50.5%,
+      rgba(255,255,255,0.06) 51.5%,
+      rgba(206,43,55,0.06) 51.5%,
+      transparent 52.5%
+    );
+  border-radius: 0 0 var(--radius) 0;
+  pointer-events: none;
+}
+
+/* --- Unit card completed state: stronger accent --- */
+.unit-card--completed::after {
+  background:
+    linear-gradient(135deg,
+      transparent 49.5%,
+      var(--italia-green) 49.5%,
+      var(--italia-green) 50.5%,
+      var(--italia-white) 50.5%,
+      var(--italia-white) 51.5%,
+      var(--italia-red) 51.5%,
+      transparent 52.5%
+    );
+  opacity: 0.6;
+}
+
+/* --- Section breadcrumb: Italian-inspired separator --- */
+.section-nav {
+  position: relative;
+}
+
+/* --- Step indicator background: subtle Italian glow --- */
+.step-indicator {
+  position: relative;
+}
+
+/* --- Dialogue bubbles: warm Italian accent --- */
+.dialogue-bubble {
+  border-left: 3px solid var(--italia-green);
+}
+
+.dialogue-bubble:nth-child(even) {
+  border-left-color: var(--italia-red);
+}
+
+/* --- Track selector buttons: active flag effect --- */
+.track-btn--active {
+  background: linear-gradient(135deg, var(--italia-green), #1a6d3a);
+  border-color: var(--italia-green);
+}
+
+.track-btn--active[data-track="b1"] {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+
+/* --- Footer: subtle Italian tricolor line --- */
+.welcome-footer-text {
+  position: relative;
+  padding-top: 16px;
+}
+
+.welcome-footer-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--italia-green),
+    var(--italia-gold),
+    var(--italia-red),
+    transparent
+  );
+  opacity: 0.3;
+}
+
+/* --- Dark theme adjustments --- */
+[data-theme="dark"] body::before {
+  opacity: 0.8;
+}
+
+[data-theme="dark"] .welcome-card::before {
+  opacity: 0.8;
+}
+
+[data-theme="dark"] .unit-card::after {
+  opacity: 0.4;
+}
+
+/* --- Decorative Italian star (Stella d'Italia) for key screens --- */
+.stella-italia {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
