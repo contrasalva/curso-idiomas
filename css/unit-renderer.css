@@ -1110,6 +1110,23 @@
   padding: 24px 16px;
 }
 
+/* Mobile welcome: compact card */
+@media (max-width: 480px) {
+  .welcome-screen {
+    padding: 16px 12px;
+    min-height: calc(100vh - 120px);
+  }
+  .welcome-card {
+    padding: 24px 20px;
+  }
+  .welcome-title {
+    font-size: 1.35rem;
+  }
+  .welcome-actions {
+    gap: 14px;
+  }
+}
+
 .welcome-card {
   max-width: 560px;
   width: 100%;
