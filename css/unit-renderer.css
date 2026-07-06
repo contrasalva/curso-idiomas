@@ -130,7 +130,7 @@
 /* --- Step Sticky Bar (header + progress) --- */
 .step-sticky {
   position: sticky;
-  top: var(--header-height);
+  top: 56px;
   z-index: 20;
   background: var(--bg);
   padding: 20px 0 16px;
@@ -140,6 +140,31 @@
 
 [data-theme="dark"] .step-sticky {
   border-bottom-color: var(--border, #334155);
+}
+
+/* JS fallback: fixed positioning when sticky fails (IntersectionObserver in app.js) */
+.step-sticky-fixed {
+  position: fixed;
+  top: 56px;
+  left: 32px;
+  right: 32px;
+  z-index: 20;
+  background: var(--bg);
+  padding: 20px 0 16px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .step-sticky-fixed {
+  border-bottom-color: var(--border, #334155);
+}
+
+/* Adjust for desktop sidebar */
+@media (min-width: 768px) {
+  .step-sticky-fixed {
+    left: calc(var(--sidebar-width) + 32px);
+    right: 32px;
+  }
 }
 
 /* --- Step Header --- */

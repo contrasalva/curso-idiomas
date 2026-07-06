@@ -945,6 +945,64 @@ function checkResume(learnerName) {
       document.body.classList.add('no-voice');
     }
 
+    // --- Sticky header fallback (IntersectionObserver) ---
+    // position: sticky doesn't always work inside flex/grid containers.
+    // This observer activates a position:fixed fallback when the sticky
+    // element scrolls past the header.
+    (function initStickyFallback() {
+      var headerH = 56; // px
+      var activeSticky = null; // currently fixed-position element
+
+      function updateSticky() {
+        var section = document.querySelector('main > section.active');
+        var sticky = section && section.querySelector('.step-sticky');
+        if (!sticky) {
+          if (activeSticky) {
+            activeSticky.classList.remove('step-sticky-fixed');
+            activeSticky = null;
+          }
+          return;
+        }
+
+        var rect = sticky.getBoundingClientRect();
+        if (rect.top < headerH) {
+          if (activeSticky !== sticky) {
+            if (activeSticky) activeSticky.classList.remove('step-sticky-fixed');
+            sticky.classList.add('step-sticky-fixed');
+            activeSticky = sticky;
+          }
+        } else {
+          if (activeSticky === sticky) {
+            sticky.classList.remove('step-sticky-fixed');
+            activeSticky = null;
+          }
+        }
+      }
+
+      // Throttled scroll handler
+      var ticking = false;
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          requestAnimationFrame(function() {
+            updateSticky();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Also re-check on section change
+      var origShow = App.nav.show;
+      if (origShow) {
+        App.nav._origShow = origShow;
+        App.nav.show = function(sectionId, params) {
+          var result = App.nav._origShow(sectionId, params);
+          updateSticky();
+          return result;
+        };
+      }
+    })();
+
     // Mark body as ready
     document.body.classList.add('ready');
   });
