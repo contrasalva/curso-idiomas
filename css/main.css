@@ -2225,6 +2225,8 @@ main > section > h2:first-child::after {
 @media (max-width: 480px) {
   #section-profile.active {
     padding: 16px 12px;
+    margin-top: calc(-1 * (var(--header-height) + 3px)); /* cancel main padding */
+    min-height: 100dvh;
   }
 
   .profile-setup {
@@ -2233,26 +2235,27 @@ main > section > h2:first-child::after {
   }
 
   .profile-hero {
-    height: 140px;
+    height: 120px;
   }
 
   .profile-hero-lemon {
-    width: 40px;
-    height: 40px;
-    right: 10px;
+    width: 32px;
+    height: 32px;
+    right: 8px;
+    bottom: 6px;
   }
 
   .profile-body {
-    padding: 28px 24px 32px;
+    padding: 24px 20px 28px;
   }
 
   .profile-body h1 {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
   }
 
   .profile-subtitle {
-    font-size: 0.95rem;
-    margin-bottom: 24px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
   }
 
   .profile-input {
