@@ -1237,8 +1237,17 @@
 .welcome-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   margin-bottom: 20px;
+}
+
+/* Remove primary-btn box-shadow from welcome buttons (causes visual overlap) */
+.welcome-actions .primary-btn {
+  box-shadow: none;
+  transform: none;
+}
+.welcome-actions .primary-btn:active {
+  transform: translateY(2px);
 }
 
 .welcome-btn {
