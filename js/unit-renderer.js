@@ -648,6 +648,7 @@ App.UnitRenderer = (function() {
         playAllSequential(texts, idx + 1);
       }, 3000);
       App.SpeechManager.speak(texts[idx], {
+        skipCancel: true,
         onEnd: function() {
           clearTimeout(safetyTimeout);
           // Small pause between phrases, then play next

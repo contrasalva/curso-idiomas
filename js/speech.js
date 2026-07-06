@@ -210,7 +210,10 @@ App.SpeechManager = (function() {
    */
   function speak(text, options) {
     if (!synth || !_speechEnabled) return;
-    synth.cancel();
+    // Don't cancel when called from sequential playback (onEnd already ensures clean transitions)
+    if (!options || !options.skipCancel) {
+      synth.cancel();
+    }
 
     // Chrome workaround: if voices aren't loaded yet, trigger a re-grab
     if (!voicesLoaded) cacheItalianVoice();
