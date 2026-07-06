@@ -133,12 +133,51 @@
   top: 56px;
   z-index: 20;
   background: var(--bg);
-  padding: 20px 0 16px;
+  padding-bottom: 16px;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--border);
 }
 
+/* Breadcrumb nav inside the sticky bar */
+.step-sticky-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  padding: 10px 0 6px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.step-sticky-nav .nav-home-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 2px;
+}
+
+.step-sticky-nav .nav-home-btn:hover {
+  text-decoration: underline;
+}
+
+.step-sticky-nav .nav-separator {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.step-sticky-nav .nav-current {
+  font-weight: 600;
+  color: var(--text);
+}
+
 [data-theme="dark"] .step-sticky {
+  border-bottom-color: var(--border, #334155);
+}
+
+[data-theme="dark"] .step-sticky-nav {
   border-bottom-color: var(--border, #334155);
 }
 
@@ -150,7 +189,7 @@
   right: 32px;
   z-index: 20;
   background: var(--bg);
-  padding: 20px 0 16px;
+  padding-bottom: 16px;
   margin-bottom: 0;
   border-bottom: 1px solid var(--border);
 }

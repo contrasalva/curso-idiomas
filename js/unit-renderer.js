@@ -169,6 +169,13 @@ App.UnitRenderer = (function() {
       navName.textContent = unit.title || 'Unidad ' + (unitId + 1);
     }
 
+    // Hide static section-nav — nav is now rendered dynamically inside .step-sticky
+    var unitSection = document.getElementById('section-unit');
+    if (unitSection) {
+      var staticNav = unitSection.querySelector('.section-nav');
+      if (staticNav) staticNav.style.display = 'none';
+    }
+
     // Show welcome screen (always — entry gate to the unit)
     renderWelcome(unit, savedStep);
   }
@@ -213,6 +220,13 @@ App.UnitRenderer = (function() {
     }
 
     var html =
+      '<div class="step-sticky">' +
+        '<nav class="step-sticky-nav" aria-label="Navegación">' +
+          '<button class="nav-home-btn" data-section="home" aria-label="Ir al inicio">🏠 Inicio</button>' +
+          '<span class="nav-separator">›</span>' +
+          '<span class="nav-current">' + escapeHtml(unit.title) + '</span>' +
+        '</nav>' +
+      '</div>' +
       '<div class="welcome-screen">' +
         '<div class="welcome-card">' +
           '<div class="welcome-header">' +
@@ -308,8 +322,16 @@ App.UnitRenderer = (function() {
     // --- BUILD HTML ---
     var html = '';
 
-    // 1. Sticky bar: step header + progress
+    // 1. Sticky bar: breadcrumb nav + step header + progress
     html += '<div class="step-sticky">';
+
+    // Breadcrumb nav (moved from static HTML into the sticky wrapper)
+    var unitName = _state.data.title || 'Unidad';
+    html += '<nav class="step-sticky-nav" aria-label="Navegación">' +
+      '<button class="nav-home-btn" data-section="home" aria-label="Ir al inicio">🏠 Inicio</button>' +
+      '<span class="nav-separator">›</span>' +
+      '<span class="nav-current">' + escapeHtml(unitName) + '</span>' +
+      '</nav>';
 
     // Step header with phase badge
     html += '<div class="step-header">';
