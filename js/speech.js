@@ -206,7 +206,7 @@ App.SpeechManager = (function() {
   /**
    * Speak text via SpeechSynthesis with Italian voice.
    * @param {string} text - Text to speak
-   * @param {object} [options] - Optional { rate, pitch }
+   * @param {object} [options] - Optional { rate, pitch, onEnd }
    */
   function speak(text, options) {
     if (!synth || !_speechEnabled) return;
@@ -227,7 +227,12 @@ App.SpeechManager = (function() {
     }
 
     utterance.onstart = function() { emit('speech:tts-start', {}); };
-    utterance.onend = function() { emit('speech:tts-end', {}); };
+    utterance.onend = function() {
+      emit('speech:tts-end', {});
+      if (options && typeof options.onEnd === 'function') {
+        options.onEnd();
+      }
+    };
 
     synth.speak(utterance);
   }

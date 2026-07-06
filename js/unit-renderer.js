@@ -643,11 +643,26 @@ App.UnitRenderer = (function() {
   function playAllSequential(texts, idx) {
     if (idx >= texts.length) return;
     if (App.SpeechManager) {
-      App.SpeechManager.speak(texts[idx]);
+      // Safety timeout in case onEnd never fires (e.g. browser quirk)
+      var safetyTimeout = setTimeout(function() {
+        playAllSequential(texts, idx + 1);
+      }, 3000);
+      App.SpeechManager.speak(texts[idx], {
+        rate: 0.85,
+        onEnd: function() {
+          clearTimeout(safetyTimeout);
+          // Small pause between phrases, then play next
+          setTimeout(function() {
+            playAllSequential(texts, idx + 1);
+          }, 400);
+        }
+      });
+    } else {
+      // Fallback if no SpeechManager: use timeout
+      setTimeout(function() {
+        playAllSequential(texts, idx + 1);
+      }, 1000);
     }
-    setTimeout(function() {
-      playAllSequential(texts, idx + 1);
-    }, 1000);
   }
 
   /**
