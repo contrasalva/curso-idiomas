@@ -1350,6 +1350,16 @@ body:has(#section-profile.active) main > section.active {
   }
 }
 
+/* Very narrow screens: hide logo text, tighter gaps */
+@media (max-width: 480px) {
+  .logo-label {
+    display: none;
+  }
+  .logo-btn {
+    padding: 4px;
+  }
+}
+
 /* --- Resume Dialog --- */
 .resume-overlay {
   position: fixed; inset: 0;
