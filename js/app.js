@@ -521,6 +521,28 @@ function getProgressDots(total, done) {
     var settingsDarkBtn = document.getElementById('settings-dark-toggle');
     if (settingsDarkBtn) settingsDarkBtn.addEventListener('click', window.__darkToggle);
 
+    // --- Speech toggle ---
+    var speechBtn = document.getElementById('speech-toggle');
+    if (speechBtn) {
+      function updateSpeechBtn() {
+        var enabled = App.SpeechManager && App.SpeechManager.isEnabled();
+        speechBtn.textContent = enabled ? '🔊' : '🔇';
+        speechBtn.classList.toggle('speech-muted', !enabled);
+        speechBtn.title = enabled ? 'Silenciar audio' : 'Activar audio';
+        speechBtn.setAttribute('aria-label', speechBtn.title);
+      }
+      speechBtn.addEventListener('click', function() {
+        if (App.SpeechManager) {
+          App.SpeechManager.toggle();
+          updateSpeechBtn();
+        }
+      });
+      // Listen for external changes (e.g. from settings)
+      window.addEventListener('speech:toggle', updateSpeechBtn);
+      // Set initial state
+      updateSpeechBtn();
+    }
+
     // --- Home button (logo) ---
     var homeBtn = document.getElementById('home-btn');
     if (homeBtn) {

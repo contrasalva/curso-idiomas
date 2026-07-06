@@ -13,17 +13,48 @@ App.SpeechManager = (function() {
   var synth = window.speechSynthesis;
   var cachedItalianVoice = null;
   var voicesLoaded = false;
+  var _speechEnabled = true; // user toggle
 
   /**
-   * Try to find and cache an Italian voice from available voices.
+   * Try to find the best Italian voice from available voices.
+   * Prioritises high-quality voices: Google, Microsoft, Premium, enhanced.
+   */
+  function findBestItalianVoice() {
+    if (!synth) return null;
+    var voices = synth.getVoices();
+    if (!voices || voices.length === 0) return null;
+
+    // Filter to Italian voices only
+    var itVoices = voices.filter(function(v) {
+      return v.lang && (v.lang === 'it-IT' || v.lang.indexOf('it') === 0);
+    });
+    if (!itVoices.length) return null;
+
+    // Scan quality indicators in the voice name
+    var qualityPrefixes = ['google', 'microsoft', 'premium', 'enhanced', 'high'];
+    for (var i = 0; i < qualityPrefixes.length; i++) {
+      var found = itVoices.find(function(v) {
+        return v.name && v.name.toLowerCase().indexOf(qualityPrefixes[i]) !== -1;
+      });
+      if (found) return found;
+    }
+
+    // Prefer the first non-default Italian voice (skip "default" if alternatives exist)
+    var nonDefault = itVoices.find(function(v) {
+      return v.name && v.name.toLowerCase().indexOf('default') === -1;
+    });
+    if (nonDefault) return nonDefault;
+
+    // Last resort: any Italian voice
+    return itVoices[0];
+  }
+
+  /**
+   * Cache the best Italian voice for subsequent use.
    */
   function cacheItalianVoice() {
     if (!synth) return false;
-    var voices = synth.getVoices();
-    if (!voices || voices.length === 0) return false;
-    // Prefer exact 'it-IT', fall back to any 'it' prefix
-    cachedItalianVoice = voices.find(function(v) { return v.lang === 'it-IT'; })
-      || voices.find(function(v) { return v.lang && v.lang.startsWith('it'); });
+    cachedItalianVoice = findBestItalianVoice();
     voicesLoaded = true;
     return !!cachedItalianVoice;
   }
@@ -145,7 +176,7 @@ App.SpeechManager = (function() {
    * @param {object} [options] - Optional { rate, pitch }
    */
   function speak(text, options) {
-    if (!synth) return;
+    if (!synth || !_speechEnabled) return;
     synth.cancel();
 
     // Chrome workaround: if voices aren't loaded yet, trigger a re-grab
@@ -176,7 +207,7 @@ App.SpeechManager = (function() {
    * @returns {Promise<{wordResults: Array, score: number}>}
    */
   function speakWithHighlight(text, onWordBoundary) {
-    if (!synth) {
+    if (!synth || !_speechEnabled) {
       return Promise.resolve({ wordResults: [], score: 0 });
     }
 
@@ -190,15 +221,10 @@ App.SpeechManager = (function() {
     utterance.pitch = 1;
     utterance.volume = 1;
 
-    // Prefer Italian female voice (e.g. "female" or "microsoft" in name)
-    var voices = synth.getVoices();
-    var italianFemaleVoice = voices && voices.find(function(v) {
-      return (v.lang === 'it-IT' || (v.lang && v.lang.indexOf('it') === 0)) &&
-             v.name && (v.name.toLowerCase().indexOf('female') !== -1 ||
-                        v.name.toLowerCase().indexOf('microsoft') !== -1);
-    });
-    if (italianFemaleVoice) {
-      utterance.voice = italianFemaleVoice;
+    // Use best Italian voice from our improved selector
+    var bestVoice = findBestItalianVoice();
+    if (bestVoice) {
+      utterance.voice = bestVoice;
     } else if (cachedItalianVoice) {
       utterance.voice = cachedItalianVoice;
     }
@@ -252,6 +278,43 @@ App.SpeechManager = (function() {
     window.dispatchEvent(event);
   }
 
+  /**
+   * Persist speech enabled state.
+   */
+  function loadState() {
+    try {
+      var val = localStorage.getItem('italian_speech_enabled');
+      if (val !== null) _speechEnabled = val === 'true';
+    } catch(e) {}
+  }
+  loadState();
+
+  /**
+   * Enable or disable speech (TTS).
+   */
+  function setEnabled(enabled) {
+    _speechEnabled = !!enabled;
+    if (!_speechEnabled) {
+      if (synth) synth.cancel();
+    }
+    try { localStorage.setItem('italian_speech_enabled', _speechEnabled); } catch(e) {}
+    emit('speech:toggle', { enabled: _speechEnabled });
+  }
+
+  /**
+   * Toggle speech on/off.
+   */
+  function toggle() {
+    setEnabled(!_speechEnabled);
+  }
+
+  /**
+   * Check if speech is currently enabled.
+   */
+  function isEnabled() {
+    return _speechEnabled;
+  }
+
   // Attempt auto-init on load
   if (SpeechRecognition) {
     // Defer slightly to let DOM finish parsing
@@ -264,7 +327,10 @@ App.SpeechManager = (function() {
     speak: speak,
     speakWithHighlight: speakWithHighlight,
     isSupported: isRecognitionSupported,
-    isListening: function() { return isListening; }
+    isListening: function() { return isListening; },
+    setEnabled: setEnabled,
+    toggle: toggle,
+    isEnabled: isEnabled
   };
 })();
 
