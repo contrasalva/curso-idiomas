@@ -93,6 +93,15 @@
   border-top: 1px solid var(--border);
 }
 
+/* On narrow screens, stack nav buttons centered */
+@media (max-width: 480px) {
+  .step-nav {
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
 .step-nav-spacer {
   flex: 1;
 }
@@ -833,6 +842,13 @@
 
 .dialogue-volver-btn:hover {
   opacity: 0.7;
+}
+
+/* On narrow screens, center volver button too */
+@media (max-width: 480px) {
+  .dialogue-volver {
+    text-align: center;
+  }
 }
 
 /* Dialogue controls row (play-all + translation toggle) */
