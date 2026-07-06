@@ -2224,48 +2224,65 @@ main > section > h2:first-child::after {
 /* --- Profile responsive --- */
 @media (max-width: 480px) {
   #section-profile.active {
-    padding: 16px 12px;
-    margin-top: calc(-1 * (var(--header-height) + 3px)); /* cancel main padding */
-    min-height: 100dvh;
+    position: fixed;
+    inset: 56px 0 0 0; /* below header, full remaining viewport */
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    margin: 0;
+    min-height: auto;
   }
 
   .profile-setup {
     max-width: 100%;
-    border-radius: 20px;
+    border-radius: 16px;
   }
 
   .profile-hero {
-    height: 120px;
+    height: 100px;
   }
 
   .profile-hero-lemon {
-    width: 32px;
-    height: 32px;
-    right: 8px;
-    bottom: 6px;
+    display: none;
   }
 
   .profile-body {
-    padding: 24px 20px 28px;
+    padding: 20px 18px 24px;
+  }
+
+  .profile-body::before {
+    left: 10%;
+    right: 10%;
   }
 
   .profile-body h1 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    margin: 0;
   }
 
   .profile-subtitle {
-    font-size: 0.9rem;
-    margin-bottom: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
   }
 
   .profile-input {
-    padding: 12px 14px;
-    font-size: 1rem;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border-radius: 10px;
   }
 
   .profile-body .primary-btn {
-    padding: 12px 20px;
-    font-size: 1rem;
+    margin-top: 14px;
+    padding: 11px 20px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+  }
+
+  .profile-hint {
+    font-size: 0.72rem;
+    margin-top: 12px;
   }
 }
 
