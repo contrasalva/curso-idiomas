@@ -1967,18 +1967,26 @@
         'images/cinque-terre.jpg'
       ];
       var chosen = images[Math.floor(Math.random() * images.length)];
-      var bg = document.getElementById('bg-italy');
-      if (bg) {
-        // Preload image, fall back to toscana if others not yet on CDN
-        var img = new Image();
-        img.onload = function() {
-          bg.style.backgroundImage = 'url("' + chosen + '")';
-        };
-        img.onerror = function() {
-          bg.style.backgroundImage = 'url("images/toscana.jpg")';
-        };
-        img.src = chosen;
-      }
+      // Preload image, fall back to toscana if others not yet on CDN
+      var fallback = 'images/toscana.jpg';
+      var img = new Image();
+      img.onload = function() {
+        var url = 'url("' + chosen + '")';
+        // Background layer
+        var bg = document.getElementById('bg-italy');
+        if (bg) bg.style.backgroundImage = url;
+        // Profile hero image (welcome card)
+        var hero = document.querySelector('.profile-hero-img');
+        if (hero) hero.src = chosen;
+      };
+      img.onerror = function() {
+        var url = 'url("' + fallback + '")';
+        var bg = document.getElementById('bg-italy');
+        if (bg) bg.style.backgroundImage = url;
+        var hero = document.querySelector('.profile-hero-img');
+        if (hero) hero.src = fallback;
+      };
+      img.src = chosen;
     })();
   </script>
   <!-- Scripts: order matters -->

@@ -265,14 +265,14 @@ main {
   position: fixed;
   inset: 0;
   background: url("../images/toscana.jpg") center / cover no-repeat;
-  opacity: 0.2;
+  opacity: 0.35;
   pointer-events: none;
   z-index: 0;
   transition: opacity 400ms ease;
 }
 
 [data-theme="dark"] #bg-italy {
-  opacity: 0.1;
+  opacity: 0.2;
   filter: saturate(0.5) brightness(0.4);
 }
 
