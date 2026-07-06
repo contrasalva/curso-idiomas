@@ -992,7 +992,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 60vh;
+  min-height: calc(100vh - 200px);
   padding: 24px 16px;
 }
 
