@@ -945,41 +945,92 @@ function checkResume(learnerName) {
       document.body.classList.add('no-voice');
     }
 
-    // --- Sticky header fallback (IntersectionObserver) ---
-    // position: sticky doesn't always work inside flex/grid containers.
-    // This observer activates a position:fixed fallback when the sticky
-    // element scrolls past the header.
+    // --- Sticky header: pure JS position:fixed approach ---
+    // position: sticky is unreliable in complex layouts. We use scroll-driven
+    // position: fixed with a spacer to prevent content jump.
     (function initStickyFallback() {
-      var headerH = 56; // px
-      var activeSticky = null; // currently fixed-position element
+      var HEADER_H = 56; // px
+      var stickyEl = null;
+      var sentinel = null;
+
+      function getSticky() {
+        var section = document.querySelector('main > section.active');
+        if (!section) return null;
+        // Only activate for unit section (has step-sticky)
+        if (section.id !== 'section-unit') return null;
+        // If welcome screen is showing, don't sticky the nav (it's fine inline)
+        var welcome = section.querySelector('.welcome-screen');
+        return welcome ? null : section.querySelector('.step-sticky');
+      }
+
+      function findOrCreateSentinel(el) {
+        // Look for existing sentinel
+        var s = el.parentNode.querySelector('.step-sticky-sentinel');
+        if (s) return s;
+        // Create a sentinel right after the sticky element
+        s = document.createElement('div');
+        s.className = 'step-sticky-sentinel';
+        el.parentNode.insertBefore(s, el.nextSibling);
+        return s;
+      }
 
       function updateSticky() {
-        var section = document.querySelector('main > section.active');
-        var sticky = section && section.querySelector('.step-sticky');
-        if (!sticky) {
-          if (activeSticky) {
-            activeSticky.classList.remove('step-sticky-fixed');
-            activeSticky = null;
+        var el = getSticky();
+
+        if (!el) {
+          if (stickyEl) {
+            stickyEl.classList.remove('step-sticky-fixed');
+            if (sentinel) {
+              sentinel.style.display = 'none';
+              sentinel.style.height = '0';
+            }
+            stickyEl = null;
+            sentinel = null;
           }
           return;
         }
 
-        var rect = sticky.getBoundingClientRect();
-        if (rect.top < headerH) {
-          if (activeSticky !== sticky) {
-            if (activeSticky) activeSticky.classList.remove('step-sticky-fixed');
-            sticky.classList.add('step-sticky-fixed');
-            activeSticky = sticky;
+        // If this is a new element, clear previous state
+        if (el !== stickyEl) {
+          if (stickyEl) {
+            stickyEl.classList.remove('step-sticky-fixed');
+          }
+          stickyEl = el;
+          sentinel = findOrCreateSentinel(el);
+        }
+
+        // Read original position once and cache it
+        // origTop = distance from document top to the element's natural position
+        if (!el._origTop) {
+          el._origTop = el.getBoundingClientRect().top + window.scrollY;
+        }
+
+        var scrollY = window.scrollY;
+        // Fix when scrolled past the natural position minus header height
+        var fixAt = el._origTop - HEADER_H;
+
+        if (scrollY > fixAt + 5) { // +5 for slight hysteresis
+          if (!el.classList.contains('step-sticky-fixed')) {
+            el.classList.add('step-sticky-fixed');
+            // Spacer prevents content jump when element becomes fixed
+            var h = el.offsetHeight;
+            if (sentinel) {
+              sentinel.style.display = 'block';
+              sentinel.style.height = h + 'px';
+            }
           }
         } else {
-          if (activeSticky === sticky) {
-            sticky.classList.remove('step-sticky-fixed');
-            activeSticky = null;
+          if (el.classList.contains('step-sticky-fixed')) {
+            el.classList.remove('step-sticky-fixed');
+            if (sentinel) {
+              sentinel.style.display = 'none';
+              sentinel.style.height = '0';
+            }
           }
         }
       }
 
-      // Throttled scroll handler
+      // Throttled scroll
       var ticking = false;
       window.addEventListener('scroll', function() {
         if (!ticking) {
@@ -991,15 +1042,46 @@ function checkResume(learnerName) {
         }
       });
 
-      // Also re-check on section change
+      // Re-init on section change
       var origShow = App.nav.show;
       if (origShow) {
         App.nav._origShow = origShow;
         App.nav.show = function(sectionId, params) {
           var result = App.nav._origShow(sectionId, params);
+          // Reset cached positions on section switch
+          var allSticky = document.querySelectorAll('.step-sticky');
+          allSticky.forEach(function(s) { delete s._origTop; });
           updateSticky();
           return result;
         };
+      }
+
+      // Also re-init on resize (viewport changes)
+      window.addEventListener('resize', function() {
+        if (!ticking) {
+          requestAnimationFrame(function() {
+            // Invalidate cached positions
+            var allSticky = document.querySelectorAll('.step-sticky');
+            allSticky.forEach(function(s) { delete s._origTop; });
+            updateSticky();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Initial call after DOM settles
+      setTimeout(updateSticky, 100);
+
+      // Watch for step content changes (only #step-container)
+      var stepContainer = document.getElementById('step-container');
+      if (stepContainer) {
+        var mo = new MutationObserver(function() {
+          var allSticky = document.querySelectorAll('.step-sticky');
+          allSticky.forEach(function(s) { delete s._origTop; });
+          updateSticky();
+        });
+        mo.observe(stepContainer, { childList: true });
       }
     })();
 

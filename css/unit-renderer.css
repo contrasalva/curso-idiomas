@@ -129,8 +129,7 @@
 
 /* --- Step Sticky Bar (header + progress) --- */
 .step-sticky {
-  position: sticky;
-  top: 56px;
+  /* position: fixed is toggled via JS (step-sticky-fixed class) */
   z-index: 20;
   background: var(--bg);
   padding-bottom: 16px;
@@ -181,7 +180,7 @@
   border-bottom-color: var(--border, #334155);
 }
 
-/* JS fallback: fixed positioning when sticky fails (IntersectionObserver in app.js) */
+/* JS driven: position:fixed when scrolled past the header (app.js) */
 .step-sticky-fixed {
   position: fixed;
   top: 56px;
