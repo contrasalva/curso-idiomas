@@ -1953,6 +1953,21 @@
   ]
 }</script>
 <script type="application/json" id="data-units-a1a2" data-src="data/units-a1-a2.json">[]</script>
+  <!-- Random Italian background on each visit -->
+  <script>
+    (function() {
+      var images = [
+        'images/toscana.jpg',
+        'images/venecia.jpg',
+        'images/roma.jpg',
+        'images/florencia.jpg',
+        'images/amalfi.jpg',
+        'images/cinque-terre.jpg'
+      ];
+      var chosen = images[Math.floor(Math.random() * images.length)];
+      document.documentElement.style.setProperty('--bg-italy', 'url("' + chosen + '")');
+    })();
+  </script>
   <!-- Scripts: order matters -->
   <script src="js/progress.js"></script>
   <script src="js/difficulty.js"></script>
