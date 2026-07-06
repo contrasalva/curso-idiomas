@@ -260,20 +260,20 @@ main {
   position: relative;
 }
 
-/* Italian landscape background — random each visit, set by JS */
+/* Italian landscape background — random each visit, set by injected JS style */
 main::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: var(--bg-italy, url("../images/toscana.jpg")) center / cover no-repeat;
-  opacity: var(--bg-italy-opacity, 0.2);
+  background: url("../images/toscana.jpg") center / cover no-repeat;
+  opacity: 0.2;
   pointer-events: none;
   z-index: 0;
   transition: opacity 400ms ease;
 }
 
 [data-theme="dark"] main::before {
-  opacity: var(--bg-italy-opacity-dark, 0.1);
+  opacity: 0.1;
   filter: saturate(0.5) brightness(0.4);
 }
 

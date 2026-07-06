@@ -1965,7 +1965,10 @@
         'images/cinque-terre.jpg'
       ];
       var chosen = images[Math.floor(Math.random() * images.length)];
-      document.documentElement.style.setProperty('--bg-italy', 'url("' + chosen + '")');
+      // Inject a <style> so the URL resolves relative to the HTML document
+      var s = document.createElement('style');
+      s.textContent = 'main::before { background-image: url("' + chosen + '") !important; }';
+      document.head.appendChild(s);
     })();
   </script>
   <!-- Scripts: order matters -->
