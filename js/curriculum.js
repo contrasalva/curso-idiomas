@@ -821,7 +821,7 @@ App.Curriculum = (function() {
 
     var tracks = [
       { id: 'a1-a2', label: 'A1-A2', disabled: false },
-      { id: 'b1',     label: 'B1',    disabled: true }
+      { id: 'b1',     label: 'B1',    disabled: false }
     ];
 
     for (var i = 0; i < tracks.length; i++) {
