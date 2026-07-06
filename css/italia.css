@@ -75,7 +75,7 @@ body::after {
 
 /* --- Header: subtle underline --- */
 header {
-  position: relative;
+  /* keep position:fixed from main.css (overrides the relative from italia.css) */
 }
 
 header::after {
