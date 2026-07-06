@@ -29,6 +29,8 @@
   </header>
 
   <main id="main-content">
+    <!-- Background layer for Italian landscape photos -->
+    <div id="bg-italy" aria-hidden="true"></div>
     <!-- Sidebar -->
     <aside id="sidebar" aria-label="Lista de módulos">
       <!-- Sidebar rendered by App.renderSidebar() -->
@@ -1965,10 +1967,18 @@
         'images/cinque-terre.jpg'
       ];
       var chosen = images[Math.floor(Math.random() * images.length)];
-      // Inject a <style> so the URL resolves relative to the HTML document
-      var s = document.createElement('style');
-      s.textContent = 'main::before { background-image: url("' + chosen + '") !important; }';
-      document.head.appendChild(s);
+      var bg = document.getElementById('bg-italy');
+      if (bg) {
+        // Preload image, fall back to toscana if others not yet on CDN
+        var img = new Image();
+        img.onload = function() {
+          bg.style.backgroundImage = 'url("' + chosen + '")';
+        };
+        img.onerror = function() {
+          bg.style.backgroundImage = 'url("images/toscana.jpg")';
+        };
+        img.src = chosen;
+      }
     })();
   </script>
   <!-- Scripts: order matters -->

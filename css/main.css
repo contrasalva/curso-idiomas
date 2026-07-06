@@ -260,9 +260,8 @@ main {
   position: relative;
 }
 
-/* Italian landscape background — random each visit, set by injected JS style */
-main::before {
-  content: '';
+/* Italian landscape background — random each visit, set by JS on #bg-italy */
+#bg-italy {
   position: fixed;
   inset: 0;
   background: url("../images/toscana.jpg") center / cover no-repeat;
@@ -272,7 +271,7 @@ main::before {
   transition: opacity 400ms ease;
 }
 
-[data-theme="dark"] main::before {
+[data-theme="dark"] #bg-italy {
   opacity: 0.1;
   filter: saturate(0.5) brightness(0.4);
 }
@@ -2217,7 +2216,7 @@ main > section > h2:first-child::after {
 
 /* Hide landscape background on mobile (bandwidth) */
 @media (max-width: 768px) {
-  main::before {
+  #bg-italy {
     opacity: 0 !important;
   }
 }
