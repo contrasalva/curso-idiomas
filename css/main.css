@@ -1316,6 +1316,19 @@ body:has(#section-profile.active) main > section.active {
     display: block;
   }
 
+  /* Hide less essential header items on mobile */
+  .learner-name {
+    display: none;
+  }
+
+  .streak-counter {
+    display: none;
+  }
+
+  .header-controls {
+    gap: 4px;
+  }
+
   #sidebar {
     display: block;
     position: fixed;
