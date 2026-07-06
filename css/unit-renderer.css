@@ -850,6 +850,19 @@
   flex: 0 1 auto;
   min-width: 0;
   text-align: center;
+  white-space: nowrap;
+}
+
+/* On narrow screens, stack buttons vertically centered */
+@media (max-width: 480px) {
+  .dialogue-controls {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .dialogue-controls .secondary-btn {
+    width: 100%;
+    max-width: 280px;
+  }
 }
 
 .dialogue-translation-toggle {
