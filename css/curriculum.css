@@ -302,7 +302,7 @@
 }
 
 /* --- Home Section Centering --- */
-#section-home {
+#section-home.active {
   display: flex;
   flex-direction: column;
   align-items: center;
