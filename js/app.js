@@ -528,7 +528,7 @@ function getProgressDots(total, done) {
         var enabled = App.SpeechManager && App.SpeechManager.isEnabled();
         speechBtn.textContent = enabled ? '🔊' : '🔇';
         speechBtn.classList.toggle('speech-muted', !enabled);
-        speechBtn.title = enabled ? 'Configurar voz (doble clic)' : 'Activar audio';
+        speechBtn.title = enabled ? 'Audio: mantener pulsado para configurar' : 'Activar audio';
         speechBtn.setAttribute('aria-label', speechBtn.title);
       }
       window.__updateSpeechBtn = updateSpeechBtn;
@@ -664,9 +664,34 @@ function getProgressDots(total, done) {
       return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    // Open voice settings from speech toggle (double-click or long-press alternative)
+    // Open voice settings from speech toggle (long-press on mobile, double-click on desktop)
     if (speechBtn && voiceOverlay) {
-      // Open on click when audio is already enabled
+      var longPressTimer = null;
+      var isLongPress = false;
+
+      speechBtn.addEventListener('touchstart', function(e) {
+        isLongPress = false;
+        longPressTimer = setTimeout(function() {
+          isLongPress = true;
+          e.preventDefault();
+          openVoiceSettings();
+        }, 500); // 500ms hold
+      });
+
+      speechBtn.addEventListener('touchend', function(ev) {
+        clearTimeout(longPressTimer);
+        // Don't toggle mute on long-press
+        if (isLongPress) {
+          ev.preventDefault();
+          return;
+        }
+      });
+
+      speechBtn.addEventListener('touchmove', function() {
+        clearTimeout(longPressTimer);
+      });
+
+      // Desktop: double-click opens settings
       speechBtn.addEventListener('dblclick', function(e) {
         e.preventDefault();
         openVoiceSettings();
