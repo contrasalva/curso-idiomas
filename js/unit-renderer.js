@@ -308,7 +308,10 @@ App.UnitRenderer = (function() {
     // --- BUILD HTML ---
     var html = '';
 
-    // 1. Step header with phase badge
+    // 1. Sticky bar: step header + progress
+    html += '<div class="step-sticky">';
+
+    // Step header with phase badge
     html += '<div class="step-header">';
     if (phase.badge) {
       html += '<span class="step-phase-badge" style="background:' + phase.color + '20;color:' + phase.color + '">' +
@@ -317,7 +320,7 @@ App.UnitRenderer = (function() {
     html += '<h2 class="step-title">' + escapeHtml(stepTitle) + '</h2>';
     html += '</div>';
 
-    // 2. Progress bar
+    // Progress bar
     var pct = Math.round(((idx + 1) / 15) * 100);
     html += '<div class="step-progress">' +
       '<div class="step-progress-bar">' +
@@ -325,6 +328,8 @@ App.UnitRenderer = (function() {
       '</div>' +
       '<div class="step-progress-label">Paso ' + (idx + 1) + ' de 15 · ' + pct + '%</div>' +
     '</div>';
+
+    html += '</div>'; // step-sticky
 
     // 3. Step content (delegate to type-specific renderer)
     var renderFn = STEP_RENDERERS[stepData.type] || renderComingSoon;

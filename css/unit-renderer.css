@@ -58,7 +58,7 @@
 
 /* --- Step Progress Bar --- */
 .step-progress {
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .step-progress-bar {
@@ -127,10 +127,25 @@
   margin: 0 auto;
 }
 
+/* --- Step Sticky Bar (header + progress) --- */
+.step-sticky {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 20;
+  background: var(--bg);
+  padding: 20px 0 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .step-sticky {
+  border-bottom-color: var(--border, #334155);
+}
+
 /* --- Step Header --- */
 .step-header {
-  margin-bottom: 24px;
   text-align: center;
+  margin-bottom: 12px;
 }
 
 .step-phase-badge {
