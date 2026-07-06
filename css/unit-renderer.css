@@ -883,6 +883,7 @@
 
 .dialogue-translation-toggle {
   /* centered via flex parent, no margin-left:auto */
+}
 
 /* Hint tooltip system (step 2) */
 .dialogue-hint-container {
