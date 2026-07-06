@@ -378,9 +378,6 @@ main > section > h2:first-child::after {
 /* --- Profile Section: centered welcome screen --- */
 #section-profile.active {
   min-height: calc(100vh - 56px);
-  max-width: 100%;
-  padding: 0;
-  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
