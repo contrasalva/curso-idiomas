@@ -267,14 +267,14 @@ main::before {
   inset: 0;
   /* Path relative to main.css location */
   background: url("../images/toscana.jpg") center / cover no-repeat;
-  opacity: 0.06;
+  opacity: 0.2;
   pointer-events: none;
   z-index: 0;
   transition: opacity 400ms ease;
 }
 
 [data-theme="dark"] main::before {
-  opacity: 0.035;
+  opacity: 0.1;
   filter: saturate(0.5) brightness(0.4);
 }
 
